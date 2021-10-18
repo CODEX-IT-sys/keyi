@@ -172,6 +172,10 @@ class PjProjectProfile extends Common
 
                 'Comment'=>'最终交付时间'
             ],
+             [
+                'Field'=>'Comment',
+                'Comment'=>'备注'
+            ],
 
         ];
 

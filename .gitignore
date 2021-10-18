@@ -8,3 +8,5 @@ thinkphp
 **/.idea/
 /public/storage
 .idea/
+/runtime
+/public

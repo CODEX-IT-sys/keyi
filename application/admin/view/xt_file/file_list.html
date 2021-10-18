@@ -13,6 +13,7 @@
                 </div>
 
                 <div class="global_btn">
+                     <a class="layui-btn modify_btn" id="refresh">{:session('language') == '中文'? '刷新' : 'Refresh'}</a>
                     <a class="layui-btn" id="add">{:session('language') == '中文'? '新增' : 'Add'}</a>
                     <a class="layui-btn com_btn" id="download">{:session('language') == '中文'? '下载' : 'Download'}</a>
                 </div>
@@ -160,6 +161,7 @@
             url: replaceEditUrlId("{:url('xt_file/file_list', ['Project_Name' => 1])}", Project_Name),
             method: 'get',
             cols: cols,
+            limit:50,
             page: true
         });
 
@@ -185,6 +187,13 @@
         $("#add").bind("click", function () {
 
             window.location.href = replaceEditUrlId("{:url('xt_file/create', ['Project_Name' => 1])}", Project_Name);
+
+        });
+
+        //刷新
+        $("#refresh").bind("click", function () {
+
+            location.reload();
 
         });
 
