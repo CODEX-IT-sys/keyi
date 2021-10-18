@@ -9,3 +9,5 @@ thinkphp
 /public/storage
 .idea/
 /runtime
+/public
+.gitignore
