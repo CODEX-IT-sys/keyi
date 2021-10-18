@@ -249,10 +249,10 @@ class PjProjectProfile extends Common
 		$yy = Db::name('xt_dict')->where('c_id',1)->select();
 		
 		// 排版难度
-		$pb = Db::name('xt_dict')->where('c_id',7)->select();
+		$pb = Db::name('xt_dict')->where('c_id',7)->order('sort','asc')->select();
 		
 		// 翻译难度
-		$fy = Db::name('xt_dict')->where('c_id',8)->select();
+		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 翻译
         $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
@@ -337,10 +337,10 @@ class PjProjectProfile extends Common
 		$yy = Db::name('xt_dict')->where('c_id',1)->select();
 		
 		// 排版难度
-		$pb = Db::name('xt_dict')->where('c_id',7)->select();
+		$pb = Db::name('xt_dict')->where('c_id',7)->order('sort','asc')->select();
 		
 		// 翻译难度
-		$fy = Db::name('xt_dict')->where('c_id',8)->select();
+		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 翻译
         $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
