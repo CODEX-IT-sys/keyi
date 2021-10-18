@@ -275,10 +275,10 @@ class PjContractReview extends Common
 		$yy = Db::name('xt_dict')->where('c_id',1)->select();
 		
 		// 排版难度
-		$pb = Db::name('xt_dict')->where('c_id',7)->select();
+		$pb = Db::name('xt_dict')->where('c_id',7)->order('sort','asc')->select();
 		
 		// 翻译难度
-		$fy = Db::name('xt_dict')->where('c_id',8)->select();
+		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 是否首次合作
         $first = Db::name('xt_dict')->where('c_id',9)->select();
@@ -364,10 +364,10 @@ class PjContractReview extends Common
         $yy = Db::name('xt_dict')->where('c_id',1)->select();
 
         // 排版难度
-        $pb = Db::name('xt_dict')->where('c_id',7)->select();
+        $pb = Db::name('xt_dict')->where('c_id',7)->order('sort','asc')->select();
 
         // 翻译难度
-        $fy = Db::name('xt_dict')->where('c_id',8)->select();
+        $fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 是否首次合作
         $first = Db::name('xt_dict')->where('c_id',9)->select();
@@ -471,10 +471,10 @@ class PjContractReview extends Common
 		$yy = Db::name('xt_dict')->where('c_id',1)->select();
 		
 		// 排版难度
-		$pb = Db::name('xt_dict')->where('c_id',7)->select();
+		$pb = Db::name('xt_dict')->where('c_id',7)->order('sort','asc')->select();
 		
 		// 翻译难度
-		$fy = Db::name('xt_dict')->where('c_id',8)->select();
+		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 是否首次合作
         $first = Db::name('xt_dict')->where('c_id',9)->select();
