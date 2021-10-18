@@ -128,6 +128,10 @@ class PjProjectProfile extends Common
                 'Comment'=>'涉及产品'
             ],
             [
+                'Field'=>'Project_Name',
+                'Comment'=>'项目名称'
+            ],
+            [
                 'Field'=>'File_Usage_and_Linguistic_Specification',
                 'Comment'=>'文件用途和语言规范'
             ],
