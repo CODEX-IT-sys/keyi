@@ -41,7 +41,7 @@
 
 								<li id="4" {$type==4?'class="active"':''}>
 									<a>
-										<span>{:session('language') == '中文'? '今日提交提醒' : 'Today File'}</span>
+										<span>{:session('language') == '中文'? '今日提交提醒 (总页数' : 'Today File'} {$t['tp']})</span>
 										<b>{$t['t']}</b>
 									</a>
 								</li>

@@ -134,6 +134,15 @@ class Workbench extends Controller
                 ->order('id desc')
                 ->paginate($limit);
 
+            // 今日提交总页数 交付时间 为今天的
+            $todayPages = Db::name('pj_contract_review')
+                ->field('id, Filing_Code, Job_Name,Pages')
+                ->where('Delivered_or_Not', 'No')
+                ->where('delete_time',0)
+                ->where('Completed', $now)
+                ->order('id desc')
+                ->paginate($limit);
+
         // 项目部 (10翻译人员  11校对人员  12、13预、后排版人员)
         } else if(in_array($job_id, [4,5,6,10,11,12,13,15,19])){
 
@@ -179,7 +188,15 @@ class Workbench extends Controller
                 ->whereBetweenTime($where_time,$beginToday,$endToday)
                 ->order('id desc')
                 ->paginate($limit);
-            
+
+            // 今日提交总页数 交付时间 为今天的
+            $todayPages = Db::name('pj_project_profile')
+                ->field('id, Filing_Code, Job_Name,Pages')
+                ->where('delete_time',0)
+                ->where($where_name, 'like', $name)
+                ->whereBetweenTime($where_time,$beginToday,$endToday)
+                ->order('id desc')
+                ->paginate($limit);
 
             // 进度异常
             /*$exception =  Db::name('pj_contract_review')
@@ -240,6 +257,15 @@ class Workbench extends Controller
                 ->order('id desc')
                 ->paginate($limit);
 
+            // 今日提交总页数 交付时间 为今天的
+            $todayPages = Db::name('pj_contract_review')
+                ->field('id, Filing_Code, Job_Name,Pages')
+                ->where('Delivered_or_Not', 'No')
+                ->where($where_name, $name)
+                ->where('delete_time',0)
+                ->where('Completed', $now)
+                ->order('id desc')
+                ->paginate($limit);
 
             // 进度异常
             $exception = Db::name('pj_contract_review')
@@ -320,6 +346,24 @@ class Workbench extends Controller
         }
         $t['t'] = $t_data['count'];
 
+        $totalPages = 0;
+        if(empty($todayPages)){
+            $tp_data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => 0,
+                'data'  => [],
+            ];
+        } else {
+
+            foreach($todayPages as $key=>$val){
+                $page = $val['Pages'];
+                $totalPages +=$page;
+            }
+            $tp_data = generate_layui_table_data($today);
+        }
+        $t['tp'] = $totalPages;
+
         if(empty($exception)){
             $e_data = [
                 'code'  => 0,
@@ -357,6 +401,9 @@ class Workbench extends Controller
 
             case 5:
                 $data = $e_data;
+                break;
+            case 6:
+                $data = $tp_data;
                 break;
         }
 
