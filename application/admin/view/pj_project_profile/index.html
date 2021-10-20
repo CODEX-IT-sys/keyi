@@ -161,7 +161,7 @@ layui.use(['table','form'], function(){
 		},
     });
 
-	
+
 
     // 回车亦可以搜索
     $(document).keyup(function (event) {
@@ -269,7 +269,8 @@ layui.use(['table','form'], function(){
             window.location.href =  replaceEditUrlId("{:url('pj_project_profile/view_file', ['id' => 1])}", obj.data.Project_Name);
         }else if(obj.event === 'view_project'){
 
-			window.location.href = replaceEditUrlId("{:url('xt_file/file_list', ['Project_Name' => 1])}", obj.data.Project_Name)
+			var purl = replaceEditUrlId("{:url('xt_file/file_list', ['Project_Name' => 1])}", obj.data.Project_Name);
+			window.open(purl);
 		}
   	});
 
