@@ -106,13 +106,63 @@ class MkFeseability extends Common
             }
 
         }
+
+        $edit=[
+            [
+                'Field'=>'Attention',
+                'Comment'=>'客户联系人'
+            ],
+            [
+                'Field'=>'Company_Name',
+                'Comment'=>'公司名称'
+            ],
+            [
+                'Field'=>'Job_Name',
+                'Comment'=>'文件名称'
+            ],
+            [
+                'Field'=>'Service',
+                'Comment'=>'服务类型'
+            ],
+            [
+                'Field'=>'Language',
+                'Comment'=>'语种'
+            ],
+
+            [
+            'Field'=>'Delivery_Date_Expected',
+            'Comment'=>'客户期望提交日期'
+             ],
+            [
+                'Field'=>'Completed',
+                'Comment'=>'交付日期'
+            ],
+            [
+                'Field'=>'Customer_Requirements',
+                'Comment'=>'客户要求'
+            ],
+            [
+                'Field'=>'External_Reference_File',
+                'Comment'=>'客户参考文件'
+            ],
+            [
+                'Field'=>'Project_Requirements',
+                'Comment'=>'生成项目需求'
+            ],
+            [
+                'Field'=>'Remarks',
+                'Comment'=>'备注'
+            ],
+
+        ];
+
         // 查询文本说明信息
         $intro = Db::name('xt_table_text')->where('id',4)->value('intro');
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
             return view('', [
-                'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'select_field'=>$colsData, 'colsData' => json_encode($colsData),'editor'=>$edit,
                 'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword
             ]);
         }
@@ -272,6 +322,62 @@ class MkFeseability extends Common
             'info'=>$res,'gs'=>$gs, 'gs_id'=>$gs_id, 'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),
 		    'pm'=>$pm, 'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units, 'show'=>$show
         ]);
+    }
+
+    public function Batch_edit(Request $request)
+    {
+
+        // 启动事务
+        Db::startTrans();
+
+        try {
+            $data=$request->param();
+            $field=array_filter(explode('&',$data['field']));
+            $numsss=array_filter(explode('&',$data['numsss']));
+            $arr=[];
+            foreach ($field as $k=>$v)
+            {
+                foreach ($numsss as $k1=>$v1)
+                {
+                    if($k==$k1)
+                    {
+                        $arr[$v]=$v1;
+                    }
+                }
+
+            }
+            //Translation_Start_Time  Translation_Delivery_Time  Pre_Format_Delivery_Time Revision_Start_Time Revision_Delivery_Time Post_Format_Delivery_Time
+//            历史中不存在的值,不允许修改
+            /*foreach ($arr as $k4=>$v4)
+            {
+                if(in_array($k4,['Completed','Translation_Start_Time','Translation_Delivery_Time','Pre_Format_Delivery_Time','Revision_Start_Time','Revision_Delivery_Time','Post_Format_Delivery_Time'])){
+                    continue;
+                }
+                $num= Db::name('pj_contract_review')->where($k4,$v4)->count();
+                if($num<=0){
+                    unset($arr[$k4]);
+                }
+            }*/
+
+            $arr1=$arr;
+            if(isset($arr['Completed'])){
+                $arr['Completed']=(int)$arr['Completed'];
+            }
+            $res = Db::name('mk_feseability')->wherein('id',$data['arr'])->update($arr);
+
+            // 提交事务
+            Db::commit();
+        } catch (ValidateException $e) {
+            // 这是进行验证异常捕获
+            return json($e->getError());
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            // 这是进行异常捕获
+            return json(['code'=>9999,'error'=>$e->getMessage()]);
+        }
+
+        return json(['code'=>$res]);
     }
 
     // 新建 保存数据

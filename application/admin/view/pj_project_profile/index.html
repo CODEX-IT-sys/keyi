@@ -142,26 +142,6 @@ layui.use(['table','form'], function(){
 
 	var cols = commonCols(language, colsData);
 
-	intCols();
-	function  intCols()
-	{
-		for (var i=0;i<cols[0].length;i++)
-		{
-			if(cols[0][i].field!=undefined)
-			{
-				let localfield='test'+cols[0][i].field;
-				let hidevalue =window.localStorage.getItem(localfield);
-				if(hidevalue==='false')
-				{
-					cols[0][i].hide=false;
-				}else if(hidevalue==='true')
-				{
-					cols[0][i].hide=true;
-				}
-			}
-		}
-	}
-
 	var search_type = '{$search_type}';
 	// 生成表格
     tableIns = table.render({
@@ -181,56 +161,7 @@ layui.use(['table','form'], function(){
 		},
     });
 
-	// 选择需要观察变动的节点
-	const targetNode =document.getElementsByClassName('layui-table-tool');//document.getElementById('some-
-	const targetNode1 =document.getElementsByClassName('layui-table-tool-self')[0];//document.getElementById('some-id');
-	//  console.log(targetNode);
-	//  console.log(targetNode1);
-// 观察器的配置（需要观察什么变动）
-	const config = { attributes: true, childList: true, subtree: true };
-
-// 当观察到变动时执行的回调函数
-	const callback = function(mutationsList, observer) {
-		console.log(mutationsList);
-		//  console.log(observer);
-		// Use traditional 'for loops' for IE 11
-		for(let mutation of mutationsList) {
-			if (mutation.type === 'childList') {
-				// console.log('A child node has been added or removed');
-			}
-			else if (mutation.type === 'attributes') {
-				console.log(mutation.target.innerText);
-				//先根据innertext 列名称 对cols 进行field 查询,查到field 可以找到本地缓存的字段,约定,本地缓存的命名规则为表名字母缩写_加field名组成,防止冲突
-				var field="";
-				for (var i=0;i<cols[0].length;i++)
-				{
-					if(cols[0][i].title===mutation.target.innerText)  //标题相同 则取field
-					{
-						field=cols[0][i].field;
-						break;
-					}
-				}
-				if(field!=="")
-				{
-					// 组装缓存key
-					let localkey='test'+field;
-					//判断value值
-					if(mutation.target.classList[2]!=undefined) //说明2: "layui-form-checked"  复选框是已选择的,说明此列是在表中显示的
-					{
-						window.localStorage.setItem(localkey,false);
-					}else  //没被选择,说明此列不在table中显示
-					{
-						window.localStorage.setItem(localkey,true);
-					}
-				}
-			}
-		}
-	};
-
-// 创建一个观察器实例并传入回调函数
-	const observer = new MutationObserver(callback);
-// 以上述配置开始观察目标节点
-	observer.observe(targetNode1, config);
+	
 
     // 回车亦可以搜索
     $(document).keyup(function (event) {
