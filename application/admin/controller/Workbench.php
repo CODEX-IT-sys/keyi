@@ -141,7 +141,7 @@ class Workbench extends Controller
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
-                ->paginate($limit);
+                ->select();
 
         // 项目部 (10翻译人员  11校对人员  12、13预、后排版人员)
         } else if(in_array($job_id, [4,5,6,10,11,12,13,15,19])){
@@ -196,7 +196,7 @@ class Workbench extends Controller
                 ->where($where_name, 'like', $name)
                 ->whereBetweenTime($where_time,$beginToday,$endToday)
                 ->order('id desc')
-                ->paginate($limit);
+                ->select();
 
             // 进度异常
             /*$exception =  Db::name('pj_contract_review')
@@ -265,7 +265,7 @@ class Workbench extends Controller
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
-                ->paginate($limit);
+                ->select();
 
             // 进度异常
             $exception = Db::name('pj_contract_review')
