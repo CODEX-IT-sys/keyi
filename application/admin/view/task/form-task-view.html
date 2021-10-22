@@ -1,0 +1,219 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+				<div class="position_lead">
+					<i class="iconfont icon-navigation"></i>
+					<a href="#">{:session('language') == '中文'? '任务预估' : 'Task Estimation'}</a>
+					<a class="on">{:session('language') == '中文'? '基本信息修改' : 'Base Info'}</a>
+				</div>
+                <div class="global_btn">
+
+                    <button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' : 'Back'}</button>
+                    </a>
+                </div>
+            </div>
+            <div class="mainCt mainSec formReset signLimit">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form" method="post" action="{:url('update')}">
+
+                        <div class="layui-row layui-col-space10">																									
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '预排版人数' : 'pre_formatter'}">
+							            {:session('language') == '中文'? '预排版人数' : 'pre_formatter'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="pre_formatter" lay-verify="required" value="{$info.pre_formatter|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '预排版每日工作页数' : 'pre_page	'}">
+                                        {:session('language') == '中文'? '预排版每日工作页数' : 'pre_page	'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="pre_page" lay-verify="required" value="{$info.pre_page|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '翻译人数' : 'translator'}">
+                                        {:session('language') == '中文'? '翻译人数' : 'translator'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="translator" lay-verify="required" value="{$info.translator|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '翻译每日工作页数' : 'trs_page'}">
+                                        {:session('language') == '中文'? '翻译每日工作页数' : 'trs_page'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="trs_page" lay-verify="required" value="{$info.trs_page|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '校对人数' : 'revisor'}">
+                                        {:session('language') == '中文'? '校对人数' : 'revisor'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="revisor" lay-verify="required" value="{$info.revisor|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '校对每日工作页数' : 'rev_page'}">
+                                        {:session('language') == '中文'? '校对每日工作页数' : 'rev_page'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="rev_page" lay-verify="required" value="{$info.rev_page|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '后排版人数' : 'post_formatter'}">
+                                        {:session('language') == '中文'? '后排版人数' : 'post_formatter'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="post_formatter" lay-verify="required" value="{$info.post_formatter|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '后排版每日工作页数' : 'post_page'}">
+                                        {:session('language') == '中文'? '后排版每日工作页数' : 'post_page'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="post_page" lay-verify="required" value="{$info.post_page|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+							<input type="hidden" name="id" value="{$info.id}" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+
+{js href="__JS__/xm-select.js"}
+
+<script>
+
+	layui.use(['form','laydate'], function () {
+		var form = layui.form, laydate = layui.laydate,layer = layui.layer;
+
+		//同时绑定多个,单个日期选择，显示在input里面
+		$('.showDate').click(function () {
+			laydate.render({
+				elem: this
+				,trigger: 'click'
+				,theme: '#1B3382'
+				,position: 'fixed'
+				//,isInitValue: true
+				//,value: new Date()
+				,type:'datetime'
+				,format: 'yyyy-MM-dd HH:mm'
+                ,ready: function(date){
+                    this.dateTime.hours=23;
+                    this.dateTime.minutes=0;
+                    //this.dateTime.seconds=59;
+                }
+			});
+		});
+
+
+
+		// 表单验证
+		var validatorFunc = function () {
+			var validator = new Validator();
+
+			// 必填项
+			validator.add('pre_formatter', [{
+				rule: 'require',
+				msg: '预排版人数不能为空'
+			}]);
+
+			validator.add('pre_page', [{
+				rule: 'require',
+				msg: '预排版每日工作页数不能为空'
+			}]);
+
+			validator.add('translator', [{
+				rule: 'require',
+				msg: '文翻译人数不能为空'
+			}]);
+
+
+            /*validator.add('Translator', [{
+                rule: 'require',
+                msg: '翻译人员不能为空'
+            }]);
+
+            validator.add('Reviser', [{
+                rule: 'require',
+                msg: '校对人员不能为空'
+            }]);
+
+            validator.add('Pre_Formatter', [{
+                rule: 'require',
+                msg: '预排版人员不能为空'
+            }]);
+
+            validator.add('Post_Formatter', [{
+                rule: 'require',
+                msg: '后排版人员不能为空'
+            }]);*/
+
+
+			return validator.start();
+		};
+
+		// 数据提交
+		$('#save').on('click', function () {
+
+			// 表单验证
+			var errorMsg = validatorFunc();
+			if (errorMsg) {
+				layer.alert(errorMsg, {title: '提示'});
+				return false;
+			}
+
+			// 表单提交
+			$('#form').submit();
+		});
+	})
+</script>
+{/block}

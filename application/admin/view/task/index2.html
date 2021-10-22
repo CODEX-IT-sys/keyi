@@ -1,0 +1,341 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<style>
+	.layui-table-total tr{
+		background: orange;
+	}
+
+</style>
+<div class="hn_body">
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="top">
+				<div class="position_lead">
+					<i class="iconfont icon-navigation"></i>
+					<a href="#">{:session('language') == '中文'? '数据统计' : 'Statistics Management'}</a>
+					<a class="on">{:session('language') == '中文'? '任务预估' : 'Task Estimation'}</a>
+				</div>
+				<div class="global_btn">
+					<a href="{:url('edit',['belong'=>'PM01'])}" class="layui-btn com_btn" >基础信息修改</a>
+
+					<!--<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>-->
+				</div>
+			</div>
+			<div class="mainCt">
+				<div class="mainWrap">
+					<!--搜索-->
+
+					<div class="forwardTable farTable">
+						<table class="layui-hide" id="test" lay-filter="test"></table>
+					</div>
+
+					<!--文本说明-->
+					<div class="explain">
+						<h5 class="explainTitle">
+							<i class="iconfont icon-tishi"></i>
+							<span>说明</span>
+						</h5>
+						<div class="explainCt">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{/block}
+
+{block name="js"}
+
+
+<!--行工具-->
+<script type="text/html" id="barDemo">
+	<div class="table_btn">
+		<a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
+		<a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+		<!--<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'Look'}</a>-->
+	</div>
+</script>
+
+<!--脚本-->
+<script>
+	var tableIns;  // 数据表格对象，用于重载
+	layui.use(['table','form'], function(){
+		var table = layui.table, form = layui.form;
+
+		// 切换语言
+		var language = "{:session('language') == '中文'? '中文' : 'english'}";
+		// 数据表格字段
+
+		var cols;
+		if(language === '中文'){
+
+			cols = [
+				{field:'work_days', title:'工作天数',minWidth: 100,align:'center',totalRowText:'合计'}
+				,{field:'pre_formatter', title:'预排版人数',minWidth: 100,align:'center'  }
+				,{field:'pre_page', title:'预排版每日工作页数', minWidth: 180,align:'center' }
+				,{field:'pre_total', title:'预排版工作总页数',style:'color: red;',minWidth: 180,align:'center'}
+				,{field:'translator', title:'翻译人数', minWidth: 100,align:'center'}
+				,{field:'trs_page', title:'翻译每日工作页数',minWidth: 100,align:'center'}
+				,{field:'trs_total', title:'翻译工作总页数',minWidth: 100, align:'center',style:'color: red;'}
+				,{field:'revisor', title:'校对人数',minWidth: 100,align:'center'}
+				,{field:'rev_page', title:'校对每日工作页数',minWidth: 100,align:'center'}
+				,{field:'rev_total', title:'校对工作总页数',minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'post_formatter', title:'后排版人数',minWidth: 120,align:'center'}
+				,{field:'post_page', title:'后排版每日工作页数',minWidth: 100,align:'center'}
+				,{field:'post_total', title:'后排版工作总页数', style:'color: red;', minWidth: 150, align:'center'}
+				,{field:'Completed', title:'提交日期',minWidth: 100,align:'center'}
+				,{field:'sumpage', title:'提交总页数',minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'trre_GapPages', title:'翻译校对页数缺口',minWidth: 150,align:'center' }
+				,{field:'trre_GapPeople', title:'翻译校对人数缺口', minWidth: 150,align:'center'}
+				,{field:'pre_GapPages', title:'预排页数缺口',minWidth: 150,align:'center'}
+				,{field:'pre_GapPeople', title:'预排人数缺口',  minWidth: 150,align:'center'}
+				,{field:'post_GapPages', title:'后排版页数缺口',minWidth: 150,align:'center'}
+				,{field:'post_GapPeople', title:'后排版人数缺口',minWidth: 150,align:'center'}
+			];
+
+
+
+		}else{
+
+			cols = [
+				{field:'work_days', title:'work_days',minWidth: 100,align:'center',totalRowText:'合计'}
+				,{field:'pre_formatter', title:'pre_formatter',minWidth: 100,align:'center'  }
+				,{field:'pre_page', title:'pre_page/day', minWidth: 180,align:'center' }
+				,{field:'pre_total', title:'pre_total',style:'color: red;',minWidth: 180,align:'center'}
+				,{field:'translator', title:'translator', minWidth: 100,align:'center'}
+				,{field:'trs_page', title:'trs_page/day',minWidth: 100,align:'center'}
+				,{field:'trs_total', title:'trs_total',minWidth: 100, align:'center',style:'color: red;'}
+				,{field:'revisor', title:'revisor',minWidth: 100,align:'center'}
+				,{field:'rev_page', title:'rev_page/day',minWidth: 100,align:'center'}
+				,{field:'rev_total', title:'rev_total',minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'post_formatter', title:'post_formatter',minWidth: 120,align:'center'}
+				,{field:'post_page', title:'post_page/day',minWidth: 100,align:'center'}
+				,{field:'post_total', title:'post_total', style:'color: red;', minWidth: 150, align:'center'}
+				,{field:'Completed', title:'Completed',minWidth: 100,align:'center'}
+				,{field:'sumpage', title:'sumpage',minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'trre_GapPages', title:'TR+RE Gap pages',minWidth: 100,align:'center' }
+				,{field:'trre_GapPeople', title:'TR+RE Gap people	', minWidth: 100,align:'center'}
+				,{field:'pre_GapPages', title:'PREF Gap pages',minWidth: 100,align:'center'}
+				,{field:'pre_GapPeople', title:'PREF  Gap people',  minWidth: 100,align:'center'}
+				,{field:'post_GapPages', title:'POSTF Gap pages',minWidth: 100,align:'center'}
+				,{field:'post_GapPeople', title:'POSTF Gap people',minWidth: 100,align:'center'}
+			];
+
+
+		}
+		//console.log(cols);
+
+
+		cols = [cols];
+
+
+		// 生成表格
+		tableIns = table.render({
+			elem: '#test'
+			,url:"{:url('index2')}"
+			,where: {}
+			,toolbar: '#forwardBar'
+			,defaultToolbar: ['filter', 'exports', 'print']
+			,title: '项目汇总表'
+			,totalRow:true
+			,cols : cols
+			, limit:100, 			height: 'full-200',
+			even: true,
+			page: {
+				curr:location.hash.replace('#!fenye=', ''),
+				hash:'fenye',
+				limits:[10,20,30,40,50,60,70,80,90,100]
+			},
+		});
+
+		// 回车亦可以搜索
+		$(document).keyup(function (event) {
+			if (event.keyCode == 13) {
+				$(".search_btn").trigger("click");
+			}
+		});
+
+
+
+
+
+		//监听行工具事件
+		table.on('tool(test)', function(obj){
+			//获得当前行数据
+			var id = obj.data.id;
+
+			// 删除
+			if(obj.event === 'del'){
+				layer.confirm('确认删除？', function(index){
+					// 向服务器发送删除请求
+					$.ajax({
+						type: 'delete',
+						contentType: 'application/json',
+						url: replaceEditUrlId("{:url('pj_contract_review/delete', ['id' => 1])}", id),
+						dataType: 'json',
+						// 删除成功
+						success: function (res) {
+							layer.alert(res.msg, {title: '提示'}, function (index) {
+								// 表格重载
+								tableIns.reload();
+								// 关闭alert
+								layer.close(index);
+							});
+						},
+						error: function (jqXHR) {
+							// 删除失败
+							if (jqXHR.status === 422) {
+								layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+									layer.close(index);
+								});
+							}
+						}
+					});
+				});
+
+			} else if(obj.event === 'edit'){
+
+				window.location.href =  replaceEditUrlId("{:url('pj_contract_review/edit', ['id' => 1])}", id);
+
+			} else if(obj.event === 'look'){
+
+				window.location.href = replaceEditUrlId("{:url('pj_contract_review/read', ['id' => 1])}", id);
+
+			} else if(obj.event === 'xsjl'){
+				// 市场行政确认
+				layer.confirm('确认？', function(index){
+					// 向服务器发送请求
+					$.ajax({
+						type: 'get',
+						contentType: 'application/json',
+						url: replaceEditUrlId("{:url('pj_contract_review/sales_admin', ['id' => 1])}", id),
+						dataType: 'json',
+						// 成功回调
+						success: function (res) {
+							layer.alert(res.msg, {title: '提示'}, function (index) {
+								// 表格重载
+								tableIns.reload();
+								// 关闭alert
+								layer.close(index);
+							});
+						}
+					});
+				});
+
+			} else if(obj.event === 'xmjl'){
+				// 项目经理确认
+				layer.confirm('确认？', function(index){
+					// 向服务器发送请求
+					$.ajax({
+						type: 'get',
+						contentType: 'application/json',
+						url: replaceEditUrlId("{:url('pj_contract_review/project_manager', ['id' => 1])}", id),
+						dataType: 'json',
+						// 成功回调
+						success: function (res) {
+							layer.alert(res.msg, {title: '提示'}, function (index) {
+								// 表格重载
+								tableIns.reload();
+								// 关闭alert
+								layer.close(index);
+							});
+						}
+					});
+				});
+
+			}else if(obj.event === 'zjl'){
+				// 总经理确认
+				layer.confirm('确认？', function(index){
+					// 向服务器发送请求
+					$.ajax({
+						type: 'get',
+						contentType: 'application/json',
+						url: replaceEditUrlId("{:url('pj_contract_review/general_manager', ['id' => 1])}", id),
+						dataType: 'json',
+						// 成功回调
+						success: function (res) {
+							layer.alert(res.msg, {title: '提示'}, function (index) {
+								// 表格重载
+								tableIns.reload();
+								// 关闭alert
+								layer.close(index);
+							});
+						}
+					});
+				});
+			}
+		});
+
+
+
+		/*字段筛选 全选 反选*/
+		table.on('toolbar()', function (obj) {
+			var config = obj.config;
+			var btnElem = $(this);
+			var tableId = config.id;
+			var tableView = config.elem.next();
+			switch (obj.event) {
+				case 'LAYTABLE_COLS':
+					// 给筛选列添加全选还有反选的功能
+					var panelElem = btnElem.find('.layui-table-tool-panel');
+					var checkboxElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]');
+					var checkboxCheckedElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]:checked');
+					$('<li class="layui-form select_lead" lay-filter="LAY_TABLE_TOOL_COLS_FORM">' +
+							'<input type="checkbox" lay-skin="primary" lay-filter="LAY_TABLE_TOOL_COLS_ALL" '+ ((checkboxElem.length === checkboxCheckedElem.length) ? 'checked' : '') + ' title="全选">' +
+							'<span class="invert_select"><i class="iconfont icon-fanxuan"></i>反选</span>' +
+							'</li>')
+							.insertBefore(panelElem.find('li').first())
+							.on('click', '.invert_select', function (event) {
+								layui.stope(event);
+								// 反选逻辑
+								panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]+').click();
+							});
+
+					form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+					break;
+			}
+		});
+
+		// 监听筛选列panel中的全选
+		form.on('checkbox(LAY_TABLE_TOOL_COLS_ALL)', function (obj) {
+			$(obj.elem).closest('ul')
+					.find('[lay-filter="LAY_TABLE_TOOL_COLS"]' + (obj.elem.checked ? ':not(:checked)' : ':checked') + '+').click();
+		});
+
+		// 监听筛选列panel中的单个记录的change
+		$(document).on('change', 'input[lay-filter="LAY_TABLE_TOOL_COLS"]', function (event) {
+			var elemCurr = $(this);
+			// 筛选列单个点击的时候同步全选的状态
+			$('input[lay-filter="LAY_TABLE_TOOL_COLS_ALL"]')
+					.prop('checked',
+							elemCurr.prop('checked') ? (!$('input[lay-filter="LAY_TABLE_TOOL_COLS"]').not(':checked').length) : false);
+			form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+		});
+
+		$('#sjth').click(function () {
+			var checkStatus = table.checkStatus('test');
+			var num = 0
+			var num2 = 0
+			for (v in checkStatus.data) {
+				num += checkStatus.data[v]['Pages'];
+				num2 += checkStatus.data[v]['Source_Text_Word_Count'];
+			}
+			var msg = "选中页数:" + num + ';源语数量:' + num2;
+
+			$('#jisuan').html(msg)
+			layer.alert(msg);
+			// console.log(num);
+		});
+	});
+</script>
+<script>
+	$("input[name='month']").change(function () {
+		console.log( $("input[name='month']").val())
+		$('#sub').submit();
+	})
+</script>
+{/block}
