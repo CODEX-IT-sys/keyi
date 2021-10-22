@@ -187,6 +187,137 @@ class PjProjectProfile extends Common
             $data= $request->only(['search_type']);
             $search_type=$data ["search_type"];
         }
+
+        //判断是否选择简洁模板
+        $simple = $request->param('simple');
+        if($simple == 3){
+            session('simple',3);
+        }
+        $tag = session('simple');
+
+        if($tag == 3){
+
+            foreach ($colsData as $k=>$v)
+            {
+                switch($v['Field']){
+                    case 'Filing_Code':
+                        $colsData[$k]['width']=180;
+                        $colsData[$k]['fixed']='left';
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Company_Name':
+                        $colsData[$k]['width']=100;
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Project_Name':
+                        $colsData[$k]['width']=200;
+                        break;
+                    case 'Job_Name':
+                        $colsData[$k]['width']=140;
+                        $colsData[$k]['fixed']='left';
+                        break;
+                    case 'Pages':
+                        $colsData[$k]['width']=60;
+                        break;
+                    case 'Source_Text_Word_Count':
+                        $colsData[$k]['width']=90;
+                        break;
+                    case 'Language':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Product_Involved':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'File_Type':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'File_Category':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Filled_by':
+                        $colsData[$k]['hide']=true;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'PA':
+                        $colsData[$k]['hide']=true;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'CODEX_Team':
+//                    $colsData[$k]['width']=100;
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Sub_Contracted':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Format_Difficulty':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Translation_Difficulty':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'One_Hundred_Percent_Repeated':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Ninety_Five_to_Ninety_Nine_Percent_Repeated':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Total_Repetition_Rate':
+                        $colsData[$k]['hide']=true;
+                        break;
+                    case 'Excluding_Words':
+                        $colsData[$k]['hide']=true;
+                        break;
+
+                    case 'Pre_Format_Delivery_Time':
+                        $colsData[$k]['hide']=true;
+                        $colsData[$k]['width']=150;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Translation_Delivery_Time':
+                        $colsData[$k]['width']=150;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Revision_Delivery_Time':
+                        $colsData[$k]['width']=150;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Post_Format_Delivery_Time':
+                        $colsData[$k]['width']=150;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Final_Delivery_Time':
+                        $colsData[$k]['style']='background-color:green;color:white';
+                        $colsData[$k]['width']=150;
+                        $colsData[$k]['sort']='true';
+                        break;
+                    case 'Translator':
+                        $colsData[$k]['sort']='true';
+                        $colsData[$k]['width']=100;
+                        break;
+                    case 'Reviser':
+                        $colsData[$k]['sort']='true';
+                        $colsData[$k]['width']=100;
+                        break;
+                    case 'Actual_Source_Text_Count':
+                        $colsData[$k]['sort']='true';
+                        $colsData[$k]['width']=100;
+                        break;
+                    case 'Pre_Formatter':
+                        $colsData[$k]['hide']=true;
+                        $colsData[$k]['sort']='true';
+                        $colsData[$k]['width']=100;
+                        break;
+                    case 'Post_Formatter':
+                        $colsData[$k]['sort']='true';
+                        $colsData[$k]['width']=100;
+                        break;
+                    default:
+                        $colsData[$k]['width']=80;
+
+                }
+
+            }
+        }
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
             return view('', [
@@ -201,6 +332,13 @@ class PjProjectProfile extends Common
 
         // 返回数据
         return json(generate_layui_table_data($list));
+    }
+
+
+
+    public function sessionOut(){
+        session('simple',null);
+        $this->redirect('index');
     }
 
     // 参考库文件(多文本框 库文件 表)

@@ -18,6 +18,8 @@
 						<a href="{:url('pj_project_profile/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 						<a class="layui-btn com_btn" id="xzedit">批量修改</a>
 						<a class="layui-btn com_btn" id="sjth">数据计算</a>
+						<a class="layui-btn com_btn" id="simple">简洁</a>
+						<a href="{:url('sessionOut')}" class="layui-btn com_btn" id="complex">完整</a>
 						<!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
 					</div>
 				</div>
@@ -317,6 +319,10 @@ layui.use(['table','form'], function(){
                 elemCurr.prop('checked') ? (!$('input[lay-filter="LAY_TABLE_TOOL_COLS"]').not(':checked').length) : false);
         form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
     });
+
+	$('#simple').click(function(){
+		window.location.href = replaceEditUrlId("{:url('pj_project_profile/index', ['simple' => 1])}", 3);
+	})
 
 	$('#sjth').click(function () {
 		var checkStatus = table.checkStatus('test');

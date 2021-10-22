@@ -607,10 +607,18 @@ class PjContractReview extends Common
                 $f_data[$k] = $v;
             }
         }
-        Db::name('pj_project_profile')
-            ->where('Filing_Code', $data['Filing_Code'])
-            ->update($f_data);
 
+        $res = Db::name('pj_project_profile')
+            ->where('Filing_Code', $data['Filing_Code'])
+            ->select();
+        $num = count($res);
+
+        //如果描述表有多个相同的文件编号，就不同步修改
+        if($num <= 1){
+            Db::name('pj_project_profile')
+                ->where('Filing_Code', $data['Filing_Code'])
+                ->update($f_data);
+        }
 
         echo "<script>history.go(-2);</script>";
 
