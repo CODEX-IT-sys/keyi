@@ -523,7 +523,7 @@ class Task extends Common
             return $this->error('修改失败');
         }
         // 返回操作结果
-        $this->redirect('index');
+        echo "<script>history.go(-2);</script>";
 
     }
 
