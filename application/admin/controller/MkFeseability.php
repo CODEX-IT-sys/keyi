@@ -117,8 +117,8 @@ class MkFeseability extends Common
                 'Comment'=>'公司名称'
             ],
             [
-                'Field'=>'Job_Name',
-                'Comment'=>'文件名称'
+                'Field'=>'File_Type',
+                'Comment'=>'文件类型'
             ],
             [
                 'Field'=>'Service',
@@ -346,24 +346,56 @@ class MkFeseability extends Common
                 }
 
             }
-            //Translation_Start_Time  Translation_Delivery_Time  Pre_Format_Delivery_Time Revision_Start_Time Revision_Delivery_Time Post_Format_Delivery_Time
-//            历史中不存在的值,不允许修改
-            /*foreach ($arr as $k4=>$v4)
-            {
-                if(in_array($k4,['Completed','Translation_Start_Time','Translation_Delivery_Time','Pre_Format_Delivery_Time','Revision_Start_Time','Revision_Delivery_Time','Post_Format_Delivery_Time'])){
-                    continue;
-                }
-                $num= Db::name('pj_contract_review')->where($k4,$v4)->count();
-                if($num<=0){
-                    unset($arr[$k4]);
-                }
-            }*/
 
             $arr1=$arr;
+            $arr2=$arr;
             if(isset($arr['Completed'])){
                 $arr['Completed']=(int)$arr['Completed'];
             }
             $res = Db::name('mk_feseability')->wherein('id',$data['arr'])->update($arr);
+            $Filing_Code=Db::name('mk_feseability')->wherein('id',$data['arr'])->field('Filing_Code')->select();
+            //结算管理需要同步的信息
+            $f = ['Assigned_Date','Subject_Company','Sales','Attention','Job_Name','Pages','Source_Text_Word_Count','File_Type','Service','Language',
+                'Currency','Unit_Price','Units','Quote_Number','Quote_Quantity','VAT_Rate','VAT_Amount','Quote_Amount','Completed','Customer_Requirements',
+                'External_Reference_File','Subject_Company_VAT_ID','Subject_Company_Address','Subject_Company_Bank_Info','Remarks'];
+
+            foreach ($field as $key=>$val){
+                if(!in_array($val, $f)){
+                    unset($arr[$val]);
+                }
+            }
+            foreach ($Filing_Code as $k=>$v){
+                $res=   Db::name('mk_invoicing')
+                    ->where('Filing_Code', $v['Filing_Code'])
+                    ->update($arr);
+            }
+
+            // 同步更新 项目汇总表 相关信息
+            $d = ['Attention','Company_Name','File_Type','Service','Language','Delivery_Date_Expected','Completed','Customer_Requirements','External_Reference_File'];
+            foreach ($field as $key=>$val){
+                if(!in_array($val, $d)) {
+                    unset($arr1[$val]);
+                }
+            }
+            foreach ($Filing_Code as $k=>$v){
+                Db::name('pj_contract_review')
+                    ->where('Filing_Code', $v['Filing_Code'])
+                    ->update($arr1);
+            }
+
+            // 同步更新项目数据库表
+            $da = ['Completed'];
+            foreach ($field as $key=>$val){
+                if(!in_array($val, $da)) {
+                    unset($arr2[$val]);
+                }
+            }
+            foreach ($Filing_Code as $k=>$v){
+                Db::name('pj_project_database')
+                    ->where('Filing_Code', $v['Filing_Code'])
+                    ->update($arr2);
+            }
+
 
             // 提交事务
             Db::commit();
