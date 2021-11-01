@@ -36,7 +36,7 @@ class PjDailyProgressTrRe extends Model
         $query = $this;
 
             // 查询器对象 判断管理层
-            if(!in_array($job_id, [1,8,9,16,17,20])) {
+            if(!in_array($job_id, [1,7,8,9,16,17,20])) {
 
                 // 否则 就只显示自己录入的 或 项目助理数据
                 $query = $this->where(function ($query) use($name) {
