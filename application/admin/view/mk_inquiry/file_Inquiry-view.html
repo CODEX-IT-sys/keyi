@@ -232,6 +232,18 @@
 								</div>
 							</div>
 							<div class="layui-col-xs4">
+								<div class="layui-form-item layui_ic">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '编号日期' : 'Number Date '}">
+										{:session('language') == '中文'? '编号日期' : 'Number Date '}
+									</label>
+									<div class="layui-input-block">
+										<input class="Date layui-input" name="bh_date" value="{$info.bh_date|default=''}" type="text">
+										<i class="layui-icon layui-icon-date"></i>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '合同编码' : 'Contract Number'}">
 							            {:session('language') == '中文'? '合同编码' : 'Contract Number'}

@@ -236,6 +236,10 @@ class MkInquiry extends Common
         // 单位
         $units = Db::name('xt_dict')->where('c_id',3)->select();
 
+        if(!$res['bh_date']){
+            $res['bh_date'] = date('Ymd',time());
+        }
+
         // 直接返回视图
         return view('file_Inquiry-view', [
             'File_Type'=>$File_Type, 'service'=>json_encode($service), 'yy'=>$yy,
@@ -347,7 +351,8 @@ class MkInquiry extends Common
             $no = count($arr);
 
             /* 调用方法 生成 文件编号*/
-            $f_data['Filing_Code'] = filing_number($company_code, $no);
+            $now = $data['bh_date'];
+            $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
             // 来稿 委托日期
             $f_data['Assigned_Date'] = date("Ymd");
@@ -494,7 +499,8 @@ class MkInquiry extends Common
                 $no = count($arr);
 
                 /*调用方法 生成 文件编号*/
-                $f_data['Filing_Code'] = filing_number($company_code, $no);
+                $now = $data['bh_date'];
+                $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
                 // 来稿 委托日期
                 $f_data['Assigned_Date'] = date("Ymd");
@@ -941,7 +947,8 @@ class MkInquiry extends Common
             $no = count($arr);
 
             /*调用方法 生成 文件编号*/
-            $f_data['Filing_Code'] = filing_number($company_code, $no);
+            $now = $a['bh_date'];
+            $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
             // 来稿 委托日期
             $f_data['Assigned_Date'] = date("Ymd");

@@ -284,10 +284,12 @@ function invoice_number($company_code)
 /*
  * 文件编码 F- + 日期 + 公司编号 + 序号（建议规则没有F） 生成
  * */
-function filing_number($company_code, $no)
+function filing_number($company_code, $no,$now)
 {
     // 获取当前时间
-    $now = date("Ymd");
+    if(!$now){
+        $now = date("Ymd");
+    }
 
     // 补位生成 序列单号
     $xh = str_pad(($no+1),2,0,STR_PAD_LEFT );

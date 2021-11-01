@@ -1,0 +1,369 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+			<div class="top">
+				<div class="position_lead">
+					<i class="iconfont icon-navigation"></i>
+					<a href="#">{:session('language') == '中文'? '公司管理' : 'Company Management'}</a>
+					<a href="{:url('mk_company/index')}">{:session('language') == '中文'? '公司信息' : 'Company'}</a>
+
+				</div>
+				<div class="global_btn">
+
+					<button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+					<a href="javascript:history.back(-1);">
+						<button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' : 'Back'}</button>
+					</a>
+				</div>
+			</div>
+            <div class="mainCt mainSec formReset signLimit">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form" method="post" action="{:url('mk_company/save')}">
+
+                        <div class="layui-row layui-col-space10">
+
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label"  title="{:session('language') == '中文'? '公司名称' : 'Company Name'}">
+										{:session('language') == '中文'? '公司名称' : 'Company Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Company_Name" id="company_name" lay-verify="required"  onblur="findCompany()" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '公司全称' : 'Company Full Name'}">
+										{:session('language') == '中文'? '公司全称' : 'Company Full Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Company_Full_Name" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '销售' : 'Sales'}">
+                                        {:session('language') == '中文'? '销售' : 'Sales'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Sales" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+														
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '客户联系人' : 'Attention'}">
+							            {:session('language') == '中文'? '客户联系人' : 'Attention'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Attention" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+														
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '所在部门' : 'Department'}">
+							            {:session('language') == '中文'? '所在部门' : 'Department'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Department" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text" >
+							        </div>
+							    </div>
+							</div>
+														
+
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '公司地址' : 'Company Address'}">
+							            {:session('language') == '中文'? '公司地址' : 'Company Address'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Company_Address" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '国家' : 'Country'}">
+							            {:session('language') == '中文'? '国家' : 'Country'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Country" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '移动电话号码' : 'Mobile'}">
+							            {:session('language') == '中文'? '移动电话号码' : 'Mobile'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Mobile" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '电话号码' : 'Telephone_Number'}">
+							            {:session('language') == '中文'? '电话号码' : 'Telephone_Number'}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Telephone_Number" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '邮箱' : 'Email'}">
+							            {:session('language') == '中文'? '邮箱' : 'Email '}
+							        </label>
+							        <div class="layui-input-block">
+							            <input name="Email" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							        </div>
+							    </div>
+							</div>
+
+							
+							<div class="layui-col-xs4">
+							    <div class="layui-form-item">
+							        <label class="layui-form-label" title="{:session('language') == '中文'? '状态' : 'Status'}">
+							            {:session('language') == '中文'? '状态' : 'Status'}
+							        </label>
+							        <div class="layui-input-block">
+										<select name="Status" lay-filter="Status">
+											<option value="未合作">{:session('language') == '中文'? '未合作' : 'On job'}</option>
+											<option value="跟进中">{:session('language') == '中文'? '跟进中' : 'leave office'}</option>
+											<option value="已合作">{:session('language') == '中文'? '已合作' : 'leave office'}</option>
+										</select>
+							        </div>
+							    </div>
+							</div>
+
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? '备注' : 'Remarks'}">
+                                        {:session('language') == '中文'? '备注' : 'Remarks'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Remarks" name="Remarks" class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+							
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+<script>
+
+
+	layui.use(['form','laydate'], function () {
+		var form = layui.form, laydate = layui.laydate,layer = layui.layer;
+        var language = "{:session('language')}";
+
+		//同时绑定多个,单个日期选择，显示在input里面
+		$('.showDate').click(function () {
+			laydate.render({
+				elem: this
+				,trigger: 'click'
+				,theme: '#1B3382'
+				,position: 'fixed'
+				//,isInitValue: true
+				//,value: new Date()
+				//,type:'datetime'
+				,format: 'yyyyMMdd'
+			});
+		});
+
+		// 下拉选择器值发生变化
+		form.on('select(Contract_Number)', function (data) {
+
+			var code = data.value;
+			//console.log(code);
+
+            // 选中第一个选项时，不请求数据
+            if (data.value === '') {
+                return;
+            }
+
+			//异步拉取信息
+			$.ajax({
+				type: 'get',
+				url: "{:url('mk_company/get_info')}",
+				data: {'code': code},
+				dataType: 'json',
+				success: function (res) {
+					//console.log(res.data);
+					var info = res.data;
+
+					// 文本框写入默认值
+					$.each(info, function (name, value) {
+						// input
+						$('#form [name=' + name + ']').val(value);
+						// select
+						$('#form select[name=' + name + ']').prop("selected", 'selected');
+						// 重新渲染表单
+						form.render();
+					});
+				}
+			})
+		});
+
+
+
+
+        // 主体公司 下拉选择器值发生变化
+        form.on('select(Subject_Company)', function (data) {
+            var name = data.value;
+            //console.log(name);
+
+            //异步拉取信息
+            $.ajax({
+                type: 'get',
+                url: "{:url('xt_company/get_info')}",
+                data: {'name': name},
+                dataType: 'json',
+                success: function (res) {
+                    //console.log(res.data);
+                    var info = res.data;
+
+                    $('#form [name=Subject_Company_VAT_ID]').val(info.VAT_ID);
+
+                    // 判断语言
+                    if(language === '中文') {
+                        $('#form [name=Subject_Company_Address]').val(info.CN_Address);
+                        $('#form [name=Subject_Company_Bank_Info]').val(info.CN_Bank_Info);
+                    }else{
+                        $('#form [name=Subject_Company_Address]').val(info.EN_Address);
+                        $('#form [name=Subject_Company_Bank_Info]').val(info.EN_Bank_Info);
+                    }
+                }
+            })
+        });
+
+
+
+
+		// 表单验证
+		var validatorFunc = function () {
+			var validator = new Validator();
+
+            validator.add('Company_Name', [{
+                rule: 'require',
+                msg: '公司名称不能为空'
+            }]);
+
+			// 邮件
+			validator.add('Email1', [{
+				rule: 'email',
+				msg: '邮箱格式错误'
+			}]);
+
+			validator.add('Email2', [{
+				rule: 'email',
+				msg: '邮箱格式错误'
+			}]);
+
+			return validator.start();
+		};
+
+		// 数据提交
+		$('#save').on('click', function () {
+
+			// 表单验证
+			var errorMsg = validatorFunc();
+			if (errorMsg) {
+				layer.alert(errorMsg, {title: '提示'});
+				return false;
+			}
+
+            var tip = layer.msg('Data Uploading', {icon: 16, shade: 0.3, time:3000});
+
+			// 表单提交
+			$('#form').submit();
+		});
+
+		function test() {
+			alert(555);
+		};
+
+		window.findCompany=function() {
+			var name = $('#company_name').val();
+			$.ajax({
+				//请求方式
+				type : "get",
+				//请求地址
+				url : "{:url('mk_company/inspection')}",
+				//数据，json字符串
+				data : {'Company_Name':name},
+				//请求成功
+				success : function(result) {
+					if(result.code!=6666){
+						layer.msg("已经有"+result.code+"条记录了!");
+					}
+					console.log(result);
+				},
+				//请求失败，包含具体的错误信息
+				error : function(e){
+					console.log(e.status);
+					console.log(e.responseText);
+				}
+			});
+
+
+			//异步拉取信息
+			$.ajax({
+				type: 'get',
+				url: "{:url('mk_company/get_info')}",
+				data: {'company_name': name},
+				dataType: 'json',
+				success: function (res) {
+					//console.log(res.data);
+					var info = res.data;
+
+					console.log(info);
+					// 文本框写入默认值
+					$.each(info, function (name, value) {
+						// input
+						$('#form [name=' + name + ']').val(value);
+						// select
+						$('#form select[name=' + name + ']').prop("selected", 'selected');
+						// 重新渲染表单
+						form.render();
+					});
+				}
+			})
+		}
+	})
+
+
+</script>
+{/block}
