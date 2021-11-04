@@ -46,7 +46,7 @@ class PjProjectProfile extends Common
                     $colsData[$k]['width']=200;
                     break;
                 case 'Job_Name':
-                    $colsData[$k]['width']=140;
+                    $colsData[$k]['width']=300;
                     $colsData[$k]['fixed']='left';
                     break;
                 case 'Pages':
@@ -135,6 +135,11 @@ class PjProjectProfile extends Common
                 'Field'=>'File_Usage_and_Linguistic_Specification',
                 'Comment'=>'文件用途和语言规范'
             ],
+            [
+                'Field'=>'File_Category',
+                'Comment'=>'文件分类'
+            ],
+
             [
                 'Field'=>'Pre_Formatter',
                 'Comment'=>'预排版人员'

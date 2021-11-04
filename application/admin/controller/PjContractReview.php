@@ -36,7 +36,7 @@ class PjContractReview extends Common
                     $colsData[$k]['width']=200;
                     break;
                 case 'Job_Name':
-                    $colsData[$k]['width']=140;
+                    $colsData[$k]['width']=300;
                     $colsData[$k]['fixed']='left';
                     break;
                 case 'Pages':
@@ -250,6 +250,8 @@ class PjContractReview extends Common
     // 显示新建的表单页
     public function create()
     {
+
+
         // 查询 可供预选的 编号值(去重)
         $file_code = Db::name('mk_feseability')->alias('f')
             ->join('ky_pj_contract_review c', 'f.Filing_Code = c.Filing_Code', 'left')
