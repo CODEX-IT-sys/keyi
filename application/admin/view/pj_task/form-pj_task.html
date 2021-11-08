@@ -66,7 +66,7 @@
                                         {:session('language') == '中文'? '预排版每日工作页数' : 'pre_page	'}
                                     </label>
                                     <div class="layui-input-block">
-                                        <input name="pre_page" lay-verify="required" value="" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                        <input name="pre_page" lay-verify="required" value="{$info.pre|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -88,7 +88,7 @@
                                         {:session('language') == '中文'? '翻译每日工作页数' : 'trs_page'}
                                     </label>
                                     <div class="layui-input-block">
-                                        <input name="trs_page" lay-verify="required" value="" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                        <input name="trs_page" lay-verify="required" value="{$info.trs|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +109,7 @@
                                         {:session('language') == '中文'? '校对每日工作页数' : 'rev_page'}
                                     </label>
                                     <div class="layui-input-block">
-                                        <input name="rev_page" lay-verify="required" value="" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                        <input name="rev_page" lay-verify="required" value="{$info.rev|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@
                                         {:session('language') == '中文'? '后排版每日工作页数' : 'post_page'}
                                     </label>
                                     <div class="layui-input-block">
-                                        <input name="post_page" lay-verify="required" value="" autocomplete="off" placeholder="" class="layui-input" type="text">
+                                        <input name="post_page" lay-verify="required" value="{$info.pos|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
                                     </div>
                                 </div>
                             </div>

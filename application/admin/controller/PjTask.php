@@ -187,8 +187,15 @@ class PjTask extends Common
 
     public function create()
     {
+        //默认人数
+        $info = [
+            'pre' => 70,
+            'trs' => 20,
+            'rev' => 25,
+            'pos' => 150
+        ];
         // 直接返回视图
-        return view('form-pj_task', []);
+        return view('form-pj_task', ['info'=>$info]);
     }
 
 
