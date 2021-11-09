@@ -22,14 +22,81 @@ class MkInvoicing extends Common
     {
         // 数据库表字段集
         $colsData = getAllField('ky_mk_invoicing');
+        foreach ($colsData as $k=>$v)
+        {
+            switch($v['Field']){
+                case 'payment_time':
+                    $colsData[$k]['hide']='true';
+                    break;
+                case 'Post_Formatter':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                default:
+                    $colsData[$k]['width']=80;
+            }
 
+        }
+        $edit=[
+            [
+                'Field'=>'Invoice_Number',
+                'Comment'=>'请款单编号'
+            ],
+            [
+                'Field'=>'Completed',
+                'Comment'=>'交付日期'
+            ],
+            [
+                'Field'=>'Unit_Price',
+                'Comment'=>'单价'
+            ],
+            [
+                'Field'=>'Units',
+                'Comment'=>'单位'
+            ],
+            [
+                'Field'=>'VAT_Rate',
+                'Comment'=>'税率'
+            ],
+            [
+                'Field'=>'Invoicing_Date',
+                'Comment'=>'请款日期'
+            ],
+            [
+                'Field'=>'PO_Number',
+                'Comment'=>'PO号'
+            ],
+            [
+                'Field'=>'Status',
+                'Comment'=>'状态'
+            ],
+            [
+                'Field'=>'Fapiao_Type',
+                'Comment'=>'发票类型'
+            ],
+            [
+                'Field'=>'Fapiao_Date',
+                'Comment'=>'开票日期'
+            ],
+
+            [
+                'Field'=>'Fapiao_Code',
+                'Comment'=>'发票编码'
+            ],
+
+            [
+                'Field'=>'Date_of_Balance',
+                'Comment'=>'付款日期'
+            ],
+
+        ];
         // 查询文本说明信息
         $intro = Db::name('xt_table_text')->where('id',5)->value('intro');
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
             return view('', [
-                'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'select_field'=>$colsData, 'colsData' => json_encode($colsData),'editor'=>$edit,
                 'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword
             ]);
         }
@@ -421,6 +488,52 @@ class MkInvoicing extends Common
         } catch (\Exception $e) {
             // 这是进行异常捕获
             return json($e->getMessage());
+        }
+
+        return json(['code'=>$res]);
+    }
+
+    public function Batch_edit(Request $request)
+    {
+
+        // 启动事务
+        Db::startTrans();
+
+        try {
+            $data=$request->param();
+            $field=array_filter(explode('&',$data['field']));
+            $numsss=array_filter(explode('&',$data['numsss']));
+            $arr=[];
+            foreach ($field as $k=>$v)
+            {
+                foreach ($numsss as $k1=>$v1)
+                {
+                    if($k==$k1)
+                    {
+                        $arr[$v]=$v1;
+                    }
+                }
+
+            }
+
+            $arr1=$arr;
+            $arr2=$arr;
+            if(isset($arr['Completed'])){
+                $arr['Completed']=(int)$arr['Completed'];
+            }
+            $res = Db::name('mk_invoicing')->wherein('id',$data['arr'])->update($arr);
+
+
+            // 提交事务
+            Db::commit();
+        } catch (ValidateException $e) {
+            // 这是进行验证异常捕获
+            return json($e->getError());
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            // 这是进行异常捕获
+            return json(['code'=>9999,'error'=>$e->getMessage()]);
         }
 
         return json(['code'=>$res]);

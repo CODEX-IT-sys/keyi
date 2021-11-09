@@ -380,22 +380,20 @@
 							        </div>
 							    </div>
 							</div>
-							
+
 							<div class="layui-col-xs4">
-							    <div class="layui-form-item">
-							        <label class="layui-form-label" title="{:session('language') == '中文'? '发票类型' : 'Fapiao Type'}">
-							            {:session('language') == '中文'? '发票类型' : 'Fapiao Type'}
-							        </label>
-							        <div class="layui-input-block">
-							            <!--<input name="Fapiao_Type" lay-verify="required" value="{$info.Fapiao_Type|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">-->
-										<select name="Fapiao_Type" lay-filter="Fapiao_Type" lay-search>
-											<!--<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>-->
-											<option value="专票"{$info.Fapiao_Type=="专票"?'selected':''}>专票</option>
-											<option value="普票"{$info.Fapiao_Type=="普票"?'selected':''}>普票</option>
-										</select>
-							        </div>
-							    </div>
+								<div class="layui-form-item layui_ic">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '付款日期' : 'Date of Balance'}">
+										{:session('language') == '中文'? '付款日期' : 'Date of Balance'}
+									</label>
+									<div class="layui-input-block">
+										<input class="showDate layui-input" name="Date_of_Balance" value="{$info.Date_of_Balance|default=''}" type="text">
+										<i class="layui-icon layui-icon-date"></i>
+									</div>
+								</div>
 							</div>
+
+
 							
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
@@ -419,7 +417,22 @@
 									</div>
 								</div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '发票类型' : 'Fapiao Type'}">
+										{:session('language') == '中文'? '发票类型' : 'Fapiao Type'}
+									</label>
+									<div class="layui-input-block">
+										<!--<input name="Fapiao_Type" lay-verify="required" value="{$info.Fapiao_Type|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">-->
+										<select name="Fapiao_Type" lay-filter="Fapiao_Type" lay-search>
+											<!--<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>-->
+											<option value="专票"{$info.Fapiao_Type=="专票"?'selected':''}>专票</option>
+											<option value="普票"{$info.Fapiao_Type=="普票"?'selected':''}>普票</option>
+											<option value="N/A"{$info.Fapiao_Type=="N/A"?'selected':''}>N/A</option>
+										</select>
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '发票编码' : 'Fapiao Code'}">
@@ -536,17 +549,7 @@
 							    </div>
 							</div>
 							
-							<div class="layui-col-xs4">
-								<div class="layui-form-item layui_ic">
-									<label class="layui-form-label" title="{:session('language') == '中文'? '余款支付日期' : 'Date of Balance'}">
-										{:session('language') == '中文'? '余款支付日期' : 'Date of Balance'}
-									</label>
-									<div class="layui-input-block">
-										<input class="showDate layui-input" name="Date_of_Balance" value="{$info.Date_of_Balance|default=''}" type="text">
-										<i class="layui-icon layui-icon-date"></i>
-									</div>
-								</div>
-							</div>
+
 							
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
@@ -676,7 +679,7 @@
 				,theme: '#1B3382'
 				,position: 'fixed'
 				//,isInitValue: true
-				//,value: new Date()
+
 				//,type:'datetime'
 				,format: 'yyyyMMdd'
 			});

@@ -348,7 +348,7 @@ class Statistics extends Controller
             ->field('Sales, SUM(Net_Amount) money')
             ->where('delete_time',0)
             ->where('Status', '付款完成')
-            ->whereBetweenTime('payment_time', $s, $d)
+            ->whereBetweenTime('Date_of_Balance', $s, $d)
             ->order('money desc')
             ->group('Sales')
             ->select();

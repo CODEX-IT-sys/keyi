@@ -284,7 +284,7 @@ function invoice_number($company_code)
 /*
  * 文件编码 F- + 日期 + 公司编号 + 序号（建议规则没有F） 生成
  * */
-function filing_number($company_code, $no,$now)
+function filing_number($company_code, $no,$now='')
 {
     // 获取当前时间
     if(!$now){

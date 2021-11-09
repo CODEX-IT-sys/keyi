@@ -15,7 +15,7 @@
 						<a href="{:url('mk_invoice/index')}" class="layui-btn com_btn">{:session('language') == '中文'? '查看请款单' : 'View Invoice'}</a>
 
 						<a id="Invoice" class="layui-btn modify_btn">{:session('language') == '中文'? '生成请款单' : 'Invoice'}</a>
-
+						<a class="layui-btn com_btn" id="xzedit">批量修改</a>
 						<a class="layui-btn com_btn" id="sjth">数据计算</a>
 						<a href="{:url('mk_invoicing/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 
@@ -118,11 +118,26 @@ layui.use(['table','form'], function(){
         for(var i = 0; i < l; i++){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
-                    if(language === '中文'){
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:120, totalRow:true,edit:true});
-                    }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:180, totalRow:true});
-                    }
+					if(colsData[i].Field !== 'payment_time') {
+						if (language === '中文') {
+							cols.push({
+								field: colsData[i].Field,
+								title: colsData[i].Comment,
+								sort: true,
+								minWidth: 120,
+								totalRow: true,
+								edit: true
+							});
+						} else {
+							cols.push({
+								field: colsData[i].Field,
+								title: colsData[i].Field,
+								sort: true,
+								minWidth: 180,
+								totalRow: true
+							});
+						}
+					}
                 }
             }
         }
@@ -212,6 +227,106 @@ layui.use(['table','form'], function(){
 			});
 		});
 	});
+
+	$('#xzedit').click(function () {
+
+		var option =  '{foreach name="editor" item="v" key="k"}<option value="{$v.Field}" {$field==$v.Field?\'selected\':\'\'}">  {$v.Comment}</option>{/foreach}'
+		// if(option.indexOf('value="'+pid+'"') != -1){
+		//     option = option.replace('value="'+pid+'"','value="'+pid+'" selected');
+		// }
+
+		var html2='';
+		html2 +=  '<div class="layui-form-item" >'
+		html2 +=     '<label class="layui-form-label" style="width:70px;padding:9px 5px">字段:</label>'
+		html2 +=    '<div class="layui-input-inline ">'
+		html2 +=         '<select name="field[]" lay-verify="" lay-search class="layui-input"style="margin-left:15px; width:100px;">'
+		html2 +=             option
+		html2 +=        '</select>'
+		html2 +=     '</div>'
+		html2 +=  '</div>'
+		html2 += '<div class="layui-form-item" style="margin:15px 10px">'
+		html2 += '  <label class="layui-form-label" style="width:70px;padding:9px 5px">修改的值：</label>'
+		html2 += '  <div class="layui-input-block" style="margin-left:85px">'
+		html2 += '    <input class="layui-input" style="width:70%;float:left" name="numsss[]" id="editstr" value="" /><span  class="h38" style="display:block;float:left;margin-left:5px;"></span>'
+		html2 += '  </div>'
+		html2 += '</div>'
+
+		var html = '';
+		html += '<form id="add_form">';
+		html +=  '<div class="layui-form-item" >'
+		html +=     '<label class="layui-form-label" style="width:70px;padding:9px 5px">字段:</label>'
+		html +=    '<div class="layui-input-inline ">'
+		html +=         '<select name="field[]" lay-verify="" lay-search class="layui-input"style="margin-left:15px; width:100px;">'
+		html +=             option
+		html +=        '</select>'
+		html +=     '</div>'
+		html +=  '</div>'
+		html += '<div class="layui-form-item" style="margin:15px 10px">'
+		html += '  <label class="layui-form-label" style="width:70px;padding:9px 5px">修改的值：</label>'
+		html += '  <div class="layui-input-block" style="margin-left:85px">'
+		html += '    <input class="layui-input" style="width:70%;float:left" name="numsss[]" id="editstr" value="" /><span  class="h38" style="display:block;float:left;margin-left:5px;"></span>'
+		html += '  </div>'
+		html += '</div>'
+		html += '</form>'+
+				'<div href="javascript:;" class="add_input" >+</div>';
+		$(document).on('click','.add_input',function(){
+			$('#add_form').append(html2);// 追加元素
+		})
+
+		layer.open({
+			area: ['500px', '500px'], //宽高
+			offset: '100px',
+			closeBtn: 0,
+			title: '批量修改',
+			btn: ['确定', '取消'],
+			content: html,
+			yes: function (index, layero) {
+				var s ='' ; var n ='';
+				$('#add_form select[name="field[]"]').each(function (index ) {
+					s+= $(this).val() + "&";
+				});
+
+				$('#add_form input[name="numsss[]"]').each(function (index ) {
+					n+= $(this).val() + "&";
+				});
+				// var field = $('select[name="field[]"]').val();
+				// var editstr = $('input[name="numsss[]"]').val();
+				// console.log(a);
+				//console.log(s);
+				//console.log(n);
+				// console.log(field);
+				// console.log(editstr);
+				var checkStatus = table.checkStatus('test');
+				console.log(checkStatus.data)
+				var arr=new Object();
+				for(var i=0;i<checkStatus.data.length;i++){
+					arr[i] = checkStatus.data[i]['id']
+				}
+				console.log(arr);
+				$.ajax({
+					type: 'post',
+					url: "{:url('Batch_edit')}",
+					data: {arr: arr,field:s,numsss:n},
+					success: function (res) {
+						if(res.code==9999){
+							layer.msg('修改失败');
+						}else{
+							location.reload();
+							layer.close(index);
+							layer.msg(res);
+						}
+
+					},
+
+				});
+			},
+			btn2: function (index, layero) {
+				layer.close(index);
+				location.reload();
+			},
+		});
+
+	})
 
   	// 批量删除
 	$('#del').click(function () {

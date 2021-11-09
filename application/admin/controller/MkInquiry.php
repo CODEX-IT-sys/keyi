@@ -340,29 +340,33 @@ class MkInquiry extends Common
             unset($in_data['PM']);
             unset($in_data['VAT_Amount']);
 
-
+            $now = $data['bh_date'];
+            if(empty($now)){
+                $now = date("Ymd");
+            }
             // 查询 公司编码
             $company_code = Db::name('mk_contract')
                 ->where('Contract_Number', $i['Contract_Number'])->value('Company_Code');
 
             // 获取当天的文件数
             $arr = Db::name('mk_feseability')->field('id')
-                ->where('Assigned_Date',  intval(date("Ymd")))->select();
+                ->where('Assigned_Date',  intval($now))->select();
             $no = count($arr);
 
             /* 调用方法 生成 文件编号*/
-            $now = $data['bh_date'];
+
             $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
+
             // 来稿 委托日期
-            $f_data['Assigned_Date'] = date("Ymd");
+            $f_data['Assigned_Date'] = $now;
             // 来稿 填表人
             $f_data['Filled_by'] = session('administrator')['name'];
 
             // 结算 文件编号
             $in_data['Filing_Code'] = $f_data['Filing_Code'];
             // 结算 委托日期
-            $in_data['Assigned_Date'] = date("Ymd");
+            $in_data['Assigned_Date'] = $now;
             // 结算 填表人
             $in_data['Filled_by'] = session('administrator')['name'];
 
@@ -488,29 +492,34 @@ class MkInquiry extends Common
                 unset($in_data['PM']);
                 unset($in_data['VAT_Amount']);
 
+
+                $now = $data['bh_date'];
+                if(empty($now)){
+                    $now = date("Ymd");
+                }
+
                 // 查询 公司编码
                 $company_code = Db::name('mk_contract')
                     ->where('Contract_Number', $i['Contract_Number'])->value('Company_Code');
 
                 // 获取当天的文件数
                 $arr = Db::name('mk_feseability')->field('id')
-                    ->where('Assigned_Date',  intval(date("Ymd")))
+                    ->where('Assigned_Date',  intval($now))
                     ->select();
                 $no = count($arr);
 
                 /*调用方法 生成 文件编号*/
-                $now = $data['bh_date'];
                 $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
                 // 来稿 委托日期
-                $f_data['Assigned_Date'] = date("Ymd");
+                $f_data['Assigned_Date'] = $now;
                 // 来稿 填表人
                 $f_data['Filled_by'] = session('administrator')['name'];
 
                 // 结算 文件编号
                 $in_data['Filing_Code'] = $f_data['Filing_Code'];
                 // 结算 委托日期
-                $in_data['Assigned_Date'] = date("Ymd");
+                $in_data['Assigned_Date'] = $now;
                 // 结算 填表人
                 $in_data['Filled_by'] = session('administrator')['name'];
                 if($data['deliver_date']!=''){
@@ -936,29 +945,34 @@ class MkInquiry extends Common
             unset($in_data['PM']);
             unset($in_data['VAT_Amount']);
 
+            $now = $a['bh_date'];
+            if(empty($now)){
+                $now = date("Ymd");
+            }
             // 查询 公司编码
             $company_code = Db::name('mk_contract')
                 ->where('Contract_Number', $i['Contract_Number'])->value('Company_Code');
 
             // 获取当天的文件数
             $arr = Db::name('mk_feseability')->field('id')
-                ->where('Assigned_Date',  intval(date("Ymd")))
+                ->where('Assigned_Date',  intval($now))
                 ->select();
             $no = count($arr);
 
             /*调用方法 生成 文件编号*/
-            $now = $a['bh_date'];
+
             $f_data['Filing_Code'] = filing_number($company_code, $no,$now);
 
+
             // 来稿 委托日期
-            $f_data['Assigned_Date'] = date("Ymd");
+            $f_data['Assigned_Date'] = $now;
             // 来稿 填表人
             $f_data['Filled_by'] = session('administrator')['name'];
 
             // 结算 文件编号
             $in_data['Filing_Code'] = $f_data['Filing_Code'];
             // 结算 委托日期
-            $in_data['Assigned_Date'] = date("Ymd");
+            $in_data['Assigned_Date'] = $now;
             // 结算 填表人
             $in_data['Filled_by'] = session('administrator')['name'];
             if($a['deliver_date']!=''){

@@ -42,6 +42,18 @@ class Admin extends Controller
         return json(generate_layui_table_data($list));
     }
 
+    public function test(){
+        $list = Db::name('mk_invoicing')->field(['id','Date_of_Balance','payment_time'])->limit(0,100)->select();
+       /* foreach($list as $key=>$val){
+             if(!empty($val['payment_time'])){
+                 $data = [
+                     'Date_of_Balance' => $val['payment_time']
+                 ];
+                  $res = Db::name('mk_invoicing')->where('id',$val['id'])->update($data);
+             }
+         }*/
+        var_dump($list);
+    }
     // 显示新建用户的表单页
     public function create()
     {
