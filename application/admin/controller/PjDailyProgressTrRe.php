@@ -106,7 +106,7 @@ class PjDailyProgressTrRe extends Common
         $data = $request->post();
         $admin=$this->userinfo();
         //如果不是翻译,排版.完成页数为0
-        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
+        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
             $data['Number_of_Pages_Completed']=0;
         };
         //计算项目描述表中的文件编号的页数
@@ -182,7 +182,7 @@ class PjDailyProgressTrRe extends Common
 
         $admin=$this->userinfo();
         //如果不是翻译,排版.完成页数为0
-        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
+        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
             $data['Number_of_Pages_Completed']=0;
         };
         //计算项目描述表中的文件编号的页数

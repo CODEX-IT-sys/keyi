@@ -202,7 +202,7 @@
 										{:session('language') == '中文'? '中文字数统计' : 'Total Chinese Characters'}
 									</label>
 									<div class="layui-input-block">
-										<input name="Total_Chinese_Characters" id="zzs" autocomplete="off" placeholder="" class="layui-input" type="number" >
+										<input name="Total_Chinese_Characters" id="zzs" autocomplete="off" readonly="readonly" placeholder="" class="layui-input" type="number" >
 									</div>
 								</div>
 							</div>
@@ -457,7 +457,7 @@
             var yzs = $.trim($('#yzs').val());
             var zcfz = $.trim($('#zcfz').val());
             var kczs = $.trim($('#kczs').val());
-
+			alert(zcfz);
             yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0;
 
 			if(zcfz < 15){
