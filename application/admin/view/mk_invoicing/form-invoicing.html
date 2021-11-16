@@ -191,7 +191,20 @@
 							        </div>
 								</div>
 							</div>
-
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '单价状态' : 'Apply to Pay'}">
+										{:session('language') == '中文'? '单价状态' : 'Apply to Pay'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Price_Status" id="djzt" lay-filter="Apply_to_Pay" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											<option value="含税" {$info.Price_Status=="含税"?'selected':''}>含税</option>
+											<option value="不含税" {$info.Price_Status=="不含税"?'selected':''}>不含税</option>
+										</select>
+									</div>
+								</div>
+							</div>
                             <div class="layui-col-xs4">
 								<div class="layui-form-item">
 									<label class="layui-form-label" title="{:session('language') == '中文'? '单价' : 'Unit Price'}">
@@ -813,17 +826,28 @@
 			var jfsl = $.trim($('#jfsl').val());
 			var sl = $.trim($('#sl').val());
 			var dj = $.trim($('#dj').val());
+			var djzt = $.trim($('#djzt').val());
+			jfsl?jfsl:0; dj?dj:0; sl?sl:0;djzt?djzt:'含税';
 
-			jfsl?jfsl:0; dj?dj:0; sl?sl:0;
+			if(djzt == '含税'){
+				// 请款金额
+				var qkje = Number(dj) * Number(jfsl);
+				// 未税金额
+				var wsje = Number(qkje) / Number(1+sl/100);
+				wsje = wsje.toFixed(2);
+				// 增值税额
+				var zzse = Number(qkje) - Number(wsje) ;
+				zzse = zzse.toFixed(2);
+			}else{
+				// 未税金额
+				var wsje = Number(jfsl) * Number(dj);
 
-			// 未税金额
-			var wsje = Number(jfsl) * Number(dj);
+				// 增值税额
+				var zzse = Number(jfsl) * Number(dj) * sl/100;
 
-			// 增值税额
-			var zzse = Number(jfsl) * Number(dj) * sl/100;
-
-			// 请款金额
-			var qkje = Number(wsje) + Number(zzse);
+				// 请款金额
+				var qkje = Number(wsje) + Number(zzse);
+			}
 
 			$('#wsje').val(wsje);
 
@@ -838,17 +862,28 @@
 			var jfsl = $.trim($('#jfsl').val());
 			var sl = $.trim($('#sl').val());
 			var dj = $.trim($('#dj').val());
+			var djzt = $.trim($('#djzt').val());
+			jfsl?jfsl:0; dj?dj:0; sl?sl:0;djzt?djzt:'含税';
 
-			jfsl?jfsl:0; dj?dj:0; sl?sl:0;
+			if(djzt == '含税'){
+				// 请款金额
+				var qkje = Number(dj) * Number(jfsl);
+				// 未税金额
+				var wsje = Number(qkje) / Number(1+sl/100);
+				wsje = wsje.toFixed(2);
+				// 增值税额
+				var zzse = Number(qkje) - Number(wsje) ;
+				zzse = zzse.toFixed(2);
+			}else{
+				// 未税金额
+				var wsje = Number(jfsl) * Number(dj);
 
-			// 未税金额
-			var wsje = Number(jfsl) * Number(dj);
+				// 增值税额
+				var zzse = Number(jfsl) * Number(dj) * sl/100;
 
-			// 增值税额
-			var zzse = Number(jfsl) * Number(dj) * sl/100;
-
-			// 请款金额
-			var qkje = Number(wsje) + Number(zzse);
+				// 请款金额
+				var qkje = Number(wsje) + Number(zzse);
+			}
 
 			$('#wsje').val(wsje);
 
