@@ -25,7 +25,14 @@
 			<div class="mainCt">
 				<div class="mainWrap">
 					<!--搜索-->
-
+					<form class="layui-form layui-inline" action="/admin/task/index3" id="sub">
+						<div class="layui-form-item">
+							<label class="layui-form-label">选择月份</label>
+							<div class="layui-input-block">
+								<input type="month" name="month3" placeholder="" value="{:input('month3')}" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+					</form>
 					<div class="forwardTable farTable">
 						<table class="layui-hide" id="test" lay-filter="test"></table>
 					</div>

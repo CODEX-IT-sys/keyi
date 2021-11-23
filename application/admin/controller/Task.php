@@ -24,22 +24,133 @@ class Task extends Common
         $base = TaskModel::getOne('admin');
 
         //每天要完成多少页
-        /*$data=request()->param('month');
+        $data=request()->param('month');
         if(isset($data)){
             session('month',$data);
 
         }
-        $data = session('month');*/
+        $data = session('month');
 
-        //第一行从当前时间开始
-        $time= time();
-        $firstTime = strtotime(date("Y-m-d"),time());
+        if(isset($data)){
+            $time= strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+            if($data==''){
+                $firstTime=19701201;
+                $lastTime=20351201;
+                $time= time();
+                $year = date("Y", $time);
 
-        $firstTime=intval(date("Ymd",$firstTime));
+                $month = date("m", $time);
 
-        $list=  Db::table('ky_pj_contract_review')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
-            ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
-        //var_dump($list);
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t',$firstTime);
+                $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+                $firstTime=intval(date("Ymd",$firstTime));
+                $lastTime=intval(date("Ymd",$lastTime));
+            }
+
+            $list=  Db::table('ky_pj_contract_review')->whereBetweenTime('Completed',$firstTime,$lastTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+        }else{
+            //第一行从当前时间开始
+            $time= time();
+            $firstTime = strtotime(date("Y-m-d"),time());
+
+            $firstTime=intval(date("Ymd",$firstTime));
+
+            $list=  Db::table('ky_pj_contract_review')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+
+        }
+
+        //var_dump($list);die;
+
+        foreach($list as $key=>$val){
+            $sub_date = $val['Completed'];
+            $n = date('N', strtotime($sub_date));
+
+            if($n == 6){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)){
+                    $cha = $list[$key]['Completed'] - $list[$key-1]['Completed'];
+                    if($cha == 1){
+                        $list[$key-1]['sumpage'] = $list[$key-1]['sumpage']+$val['sumpage'];
+                        unset($list[$key]);
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-1,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        unset($list[$key]);
+                        $list[$key] = $five;
+                    }
+
+
+
+                }
+
+            }
+
+
+            if($n == 7){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)) {
+                    $cha = $list[$key]['Completed'] - $list[$key - 1]['Completed'];
+                    //差值为2是周五 为1是周六，不做修改
+                    if ($cha == 2) {
+                        $list[$key - 1]['sumpage'] = $list[$key - 1]['sumpage'] + $val['sumpage'];
+                    } else {
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed'] - 2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+                }elseif(array_key_exists($key-2,$list)){
+                    $cha2 = $list[$key]['Completed'] - $list[$key-2]['Completed'];
+
+                    //差值为2是周五
+                    if($cha2 == 2){
+                        $list[$key-2]['sumpage'] = $list[$key-2]['sumpage']+$val['sumpage'];
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+
+                }else{
+                    //新建一个周五的数据
+                    $five = [
+                        'Completed' => $val['Completed']-2,
+                        'sumpage' => $val['sumpage'],
+                    ];
+                    $list[] = $five;
+                }
+                unset($list[$key]);
+
+            }
+
+
+        }
+        //var_dump($list);die;
+        $Completed = array_column($list,'Completed');
+        array_multisort($Completed,SORT_ASC,$list);
+        //var_dump($list);die;
 
         $preDate = '';
         $totalRow = [];
@@ -184,21 +295,131 @@ class Task extends Common
         $base = TaskModel::getOne('PM01');
 
         //每天要完成多少页
-        /*$data=request()->param('month');
+        $data=request()->param('month2');
         if(isset($data)){
-            session('month',$data);
+            session('month2',$data);
 
         }
-        $data = session('month');*/
+        $data = session('month2');
 
-        //第一行从当前时间开始
-        $time= time();
-        $firstTime = strtotime(date("Y-m-d"),time());
+        if(isset($data)){
+            $time= strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+            if($data==''){
+                $firstTime=19701201;
+                $lastTime=20351201;
+                $time= time();
+                $year = date("Y", $time);
 
-        $firstTime=intval(date("Ymd",$firstTime));
+                $month = date("m", $time);
 
-        $list=  Db::table('ky_pj_contract_review')->where('PM','PM01')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
-            ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t',$firstTime);
+                $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+                $firstTime=intval(date("Ymd",$firstTime));
+                $lastTime=intval(date("Ymd",$lastTime));
+            }
+
+            $list=  Db::table('ky_pj_contract_review')->where('PM','PM01')->whereBetweenTime('Completed',$firstTime,$lastTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+        }else{
+            //第一行从当前时间开始
+            $time= time();
+            $firstTime = strtotime(date("Y-m-d"),time());
+
+            $firstTime=intval(date("Ymd",$firstTime));
+
+            $list=  Db::table('ky_pj_contract_review')->where('PM','PM01')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+
+        }
+
+        foreach($list as $key=>$val){
+            $sub_date = $val['Completed'];
+            $n = date('N', strtotime($sub_date));
+
+            if($n == 6){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)){
+                    $cha = $list[$key]['Completed'] - $list[$key-1]['Completed'];
+                    if($cha == 1){
+                        $list[$key-1]['sumpage'] = $list[$key-1]['sumpage']+$val['sumpage'];
+                        unset($list[$key]);
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-1,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        unset($list[$key]);
+                        $list[$key] = $five;
+                    }
+
+
+
+                }
+
+            }
+
+
+            if($n == 7){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)) {
+                    $cha = $list[$key]['Completed'] - $list[$key - 1]['Completed'];
+                    //差值为2是周五 为1是周六，不做修改
+                    if ($cha == 2) {
+                        $list[$key - 1]['sumpage'] = $list[$key - 1]['sumpage'] + $val['sumpage'];
+                    } else {
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed'] - 2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+                }elseif(array_key_exists($key-2,$list)){
+                    $cha2 = $list[$key]['Completed'] - $list[$key-2]['Completed'];
+
+                    //差值为2是周五
+                    if($cha2 == 2){
+                        $list[$key-2]['sumpage'] = $list[$key-2]['sumpage']+$val['sumpage'];
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+
+                }else{
+                    //新建一个周五的数据
+                    $five = [
+                        'Completed' => $val['Completed']-2,
+                        'sumpage' => $val['sumpage'],
+                    ];
+                    $list[] = $five;
+                }
+                unset($list[$key]);
+
+            }
+
+
+        }
+
+        $Completed = array_column($list,'Completed');
+        array_multisort($Completed,SORT_ASC,$list);
+
         //var_dump($list);
 
         $preDate = '';
@@ -344,21 +565,130 @@ class Task extends Common
         $base = TaskModel::getOne('PM02');
 
         //每天要完成多少页
-        /*$data=request()->param('month');
+        $data=request()->param('month3');
         if(isset($data)){
-            session('month',$data);
+            session('month3',$data);
 
         }
-        $data = session('month');*/
+        $data = session('month3');
 
-        //第一行从当前时间开始
-        $time= time();
-        $firstTime = strtotime(date("Y-m-d"),time());
+        if(isset($data)){
+            $time= strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+            if($data==''){
+                $firstTime=19701201;
+                $lastTime=20351201;
+                $time= time();
+                $year = date("Y", $time);
 
-        $firstTime=intval(date("Ymd",$firstTime));
+                $month = date("m", $time);
 
-        $list=  Db::table('ky_pj_contract_review')->where('PM','PM02')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
-            ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t',$firstTime);
+                $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+                $firstTime=intval(date("Ymd",$firstTime));
+                $lastTime=intval(date("Ymd",$lastTime));
+            }
+
+            $list=  Db::table('ky_pj_contract_review')->where('PM','PM02')->whereBetweenTime('Completed',$firstTime,$lastTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+        }else{
+            //第一行从当前时间开始
+            $time= time();
+            $firstTime = strtotime(date("Y-m-d"),time());
+
+            $firstTime=intval(date("Ymd",$firstTime));
+
+            $list=  Db::table('ky_pj_contract_review')->where('PM','PM02')->where('Completed','>=',$firstTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
+                ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
+
+        }
+
+        foreach($list as $key=>$val){
+            $sub_date = $val['Completed'];
+            $n = date('N', strtotime($sub_date));
+
+            if($n == 6){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)){
+                    $cha = $list[$key]['Completed'] - $list[$key-1]['Completed'];
+                    if($cha == 1){
+                        $list[$key-1]['sumpage'] = $list[$key-1]['sumpage']+$val['sumpage'];
+                        unset($list[$key]);
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-1,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        unset($list[$key]);
+                        $list[$key] = $five;
+                    }
+
+
+
+                }
+
+            }
+
+
+            if($n == 7){
+                //判断前一天是否是周五，是的话将提交页数提交到周五 不是的话虚拟一个周五
+                if(array_key_exists($key-1,$list)) {
+                    $cha = $list[$key]['Completed'] - $list[$key - 1]['Completed'];
+                    //差值为2是周五 为1是周六，不做修改
+                    if ($cha == 2) {
+                        $list[$key - 1]['sumpage'] = $list[$key - 1]['sumpage'] + $val['sumpage'];
+                    } else {
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed'] - 2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+                }elseif(array_key_exists($key-2,$list)){
+                    $cha2 = $list[$key]['Completed'] - $list[$key-2]['Completed'];
+
+                    //差值为2是周五
+                    if($cha2 == 2){
+                        $list[$key-2]['sumpage'] = $list[$key-2]['sumpage']+$val['sumpage'];
+                    }else{
+                        //新建一个周五的数据
+                        $five = [
+                            'Completed' => $val['Completed']-2,
+                            'sumpage' => $val['sumpage'],
+                        ];
+                        $list[] = $five;
+                    }
+
+                }else{
+                    //新建一个周五的数据
+                    $five = [
+                        'Completed' => $val['Completed']-2,
+                        'sumpage' => $val['sumpage'],
+                    ];
+                    $list[] = $five;
+                }
+                unset($list[$key]);
+
+            }
+
+
+        }
+
+        $Completed = array_column($list,'Completed');
+        array_multisort($Completed,SORT_ASC,$list);
         //var_dump($list);
 
         $preDate = '';
