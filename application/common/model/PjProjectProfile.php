@@ -80,7 +80,7 @@ class PjProjectProfile extends Model
 
                 $field_name = '';
 
-                if($job_id == 7){
+                /*if($job_id == 7){
                     $field_name = 'PA';
                 } else if($job_id == 10 or $job_id == 19){
                     $field_name = 'Translator';
@@ -95,8 +95,21 @@ class PjProjectProfile extends Model
                 // 否则 就只显示自己录入和参与的数据
                 $query = $this->where(function ($query) use($field_name, $name) {
                     $query->where($field_name, 'like', "%$name%");
-                });
+                });*/
 
+                if($job_id == 7){
+                    $field_name = 'PA';
+                    $query = $this->where(function ($query) use($field_name, $name) {
+                        $query->where($field_name, 'like', "%$name%");
+                    });
+                } else{
+                    $query = $this->where(function ($query) use($name){
+                        $query->where('Translator', 'like', "%$name%")
+                            ->whereOr('Reviser', 'like', "%$name%")
+                            ->whereOr('Pre_Formatter','like',"%$name%")
+                            ->whereOr('Post_Formatter','like',"%$name%");
+                    });
+                }
                 // codex 校长、副校长、质控主管
             }else if(in_array($job_id, [4,6,15])) {
 
@@ -208,7 +221,7 @@ class PjProjectProfile extends Model
 
             $field_name = '';
 
-            if($job_id == 7){
+            /*if($job_id == 7){
                 $field_name = 'PA';
             } else if($job_id == 10 or $job_id == 19){
                 $field_name = 'Translator';
@@ -223,7 +236,21 @@ class PjProjectProfile extends Model
             // 否则 就只显示自己录入和参与的数据
             $query = $this->where(function ($query) use($field_name, $name) {
                 $query->where($field_name, 'like', "%$name%");
-            });
+            });*/
+
+            if($job_id == 7){
+                $field_name = 'PA';
+                $query = $this->where(function ($query) use($field_name, $name) {
+                    $query->where($field_name, 'like', "%$name%");
+                });
+            } else{
+                $query = $this->where(function ($query) use($name){
+                    $query->where('Translator', 'like', "%$name%")
+                        ->whereOr('Reviser', 'like', "%$name%")
+                        ->whereOr('Pre_Formatter','like',"%$name%")
+                        ->whereOr('Post_Formatter','like',"%$name%");
+                });
+            }
 
             // codex 校长、副校长、质控主管
         }else if(in_array($job_id, [4,6,15])) {
