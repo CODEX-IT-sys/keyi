@@ -46,6 +46,16 @@ class PjDailyProgressTrRe extends Model
                     $name_arr = Db::name('xt_dict')->where('c_id',$c_id)->select();
                     $name_arr = array_column($name_arr,'cn_name');
 
+                    if($name == 'PA03'){
+                        //兼职新人组
+                        $xid = Db::name('xt_dict_cate')->where('en_name','PA99')->field(['id'])->find();
+                        $x_id = $xid['id'];
+                        $x_arr = Db::name('xt_dict')->where('c_id',$x_id)->select();
+                        $x_arr = array_column($x_arr,'cn_name');
+                        $name_arr = array_merge($name_arr,$x_arr);
+
+                    }
+
                     $query = $this->where(function ($query) use($name,$name_arr) {
                         $query->where('Filled_by','in',$name_arr)
                             ->whereOr('Name_of_Translator_or_Reviser', 'in', $name_arr);
