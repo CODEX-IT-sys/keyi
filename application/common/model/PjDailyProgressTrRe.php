@@ -35,15 +35,32 @@ class PjDailyProgressTrRe extends Model
 
         $query = $this;
 
-            // 查询器对象 判断管理层
-            if(!in_array($job_id, [1,7,8,9,16,17,20])) {
+        // 查询器对象 判断管理层
+        if(!in_array($job_id, [1,8,9,16,17,20])) {
 
+            if($job_id == 7){
+                $cid = Db::name('xt_dict_cate')->where('en_name',$name)->field(['id'])->find();
+
+                if($cid){
+                    $c_id = $cid['id'];
+                    $name_arr = Db::name('xt_dict')->where('c_id',$c_id)->select();
+                    $name_arr = array_column($name_arr,'cn_name');
+
+                    $query = $this->where(function ($query) use($name,$name_arr) {
+                        $query->where('Filled_by','in',$name_arr)
+                            ->whereOr('Name_of_Translator_or_Reviser', 'in', $name_arr);
+                    });
+                }
+
+            }else{
                 // 否则 就只显示自己录入的 或 项目助理数据
                 $query = $this->where(function ($query) use($name) {
                     $query->where('Filled_by', $name)
                         ->whereOr('Name_of_Translator_or_Reviser', 'like', "$name%");
                 });
             }
+
+        }
 
 
 
