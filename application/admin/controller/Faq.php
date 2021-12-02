@@ -240,8 +240,10 @@ class Faq extends Common
         // 保存
         FaqModel::create($data);
 
+        echo "<script>history.go(-2);</script>";
+
         // 返回操作结果
-        $this->redirect('index');
+        //$this->redirect('index');
     }
 
     // 更新
