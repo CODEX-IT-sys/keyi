@@ -402,22 +402,22 @@ class PjProjectProfile extends Common
 		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 翻译
-        $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6,19])
+        $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $tr = array_merge($tr, $na);
 
         // 校对
-        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6])
+        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $re = array_merge($re, $na);
 
         // 预排
-        $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,10,11,12,13,5])
+        $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $yp = array_merge($yp, $na);
 
         // 后排
-        $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,10,11,12,13,5])
+        $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $hp = array_merge($hp, $na);
 
@@ -444,7 +444,7 @@ class PjProjectProfile extends Common
         $na = [['value'=>0, 'name'=>'N/A']];
 
         // 校对
-        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6])
+        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $re = array_merge($re, $na);
 
@@ -490,7 +490,7 @@ class PjProjectProfile extends Common
 		$fy = Db::name('xt_dict')->where('c_id',8)->order('sort','asc')->select();
 
         // 翻译
-        $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6,19])
+        $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $tr = array_merge($tr, $na);
         foreach ($tr as $k => $v){
@@ -500,7 +500,7 @@ class PjProjectProfile extends Common
         }
 
         // 校对
-        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6])
+        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $re = array_merge($re, $na);
         foreach ($re as $k => $v){
@@ -510,7 +510,7 @@ class PjProjectProfile extends Common
         }
 
         // 预排
-        $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,10,11,12,13,5])
+        $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $yp = array_merge($yp, $na);
         foreach ($yp as $k => $v){
@@ -520,7 +520,7 @@ class PjProjectProfile extends Common
         }
 
         // 后排
-        $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,10,11,12,13,5])
+        $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $hp = array_merge($hp, $na);
         foreach ($hp as $k => $v){
@@ -556,7 +556,7 @@ class PjProjectProfile extends Common
         $na = [['value'=>0, 'name'=>'N/A']];
 
         // 校对
-        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6])
+        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $re = array_merge($re, $na);
         foreach ($re as $k => $v){
@@ -580,7 +580,7 @@ class PjProjectProfile extends Common
         $na = [['value'=>0, 'name'=>'N/A']];
 
         // 校对
-        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,12,13,8,4,15,6])
+        $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
             ->where(['status'=> 0, 'delete_time'=>0])->select();
         $re = array_merge($re, $na);
         foreach ($re as $k => $v){
