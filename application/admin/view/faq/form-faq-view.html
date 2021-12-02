@@ -1,0 +1,127 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="top">
+				<div class="position_lead">
+					<i class="iconfont icon-navigation"></i>
+					<a href="#">{:session('language') == '中文'? 'FAQ' : 'Project Management'}</a>
+					<a class="on">{:session('language') == '中文'? '常见问题' : 'Contract Review'}</a>
+				</div>
+				<div class="global_btn">
+					<button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+					<a href="javascript:history.back(-1);">
+						<button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' : 'Back'}</button>
+					</a>
+				</div>
+			</div>
+			<div class="mainCt mainSec formReset signLimit">
+				<div class="mainWrap">
+
+					<form class="layui-form" id="form" method="post" action="{:url('faq/update')}">
+
+						<div class="layui-row layui-col-space10">
+
+							<input type="hidden" value="{$info.id}" name="id">
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '标题' : 'Job Name'}">
+										{:session('language') == '中文'? '标题' : 'Job Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="title" lay-verify="required" value="{$info.title|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '简介' : 'Company Name'}">
+										{:session('language') == '中文'? '简介' : 'Company Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="dec" lay-verify="required" value="{$info.dec|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '分类' : 'Language'}">
+										{:session('language') == '中文'? '分类' : 'Language'}
+									</label>
+									<div class="layui-input-block">
+										<select name="cate_id" lay-filter="Language" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$cate" id="v"}
+											<option value="{$v.id}" {$info.cate_id==$v.cn_name?'selected':''}>{:session('language') == '中文'?$v.cn_name : $v.en_name} </option>
+											{/volist}
+										</select>
+									</div>
+								</div>
+							</div>
+
+
+							<div class="layui-col-xs12">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '内容' : 'Comment'}">
+										{:session('language') == '中文'? '内容' : 'Comment'}
+									</label>
+									<div class="layui-input-block">
+										<textarea id="demo" lay-verify="content" name="content" class="layui-textarea">{$info.content|default=''}</textarea>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+
+{js href="__JS__/xm-select.js"}
+
+<script>
+	layui.use(["jquery", "form", "layedit"], function () {
+		var $ = layui.jquery
+				,upload = layui.upload
+				,layedit = layui.layedit
+				,form = layui.form;
+		//注意：layedit.set 一定要放在 build 前面，否则配置全局接口将无效。
+		layedit.set({
+			uploadImage: {
+				url: "{:url('upload')}" //图片上传接口
+				,type: 'post' //默认post
+			}
+		});
+		var index = layedit.build('demo'); //建立编辑器
+		//提交时把值同步到文本域中
+		form.verify({
+			//content富文本域中的lay-verify值
+			content: function (value) {
+				return layedit.sync(index);
+			}
+		});
+
+
+		// 数据提交
+		$('#save').on('click', function () {
+			// 表单提交
+			$('#form').submit();
+		});
+	})
+
+
+</script>
+{/block}
