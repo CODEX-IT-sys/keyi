@@ -119,7 +119,7 @@ class PjDailyProgressDtp extends Common
             return $this->error('该文件完成页数和和超过项目描述页数');
         }
 
-        if($data['Work_Content']=='Postformat'){
+      /*  if($data['Work_Content']=='Postformat'){
             //获取y排版人员
             $ypb=Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])
                 ->where('Work_Content','Preformat')->select();
@@ -131,7 +131,7 @@ class PjDailyProgressDtp extends Common
             if(in_array($data['Name_of_Formatter'],$man)){
                 $data['Number_of_Pages_Completed']=0;
             }
-        }
+        }*/
         // 计算实际用时
         $s = strtotime($data['Start_Time']);
         $e = strtotime($data['End_Time']);
@@ -187,7 +187,7 @@ class PjDailyProgressDtp extends Common
             return $this->error('该文件完成页数和和超过项目描述页数');
         }
 
-        if($data['Work_Content']=='Postformat'){
+        /*if($data['Work_Content']=='Postformat'){
             //获取y排版人员
             $ypb=Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])
                 ->where('Work_Content','Preformat')->select();
@@ -199,7 +199,7 @@ class PjDailyProgressDtp extends Common
             if(in_array($data['Name_of_Formatter'],$man)){
                 $data['Number_of_Pages_Completed']=0;
             }
-        }
+        }*/
 
         // 计算实际用时
         $s = strtotime($data['Start_Time']);
