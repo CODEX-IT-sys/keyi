@@ -179,6 +179,62 @@ class Faq extends Common
         // 返回数据
         return json(generate_layui_table_data($list));
     }
+
+    public function project(Request $request, $search_type = '', $field = '', $keyword = '', $limit = 50)
+    {
+        // 数据库表字段集
+        $colsData = getAllField('ky_faq');
+
+        foreach ($colsData as $k=>$v)
+        {
+            switch($v['Field']){
+                case 'title':
+                    $colsData[$k]['width']=300;
+                    $colsData[$k]['fixed']='left';
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'content':
+                    $colsData[$k]['hide']='true';
+                    break;
+                case 'update_time':
+                    $colsData[$k]['hide']='true';
+                    break;
+                case 'create_time':
+                    $colsData[$k]['hide']='true';
+                    break;
+                case 'Filled_by':
+                    $colsData[$k]['hide']='true';
+                    break;
+                default:;
+
+            }
+
+        }
+
+        // 查询分类信息
+        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+
+        if($request->has('search_type')){
+            $data= $request->only(['search_type']);
+            $search_type=$data ["search_type"];
+        }
+        // 非Ajax请求，直接返回视图
+        if (!$request->isAjax()) {
+            return view('', [
+                'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword,
+                'search_type'=>$search_type
+            ]);
+        }
+        $cate = '项目';
+        // 调用模型获取列表
+        $list = FaqModel::getList($search_type, $field, $keyword, $limit,$cate);
+
+
+        // 返回数据
+        return json(generate_layui_table_data($list));
+    }
+
     // 搜索弹框
     public function condition()
     {
