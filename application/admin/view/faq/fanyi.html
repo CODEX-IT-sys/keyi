@@ -111,15 +111,17 @@ layui.use(['table','form'], function(){
         for(var i = 0; i < l; i++){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
-                    if(language === '中文'){
-                        // cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
-						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
-						style: colsData[i].style
+					if(colsData[i].Field !== 'content'){
+						if(language === '中文'){
+							// cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
+							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
+							style: colsData[i].style
 
-						});
-                    }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
-                    }
+							});
+						}else{
+							cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+						}
+					}
                 }
             }
         }
