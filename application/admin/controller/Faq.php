@@ -226,7 +226,7 @@ class Faq extends Common
                 'search_type'=>$search_type
             ]);
         }
-        $cate = '项目';
+        $cate = '项目管理';
         // 调用模型获取列表
         $list = FaqModel::getList($search_type, $field, $keyword, $limit,$cate);
 
@@ -273,13 +273,6 @@ class Faq extends Common
     {
         // 查询信息
         $res = FaqModel::get($id);
-        $job_id = session('administrator')['job_id'];
-        $name = session('administrator')['name'];
-        if(!in_array($job_id, [1,8,9,20])) {
-            if ($res['Filled_by'] != $name) {
-                return $this->error('非本人不能修改');
-            }
-        }
 
         $cate_id = $res['cate_id'];
 
@@ -319,7 +312,7 @@ class Faq extends Common
         $data['Filled_by'] = session('administrator')['name'];
 
         $upData = [
-          'title' =>$data['title'],
+            'title' =>$data['title'],
             'dec' => $data['dec'],
             'cate_id' => $data['cate_id'],
             'content' =>$data['content'],
@@ -338,16 +331,7 @@ class Faq extends Common
     // 删除
     public function delete($id)
     {
-        // 查询信息
-        $res = FaqModel::get($id);
 
-        $job_id = session('administrator')['job_id'];
-        $name = session('administrator')['name'];
-        if(!in_array($job_id, [1,8,9,20])) {
-            if ($res['Filled_by'] != $name) {
-                return $this->error('非本人不能删除');
-            }
-        }
         // 调用模型删除
         FaqModel::destroy($id);
 
