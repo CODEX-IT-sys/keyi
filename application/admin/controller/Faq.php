@@ -46,7 +46,7 @@ class Faq extends Common
         }
 
         // 查询分类信息
-        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $intro = Db::name('xt_table_text')->where('id',17)->value('intro');
 
         if($request->has('search_type')){
             $data= $request->only(['search_type']);
@@ -103,7 +103,7 @@ class Faq extends Common
         }
 
         // 查询分类信息
-        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $intro = Db::name('xt_table_text')->where('id',17)->value('intro');
 
         if($request->has('search_type')){
             $data= $request->only(['search_type']);
@@ -157,7 +157,7 @@ class Faq extends Common
         }
 
         // 查询分类信息
-        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $intro = Db::name('xt_table_text')->where('id',17)->value('intro');
 
         if($request->has('search_type')){
             $data= $request->only(['search_type']);
@@ -212,7 +212,7 @@ class Faq extends Common
         }
 
         // 查询分类信息
-        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $intro = Db::name('xt_table_text')->where('id',17)->value('intro');
 
         if($request->has('search_type')){
             $data= $request->only(['search_type']);
