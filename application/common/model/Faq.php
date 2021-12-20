@@ -38,24 +38,81 @@ class Faq extends Model
         $job_id = session('administrator')['job_id'];
 
         $query = $this;
-
-        // 查询器对象 判断管理层
+        //获取分类
         $query = $this->alias('a')
             ->join('faq_cate c', 'a.cate_id = c.id')
             ->field('a.*, c.cn_name')
             ->where('c.cn_name', '=', $cate);
 
-        if($field == 'cate_id'){
+        // 如果有搜索类型，添加查询条件
+        if ($search_type != '') {
 
-            $query = $this->alias('a')
-                ->join('faq_cate c', 'a.cate_id = c.id')
-                ->field('a.*, c.cn_name')
-                ->where('c.cn_name', 'like', "%$keyword%");
+            $field_arr = explode(',' , $field);//字段数组
+            $keyword_arr = explode(',' , $keyword);//关键词数组
 
+            // 字段不为空
+            if($search_type == 'and'){
+                //多字段 且 查询
+                $query = $query->where(function ($query) use($field_arr, $keyword_arr) {
+                    foreach ($field_arr as $k => $v){
+                        foreach ($keyword_arr as $key => $val){
+                            if($k == $key) {
+                                if ($v == 'cate_id') {
+                                    $query = $this->alias('a')
+                                        ->join('faq_cate c', 'a.cate_id = c.id')
+                                        ->field('a.*, c.cn_name')
+                                        ->where('c.cn_name', 'like', "%$val%");
+
+                                } else {
+                                    $query = $query->where($v, 'like', "%$val%");
+                                }
+                            }
+                        }
+                    }
+                });
+            }else{
+                //多字段 或 查询
+                $query = $query->where(function ($query) use($field_arr, $keyword_arr) {
+                    foreach ($field_arr as $k => $v){
+                        foreach ($keyword_arr as $key => $val){
+                            if($k == $key) {
+                                if($v == 'cate_id'){
+                                    $query = $this->alias('a')
+                                        ->join('faq_cate c', 'a.cate_id = c.id')
+                                        ->field('a.*, c.cn_name')
+                                        ->whereXor('c.cn_name', 'like', "%$val%");
+
+                                }else{
+                                    $query = $query->whereXor($v, 'like', "%$val%");
+                                }
+
+                            }
+                        }
+                    }
+                });
+
+
+
+            }
         }else{
+            // 字段不为空
+            if(!empty($field)){// 单字段查询
 
-            $query = $query->where($field, 'like', "%$keyword%");
+                if($field == 'cate_id'){
+
+                    $query = $this->alias('a')
+                        ->join('faq_cate c', 'a.cate_id = c.id')
+                        ->field('a.*, c.cn_name')
+                        ->where('c.cn_name', 'like', "%$keyword%");
+
+                }else{
+
+                    $query = $query->where($field, 'like', "%$keyword%");
+                }
+            }
         }
+
+
 
         // 返回分页对象
         return $query->order('id desc')->paginate($limit);
