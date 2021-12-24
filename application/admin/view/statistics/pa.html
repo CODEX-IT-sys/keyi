@@ -23,13 +23,13 @@
                 </thead>
 
             </table>
-            <table class="layui-table" lay-filter="demo" lay-data="{toolbar: true,}">
+            <table class="layui-table" lay-filter="demo1" lay-data="{limit:30,toolbar: true,}">
                 <thead >
-                <tr>
-                    <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                    <th lay-data="{field:'sumpage1',sort:true}">未提交页数</th>
-                    <th lay-data="{field:'num1',sort: true}">未提交份数</th>
-                </tr>
+             <tr>
+                <th lay-data="{field:'PA',sort: true}">项目助理</th>
+                <th lay-data="{field:'sumpage1',sort:true}">未提交页数</th>
+                <th lay-data="{field:'num1',sort: true}">未提交份数</th>
+            </tr> 
                 </thead>
                 <tbody>
                 {foreach $pa2 as $key=>$vo }

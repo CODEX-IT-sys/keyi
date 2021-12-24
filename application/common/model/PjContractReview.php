@@ -110,8 +110,19 @@ class PjContractReview extends Model
             });
         }
 
-        // 返回分页对象
-        return $query->order('Date desc, id desc')->paginate($limit);
+       // 返回分页对象
+        return $query->order('Date desc, id desc')->paginate($limit)->each(function($item, $key){
+
+        $expect = strtotime($item["Delivery_Date_Expected"]); //客户期望日期
+            $expect = date('Ymd',$expect);
+        $completed = $item["Completed"];
+        $item['Early_days'] = $completed - $expect;
+        if($item['Early_days'] >100 || $item['Early_days'] < -100){
+            $item['Early_days'] = -999;
+        }
+            return $item;
+
+        });
     }
 
     public function getAll()

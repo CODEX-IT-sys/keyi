@@ -624,15 +624,67 @@ class MkFeseability extends Common
                     if ($i['Approval_General_Manager'] != 'Yes') {
 
                         //$js_data = Db::name('mk_feseability')->where('id', $v)->field($js)->find();
+                         $pa01 = ['飞利浦','泛生子'];
+                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology'];
+                         $pa03 = ['比司特','库克','嘉德诺','Cryolife','唯美','微创心脉','瓦里安','微创神通','梅里埃','华大智造','索诺瓦','法液空'];
+                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
+                         $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
+                         $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
+                         $pa08 = ['碧迪','赛默飞'];
+                         $pa09 = ['拜耳海外','卡尔蔡司'];
+                         $pa10 = ['雅培','皆美'];
+                         $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
+                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
 
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
                         $pj_data['Date'] = substr($pj_data['Filing_Code'], 2, 8);
-
+                        
                         $pj_db_data = Db::name('mk_feseability')->where('id', $v)->field($pj_db)->find();
 
                         //$gsqc = Db::name('mk_inquiry')->where('Contract_Number',$i['Contract_Number'])->value('Company_Full_Name');
                         //$js_data['Company_Full_Name'] = $gsqc;
                         //MkInvoicingModel::create($js_data);
+
+                        //根据公司名称判断是哪个项目组长负责
+                        $pj_company = $pj_data['Company_Name'];
+                        if(in_array($pj_company,$pa01)){
+                            $pj_data['PA'] = "PA01";
+                            $pj_db_data['PA'] = "PA01";
+                        }elseif(in_array($pj_company,$pa02)){
+                            $pj_data['PA'] = "PA02";
+                            $pj_db_data['PA'] = "PA02";
+                        }elseif(in_array($pj_company,$pa03)){
+                            $pj_data['PA'] = "PA03";
+                            $pj_db_data['PA'] = "PA03";
+                        }elseif(in_array($pj_company,$pa04)){
+                            $pj_data['PA'] = "PA04";
+                            $pj_db_data['PA'] = "PA04";
+                        }elseif(in_array($pj_company,$pa05)){
+                            $pj_data['PA'] = "PA05";
+                            $pj_db_data['PA'] = "PA05";
+                        }elseif(in_array($pj_company,$pa06)){
+                            $pj_data['PA'] = "PA06";
+                            $pj_db_data['PA'] = "PA06";
+                        }elseif(in_array($pj_company,$pa08)){
+                            $pj_data['PA'] = "PA08";
+                            $pj_db_data['PA'] = "PA08";
+                        }elseif(in_array($pj_company,$pa09)){
+                            $pj_data['PA'] = "PA09";
+                            $pj_db_data['PA'] = "PA09";
+                        }elseif(in_array($pj_company,$pa10)){
+                            $pj_data['PA'] = "PA10";
+                            $pj_db_data['PA'] = "PA10";
+                        }elseif(in_array($pj_company,$pa11)){
+                            $pj_data['PA'] = "PA11";
+                            $pj_db_data['PA'] = "PA11";
+                        }elseif(in_array($pj_company,$pa12)){
+                            $pj_data['PA'] = "PA12";
+                            $pj_db_data['PA'] = "PA12";
+                        }else{
+                            $pj_data['PA'] = "";
+                            $pj_db_data['PA'] = "";
+                        }
+
 
                         PjContractReviewModel::create($pj_data);
 
@@ -722,7 +774,17 @@ class MkFeseability extends Common
                 // 不限制
                 if($i['Approval_Sales_Admin_Manager'] != 'Yes') {
                     if($i['Approval_General_Manager'] != 'Yes'){
-
+                         $pa01 = ['飞利浦','泛生子'];
+                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology'];
+                         $pa03 = ['比司特','库克','嘉德诺','Cryolife','唯美','微创心脉','瓦里安','微创神通','梅里埃','华大智造','索诺瓦','法液空'];
+                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
+                         $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
+                         $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
+                         $pa08 = ['碧迪','赛默飞'];
+                         $pa09 = ['拜耳海外','卡尔蔡司'];
+                         $pa10 = ['雅培','皆美'];
+                         $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
+                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
                         //$js_data = Db::name('mk_feseability')->where('id', $v)->field($js)->find();
 
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
@@ -733,6 +795,46 @@ class MkFeseability extends Common
                         //$gsqc = Db::name('mk_inquiry')->where('Contract_Number',$i['Contract_Number'])->value('Company_Full_Name');
                         //$js_data['Company_Full_Name'] = $gsqc;
                         //MkInvoicingModel::create($js_data);
+                        //根据公司名称判断是哪个项目组长负责
+                        $pj_company = $pj_data['Company_Name'];
+                        if(in_array($pj_company,$pa01)){
+                            $pj_data['PA'] = "PA01";
+                            $pj_db_data['PA'] = "PA01";
+                        }elseif(in_array($pj_company,$pa02)){
+                            $pj_data['PA'] = "PA02";
+                            $pj_db_data['PA'] = "PA02";
+                        }elseif(in_array($pj_company,$pa03)){
+                            $pj_data['PA'] = "PA03";
+                            $pj_db_data['PA'] = "PA03";
+                        }elseif(in_array($pj_company,$pa04)){
+                            $pj_data['PA'] = "PA04";
+                            $pj_db_data['PA'] = "PA04";
+                        }elseif(in_array($pj_company,$pa05)){
+                            $pj_data['PA'] = "PA05";
+                            $pj_db_data['PA'] = "PA05";
+                        }elseif(in_array($pj_company,$pa06)){
+                            $pj_data['PA'] = "PA06";
+                            $pj_db_data['PA'] = "PA06";
+                        }elseif(in_array($pj_company,$pa08)){
+                            $pj_data['PA'] = "PA08";
+                            $pj_db_data['PA'] = "PA08";
+                        }elseif(in_array($pj_company,$pa09)){
+                            $pj_data['PA'] = "PA09";
+                            $pj_db_data['PA'] = "PA09";
+                        }elseif(in_array($pj_company,$pa10)){
+                            $pj_data['PA'] = "PA10";
+                            $pj_db_data['PA'] = "PA10";
+                        }elseif(in_array($pj_company,$pa11)){
+                            $pj_data['PA'] = "PA11";
+                            $pj_db_data['PA'] = "PA11";
+                        }elseif(in_array($pj_company,$pa12)){
+                            $pj_data['PA'] = "PA12";
+                            $pj_db_data['PA'] = "PA12";
+                        }else{
+                            $pj_data['PA'] = "";
+                            $pj_db_data['PA'] = "";
+                        }
+
 
                         PjContractReviewModel::create($pj_data);
 

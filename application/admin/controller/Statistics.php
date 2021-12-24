@@ -1043,7 +1043,7 @@ class Statistics extends Controller
         $pa2=  Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','No')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',19701201,20351201)->field('PA,sum(Pages) as sumpage1,count(id) as num1')->group('PA')->select();
         $list=[];
 
-//        dump($pa);
+        //dump($pa2);
         if (!request()->isAjax()) {
             $this->assign(['pa2'=>$pa2]);
             return $this->fetch();
