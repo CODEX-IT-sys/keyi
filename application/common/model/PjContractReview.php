@@ -114,9 +114,10 @@ class PjContractReview extends Model
         return $query->order('Date desc, id desc')->paginate($limit)->each(function($item, $key){
 
         $expect = strtotime($item["Delivery_Date_Expected"]); //客户期望日期
-            $expect = date('Ymd',$expect);
-        $completed = $item["Completed"];
-        $item['Early_days'] = $completed - $expect;
+            $expect = strtotime(date('Ymd',$expect));
+
+        $completed = strtotime($item["Completed"]);
+        $item['Early_days'] = round(($completed - $expect)/86400);
         if($item['Early_days'] >100 || $item['Early_days'] < -100){
             $item['Early_days'] = -999;
         }
