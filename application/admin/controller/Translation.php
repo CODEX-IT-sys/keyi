@@ -20,6 +20,7 @@ class Translation extends Controller
      * */
     public function index(Request $request, $y = '', $mon = '', $field = '', $keyword = '', $limit = 50)
     {
+
         // 前年
         $f_year = date("Y", strtotime("-2 year"));
         // 去年
@@ -79,6 +80,7 @@ class Translation extends Controller
             ->field('Company_Name')
             ->where($field, 'like', "%$keyword%")
             ->where('delete_time',0)
+            ->where('Delivered_or_Not','<>','CXL')
             ->whereBetweenTime('Date', $qys, $qyd)
             ->group('Company_Name')
             ->paginate($limit);
@@ -112,6 +114,7 @@ class Translation extends Controller
                     ->field('SUM(Pages) Pages')
                     ->where('Company_Name', $v['Company_Name'])
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     ->whereBetweenTime('Date', $qs, $qd)
                     ->group('Company_Name')
                     ->select();
@@ -187,6 +190,7 @@ class Translation extends Controller
             ->field('Company_Name')
             ->where($field, 'like', "%$keyword%")
             ->where('delete_time',0)
+            ->where('Delivered_or_Not','<>','CXL')
             ->whereBetweenTime('Date', $ys, $yd)
             ->group('Company_Name')
             ->paginate($limit);
@@ -221,6 +225,7 @@ class Translation extends Controller
                     ->field('SUM(Pages) Pages')
                     ->where('Company_Name', $v['Company_Name'])
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     ->whereBetweenTime('Date', $s, $d)
                     ->group('Company_Name')
                     ->select();
@@ -231,6 +236,7 @@ class Translation extends Controller
                     ->where('Language', 'like', 'CN-%')
                     ->where('Company_Name', $v['Company_Name'])
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     ->whereBetweenTime('Date', $s, $d)
                     ->select();
 
@@ -240,6 +246,7 @@ class Translation extends Controller
                     ->where('Language', 'like', '%-CN')
                     ->where('Company_Name', $v['Company_Name'])
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     ->whereBetweenTime('Date', $s, $d)
                     ->select();
 

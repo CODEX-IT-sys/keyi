@@ -73,6 +73,7 @@ class Statistics extends Controller
             ->field('Company_Name')
             ->where($field, 'like', "%$keyword%")
             ->where('delete_time',0)
+            ->where('Delivered_or_Not','<>','CXL')
             ->whereBetweenTime('Date', $ys, $yd)
             ->group('Company_Name')
             ->paginate($limit);
@@ -93,6 +94,7 @@ class Statistics extends Controller
                     ->field('SUM(Pages) Pages')
                     ->where('Company_Name', $v['Company_Name'])
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     //->where('Filing_Code', 'like', $t.'%')
                     ->whereBetweenTime('Date', $s, $d)
                     ->group('Company_Name')
@@ -121,6 +123,7 @@ class Statistics extends Controller
                 $c_date[$m[$i]] = Db::name('pj_contract_review')
                     ->field('SUM(Pages) Pages')
                     ->where('delete_time',0)
+                    ->where('Delivered_or_Not','<>','CXL')
                     //->where('Filing_Code', 'like', $y_t.'%')
                     ->whereBetweenTime('Date', $cs, $cd)
                     ->select();
