@@ -59,7 +59,11 @@
 						<option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
 						{volist name="$select_field" id="v"}
 						{if $v.Field != 'delete_time'}{if $v.Field != 'id'}
+						{if $v.Field == 'PA'}
+						<option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'? $v.Comment : 'PTL'}</option>
+						{else}
 						<option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'? $v.Comment : str_replace('_' , ' ', $v.Field)}</option>
+						{/if}
 						{/if}{/if}
 						{/volist}
 					</select>
@@ -125,7 +129,11 @@ layui.use(['table','form'], function(){
 
 						});
                     }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+						if(colsData[i].Field == 'PA'){
+							cols.push({field: colsData[i].Field ,title: 'PTL', sort:true, minWidth:200, totalRow:true});
+						}else{
+							cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+						}
                     }
                 }
             }
