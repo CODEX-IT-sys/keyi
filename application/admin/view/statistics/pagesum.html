@@ -12,10 +12,14 @@
                     </div>
                 </div>
             </form>
+        <div class="global_btn">
+            <a class="layui-btn com_btn" id="sjth">数据计算</a>
+        </div>
         <div class="layui-form">
             <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pagesum?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
                 <thead >
                 <tr>
+                    <th lay-data="{checkbox:true}"></th>
                     <th lay-data="{field:'date',sort: true}">日期</th>
                     <th lay-data="{field:'sumpage',sort:true}">当天需提交页数</th>
                     <th lay-data="{field:'yppage',sort: true}">预排完成页数</th>
@@ -65,6 +69,38 @@
 //             title:'页数统计表',
 //             limit:300,
 //         });
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var len = checkStatus.data.length;
+            var sum1=0,sum2=0,sum3=0,sum4=0,sum5=0;
+            for (v in checkStatus.data) {
+
+                if(checkStatus.data[v]['sumpage']){
+                    sum1 += checkStatus.data[v]['sumpage'];
+                }
+                if(checkStatus.data[v]['yppage']){
+                    sum2 += checkStatus.data[v]['yppage'];
+                }
+                if(checkStatus.data[v]['trpage']){
+                    sum3 += checkStatus.data[v]['trpage'];
+                }
+                if(checkStatus.data[v]['xdpage']){
+                    sum4 += checkStatus.data[v]['xdpage'];
+                }
+                if(checkStatus.data[v]['hppage']){
+                    sum5 += checkStatus.data[v]['hppage'];
+                }
+
+            }
+
+            var msg = "提交总和:" + sum1 + ';平均数:' + (sum1/len).toFixed(1) + "<br>预排总和:" + sum2 + ';平均数:' + (sum2/len).toFixed(1)
+                + "<br>翻译总和:" + sum3 + ';平均数:' + (sum3/len).toFixed(1) + "<br>校对总和:" + sum4 + ';平均数:' + (sum4/len).toFixed(1)
+                + "<br>后排总和:" + sum5 + ';平均数:' + (sum5/len).toFixed(1);
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        })
 
 
     });
