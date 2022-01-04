@@ -119,8 +119,50 @@ class PjDailyProgressTrRe extends Common
 
           return $this->error('该文件完成页数和和超过项目描述页数');
         }
+        //校对比率的默认值
+        if($data['Percentage_Completed'] != 100 ){
+            $data['Reviser_Rate'] = 'N/A';
+        }else{
+            if($data['Category'] != 'RE'){
+                $data['Reviser_Rate'] = 0;
+            }
+        }
 
 
+        if($data['Category'] == 'RE'){
+            //判断是否已存在校对记录
+            $re_where = [
+                'Filing_Code' => $data['Filing_Code'],
+                'Job_Name' => $data['Job_Name'],
+                'Category' => 'RE',
+                'delete_time' => 0,
+            ];
+
+            $re_num = Db('pj_daily_progress_tr_re')->where($re_where)->find();
+            if($re_num){
+                return $this->error('该文件的校对记录已存在');
+            }
+            //同步校对比率到翻译同事
+            $where = [
+                'Filing_Code' => $data['Filing_Code'],
+                'Job_Name' => $data['Job_Name'],
+                'Percentage_Completed' => '100%',
+                'Work_Content' => 'Translate',
+                'delete_time' => 0,
+            ];
+            $record = Db('pj_daily_progress_tr_re')->where($where)->count();
+            if($record > 1){
+                return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
+            }elseif($record == 1){
+                $upData = [
+                    'Reviser_Rate' => $data['Reviser_Rate']
+                ];
+                $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+            }else{
+                return $this->error('翻译记录不存在，无法同步校对比率');
+            }
+
+        }
 
 
         // 计算实际用时
@@ -197,6 +239,39 @@ class PjDailyProgressTrRe extends Common
         if($ysh+$data['Number_of_Pages_Completed']-$page>$xmms){
             return $this->error('该文件完成页数和和超过项目描述页数');
         }
+
+        //校对比率的默认值
+        if($data['Percentage_Completed'] != 100 ){
+            $data['Reviser_Rate'] = 'N/A';
+        }else{
+            if($data['Category'] != 'RE'){
+                $data['Reviser_Rate'] = 0;
+            }
+        }
+
+        if($data['Category'] == 'RE'){
+            //同步校对比率到翻译同事
+            $where = [
+                'Filing_Code' => $data['Filing_Code'],
+                'Job_Name' => $data['Job_Name'],
+                'Percentage_Completed' => '100%',
+                'Work_Content' => 'Translate',
+                'delete_time' => 0,
+            ];
+            $record = Db('pj_daily_progress_tr_re')->where($where)->count();
+            if($record > 1){
+                return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
+            }elseif($record == 1){
+                $upData = [
+                    'Reviser_Rate' => $data['Reviser_Rate']
+                ];
+                $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+            }else{
+                return $this->error('翻译记录不存在，无法同步校对比率');
+            }
+
+        }
+
         // 计算实际用时
         $s = strtotime($data['Start_Time']);
         $e = strtotime($data['End_Time']);

@@ -72,7 +72,7 @@
 							            {:session('language') == '中文'? '翻译/校对人员' : 'Translator or Reviser'}
 							        </label>
 									<div class="layui-input-block">
-										<select name="Category" lay-filter="Category">
+										<select name="Category" id="category" lay-filter="Category">
 											<option value="TR" {$job_id==10?'selected':''}>{:session('language') == '中文'? '翻译' : 'Translator'}</option>
 											<option value="RE" {$job_id==11?'selected':''}>{:session('language') == '中文'? '校对' : 'Reviser'}</option>
 										</select>
@@ -161,7 +161,19 @@
 									<span class="signTip">%</span>
 							    </div>
 							</div>
-							
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '校对比率' : 'Revision  Rate'}">
+										{:session('language') == '中文'? '校对比率' : 'Revision Rate'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Reviser_Rate" id="jdbl"  autocomplete="off" placeholder="" class="layui-input">
+									</div>
+									<span class="signTip">%</span>
+								</div>
+							</div>
+
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '原总字数' : 'Original Chinese Characters'}">
@@ -556,7 +568,21 @@
 				layer.msg('完成百分比为100才可填写');
 			}
 		});
+		$('#jdbl').blur(function(){
+			var cate = $('#category').val();
+			var bfb = $('#bfb').val();
 
+
+			if(bfb!=100){
+				$('#jdbl').val('N/A');
+				layer.msg('完成百分比为100才可填写');
+			}else{
+				if(cate != 'RE'){
+					$('#jdbl').val('0');
+					layer.msg('只有校对人员才能填写');
+				}
+			}
+		})
 
 		// 数据提交
 		$('#save').on('click', function () {
