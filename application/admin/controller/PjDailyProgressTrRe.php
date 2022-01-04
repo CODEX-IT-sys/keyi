@@ -121,10 +121,10 @@ class PjDailyProgressTrRe extends Common
         }
         //校对比率的默认值
         if($data['Percentage_Completed'] != 100 ){
-            $data['Reviser_Rate'] = 'N/A';
+            $data['Revision_Rate'] = 'N/A';
         }else{
             if($data['Category'] != 'RE'){
-                $data['Reviser_Rate'] = 0;
+                $data['Revision_Rate'] = 0;
             }
         }
 
@@ -155,7 +155,7 @@ class PjDailyProgressTrRe extends Common
                 return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
             }elseif($record == 1){
                 $upData = [
-                    'Reviser_Rate' => $data['Reviser_Rate']
+                    'Revision_Rate' => $data['Revision_Rate']
                 ];
                 $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
             }else{
@@ -242,10 +242,10 @@ class PjDailyProgressTrRe extends Common
 
         //校对比率的默认值
         if($data['Percentage_Completed'] != 100 ){
-            $data['Reviser_Rate'] = 'N/A';
+            $data['Revision_Rate'] = 'N/A';
         }else{
             if($data['Category'] != 'RE'){
-                $data['Reviser_Rate'] = 0;
+                $data['Revision_Rate'] = 0;
             }
         }
 
@@ -263,7 +263,7 @@ class PjDailyProgressTrRe extends Common
                 return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
             }elseif($record == 1){
                 $upData = [
-                    'Reviser_Rate' => $data['Reviser_Rate']
+                    'Revision_Rate' => $data['Revision_Rate']
                 ];
                 $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
             }else{
