@@ -9,7 +9,7 @@
 					<div class="position_lead">
 						<i class="iconfont icon-navigation"></i>
 						<a href="#">{:session('language') == '中文'? 'FAQ' : 'Project Management'}</a>
-						<a class="on">{:session('language') == '中文'? '项目管理' : 'Contract Review'}</a>
+						<a class="on">{:session('language') == '中文'? '工作进度表' : 'Work Progress'}</a>
 					</div>
 					<div class="global_btn">
 						<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
@@ -139,7 +139,7 @@ layui.use(['table','form'], function(){
 	// 生成表格
     tableIns = table.render({
             elem: '#test'
-			,url:"{:url('project')}"
+			,url:"{:url('workProgress')}"
 			,where: {field: field, keyword: keyword,search_type:search_type}
             ,toolbar: '#forwardBar'
             ,defaultToolbar: ['filter', 'exports', 'print']
