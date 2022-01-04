@@ -237,6 +237,452 @@ class PjContractReview extends Common
         return json(generate_layui_table_data($list));
     }
 
+    //交稿文件
+    public function handover(Request $request, $search_type = '', $field = '', $keyword = '', $limit = 50)
+    {
+        // 数据库表字段集
+        $colsData = getAllField('ky_pj_contract_review');
+
+        foreach ($colsData as $k=>$v)
+        {
+            switch($v['Field']){
+                case 'Filing_Code':
+                    $colsData[$k]['width']=180;
+                    $colsData[$k]['fixed']='left';
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Company_Name':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Project_Name':
+                    $colsData[$k]['width']=200;
+                    break;
+                case 'Job_Name':
+                    $colsData[$k]['width']=300;
+                    $colsData[$k]['fixed']='left';
+                    break;
+                case 'Pages':
+                    $colsData[$k]['width']=60;
+                    break;
+                case 'Source_Text_Word_Count':
+                    $colsData[$k]['width']=90;
+                    break;
+                case 'Filled_by':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'CODEX_Team':
+//                    $colsData[$k]['width']=100;
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Sub_Contracted':
+                    $colsData[$k]['hide']=true;
+                    break;
+
+                case 'Pre_Format_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Translation_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Revision_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Post_Format_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Final_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Delivery_Date_Expected':
+                    $colsData[$k]['style']='background-color:green;color:white';
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=141;
+                    break;
+                case 'Translator':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Reviser':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Translation_Start_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'File_Category':
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Completed':
+                    $colsData[$k]['width']=96;
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['style']='background-color:green;color:white';
+                    break;
+                case 'Pre_Formatter':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Post_Formatter':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Delivered_or_Not':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Attention':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Revision_Start_Time':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+
+                case 'External_Reference_File':
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Customer_Requirements':
+                    $colsData[$k]['width']=180;
+                    break;
+                default:
+                    $colsData[$k]['width']=80;
+
+            }
+
+        }
+
+        // 查询文本说明信息
+        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $edit=[
+            [
+                'Field'=>'File_Category',
+                'Comment'=>'文件分类'
+            ],
+            [
+                'Field'=>'Format_Difficulty',
+                'Comment'=>'排版难易程度'
+            ],
+            [
+                'Field'=>'Translation_Difficulty',
+                'Comment'=>'翻译难易程度'
+            ],
+            [
+                'Field'=>'Completed',
+                'Comment'=>'交付日期'
+            ],
+            [
+                'Field'=>'Translator',
+                'Comment'=>'翻译人员'
+            ],
+            [
+                'Field'=>'Translation_Start_Time',
+                'Comment'=>'翻译开始时间'
+            ],
+            [
+                'Field'=>'Translation_Delivery_Time',
+                'Comment'=>'翻译交付时间'
+            ],
+            [
+                'Field'=>'Pre_Formatter',
+                'Comment'=>'预排版人员'
+            ],
+            [
+                'Field'=>'Pre_Format_Delivery_Time',
+                'Comment'=>'预排版交付时间'
+            ],
+            [
+                'Field'=>'Reviser',
+                'Comment'=>'校对人员'
+            ],
+            [
+                'Field'=>'Revision_Start_Time',
+                'Comment'=>'校对开始时间'
+            ],
+            [
+                'Field'=>'Revision_Delivery_Time',
+                'Comment'=>'校对交付时间'
+            ],
+            [
+                'Field'=>'Post_Formatter',
+                'Comment'=>'后排版人员'
+            ],
+            [
+                'Field'=>'Post_Format_Delivery_Time',
+                'Comment'=>'后排版交付时间'
+            ],
+            [
+                'Field'=>'Delivered_or_Not',
+                'Comment'=>'是否交稿'
+            ],
+            [
+                'Field'=>'Quality_Requirements',
+                'Comment'=>'质量要求'
+            ],
+            [
+                'Field'=>'PA',
+                'Comment'=>'项目组长'
+            ],
+            [
+                'Field'=>'PM',
+                'Comment'=>'项目经理'
+            ],
+            [
+                'Field'=>'Comment',
+                'Comment'=>'备注'
+            ],
+
+        ];
+
+        if($request->has('search_type')){
+            $data= $request->only(['search_type']);
+            $search_type=$data ["search_type"];
+        }
+        // 非Ajax请求，直接返回视图
+        if (!$request->isAjax()) {
+            return view('', [
+                'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword,'editor'=>$edit,
+                'search_type'=>$search_type
+            ]);
+        }
+        $cate = 'Yes';
+        // 调用模型获取列表
+        $list = PjContractReviewModel::getList($search_type, $field, $keyword, $limit, $cate);
+
+        // 返回数据
+        return json(generate_layui_table_data($list));
+    }
+
+    //未交稿文件
+    public function unhandover(Request $request, $search_type = '', $field = '', $keyword = '', $limit = 50)
+    {
+        // 数据库表字段集
+        $colsData = getAllField('ky_pj_contract_review');
+
+        foreach ($colsData as $k=>$v)
+        {
+            switch($v['Field']){
+                case 'Filing_Code':
+                    $colsData[$k]['width']=180;
+                    $colsData[$k]['fixed']='left';
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Company_Name':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Project_Name':
+                    $colsData[$k]['width']=200;
+                    break;
+                case 'Job_Name':
+                    $colsData[$k]['width']=300;
+                    $colsData[$k]['fixed']='left';
+                    break;
+                case 'Pages':
+                    $colsData[$k]['width']=60;
+                    break;
+                case 'Source_Text_Word_Count':
+                    $colsData[$k]['width']=90;
+                    break;
+                case 'Filled_by':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'CODEX_Team':
+//                    $colsData[$k]['width']=100;
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Sub_Contracted':
+                    $colsData[$k]['hide']=true;
+                    break;
+
+                case 'Pre_Format_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Translation_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Revision_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Post_Format_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Final_Delivery_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Delivery_Date_Expected':
+                    $colsData[$k]['style']='background-color:green;color:white';
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=141;
+                    break;
+                case 'Translator':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Reviser':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Translation_Start_Time':
+                    $colsData[$k]['width']=150;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'File_Category':
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Completed':
+                    $colsData[$k]['width']=96;
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['style']='background-color:green;color:white';
+                    break;
+                case 'Pre_Formatter':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Post_Formatter':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=100;
+                    break;
+                case 'Delivered_or_Not':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Attention':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Revision_Start_Time':
+                    $colsData[$k]['sort']='true';
+                    $colsData[$k]['width']=180;
+                    break;
+
+                case 'External_Reference_File':
+                    $colsData[$k]['width']=180;
+                    break;
+                case 'Customer_Requirements':
+                    $colsData[$k]['width']=180;
+                    break;
+                default:
+                    $colsData[$k]['width']=80;
+
+            }
+
+        }
+
+        // 查询文本说明信息
+        $intro = Db::name('xt_table_text')->where('id',6)->value('intro');
+        $edit=[
+            [
+                'Field'=>'File_Category',
+                'Comment'=>'文件分类'
+            ],
+            [
+                'Field'=>'Format_Difficulty',
+                'Comment'=>'排版难易程度'
+            ],
+            [
+                'Field'=>'Translation_Difficulty',
+                'Comment'=>'翻译难易程度'
+            ],
+            [
+                'Field'=>'Completed',
+                'Comment'=>'交付日期'
+            ],
+            [
+                'Field'=>'Translator',
+                'Comment'=>'翻译人员'
+            ],
+            [
+                'Field'=>'Translation_Start_Time',
+                'Comment'=>'翻译开始时间'
+            ],
+            [
+                'Field'=>'Translation_Delivery_Time',
+                'Comment'=>'翻译交付时间'
+            ],
+            [
+                'Field'=>'Pre_Formatter',
+                'Comment'=>'预排版人员'
+            ],
+            [
+                'Field'=>'Pre_Format_Delivery_Time',
+                'Comment'=>'预排版交付时间'
+            ],
+            [
+                'Field'=>'Reviser',
+                'Comment'=>'校对人员'
+            ],
+            [
+                'Field'=>'Revision_Start_Time',
+                'Comment'=>'校对开始时间'
+            ],
+            [
+                'Field'=>'Revision_Delivery_Time',
+                'Comment'=>'校对交付时间'
+            ],
+            [
+                'Field'=>'Post_Formatter',
+                'Comment'=>'后排版人员'
+            ],
+            [
+                'Field'=>'Post_Format_Delivery_Time',
+                'Comment'=>'后排版交付时间'
+            ],
+            [
+                'Field'=>'Delivered_or_Not',
+                'Comment'=>'是否交稿'
+            ],
+            [
+                'Field'=>'Quality_Requirements',
+                'Comment'=>'质量要求'
+            ],
+            [
+                'Field'=>'PA',
+                'Comment'=>'项目组长'
+            ],
+            [
+                'Field'=>'PM',
+                'Comment'=>'项目经理'
+            ],
+            [
+                'Field'=>'Comment',
+                'Comment'=>'备注'
+            ],
+
+        ];
+
+        if($request->has('search_type')){
+            $data= $request->only(['search_type']);
+            $search_type=$data ["search_type"];
+        }
+        // 非Ajax请求，直接返回视图
+        if (!$request->isAjax()) {
+            return view('', [
+                'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword,'editor'=>$edit,
+                'search_type'=>$search_type
+            ]);
+        }
+        $cate = 'No';
+        // 调用模型获取列表
+        $list = PjContractReviewModel::getList($search_type, $field, $keyword, $limit, $cate);
+
+        // 返回数据
+        return json(generate_layui_table_data($list));
+    }
+
     // 搜索弹框
     public function condition()
     {
@@ -587,6 +1033,15 @@ class PjContractReview extends Common
 
         PjContractReviewModel::update($data);
 
+        //同步更新到来稿确认 反馈修订是否提交
+        $feedback = [
+            'Feedback_Completed' => $data['Feedback_Completed']
+        ];
+
+        Db::name('mk_feseability')
+            ->where('Filing_Code', $data['Filing_Code'])
+            ->update($feedback);
+
         // 同步更新 项目数据库表 相关信息
         $d = ['Translator','Reviser','Pre_Formatter','Post_Formatter','Language','File_Type','File_Category',
             'Completed','Delivered_or_Not','File_Category', 'PA'];
@@ -766,7 +1221,7 @@ class PjContractReview extends Common
     public function Batch_edit(Request $request)
     {
 
-// 启动事务
+        // 启动事务
         Db::startTrans();
 
         try {
@@ -845,5 +1300,110 @@ class PjContractReview extends Common
         }
 
         return json(['code'=>$res]);
+    }
+
+    public function import()
+    {
+
+        try{
+            require '../extend/PHPExcel/PHPExcel.php';
+
+            $file = request()->file('file');
+            if($file) {
+                $info = $file->validate(['size' => 10485760, 'ext' => 'xls,xlsx,'])->move( 'public/' . 'excel');
+                if (!$info) {
+                    $this->error('上传文件格式不正确');
+                } else {
+                    //获取上传到后台的文件名
+                    $fileName = $info->getSaveName();
+                    //获取文件路径
+                    $filePath =   'public/' . 'excel/' . $fileName;
+                    //获取文件后缀
+                    $suffix = $info->getExtension();
+                    // 判断哪种类型
+                    if($suffix=="xlsx"){
+                        $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+                    }else{
+                        $reader = \PHPExcel_IOFactory::createReader('Excel5');
+                    }
+                }
+                $excel = $reader->load("$filePath",$encode = 'utf-8');
+
+                $sheet = $excel->getSheet(0);	// 读取第一个工作表(编号从 0 开始)
+
+                $highestRow = $sheet->getHighestRow(); 			// 取得总行数
+                $highestColumn = $sheet->getHighestColumn(); 	// 取得总列数
+                $arr = array('A','B','C','D','E','F','G','H','I','J','K','L','M', 'N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+                // 一次读取一列
+                $res_arr = array();
+//                $row_arr = array();
+//                for ($column = 0; $arr[$column] != 'V'; $column++) {
+//                    $val = $sheet->getCellByColumnAndRow($column, 2)->getValue();
+//                    $row_arr[] = $val;
+//                }
+//
+//                $res_arr[] = $row_arr;
+//                                dump($res_arr);die;
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    $res_arr[$row-2]['Filing_Code']  = trim($sheet->getCell("A".$row)->getValue());
+                    $res_arr[$row-2]['Job_Name']  = trim($sheet->getCell("B".$row)->getValue());
+                    $res_arr[$row-2]['Company_Name']  = trim($sheet->getCell("C".$row)->getValue());
+                    $res_arr[$row-2]['Pages']  = trim($sheet->getCell("D".$row)->getValue());
+                    $res_arr[$row-2]['Source_Text_Word_Count']  = trim($sheet->getCell("E".$row)->getValue());
+                    $res_arr[$row-2]['File_Type']  = trim($sheet->getCell("F".$row)->getValue());
+                    $res_arr[$row-2]['Service']  = trim($sheet->getCell("G".$row)->getValue());
+                    $res_arr[$row-2]['File_Category']  = trim($sheet->getCell("H".$row)->getValue());
+                    $res_arr[$row-2]['Language']  = trim($sheet->getCell("I".$row)->getValue());
+                    $res_arr[$row-2]['Format_Difficulty']  = trim($sheet->getCell("J".$row)->getValue());
+                    $res_arr[$row-2]['Translation_Difficulty']  = trim($sheet->getCell("K".$row)->getValue());
+                    $res_arr[$row-2]['Translator']  = trim($sheet->getCell("L".$row)->getValue());
+                    $res_arr[$row-2]['Translation_Start_Time']  = trim($sheet->getCell("M".$row)->getValue());
+                    $res_arr[$row-2]['Translation_Delivery_Time']  = trim($sheet->getCell("N".$row)->getValue());
+                    $res_arr[$row-2]['Reviser']  = trim($sheet->getCell("O".$row)->getValue());
+
+                    /*if($sheet->getCell("O".$row)->getValue()==''){
+                        $res_arr[$row-2]['Delivery_Date_Expected']  ='';
+                    }else{
+                        $res_arr[$row-2]['Delivery_Date_Expected']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("O".$row)->getValue()))));
+                    }*/
+                    $res_arr[$row-2]['Revision_Start_Time']  = trim($sheet->getCell("P".$row)->getValue());
+                    $res_arr[$row-2]['Revision_Delivery_Time']  = trim($sheet->getCell("Q".$row)->getValue());
+                    $res_arr[$row-2]['Pre_Formatter']  = trim($sheet->getCell("R".$row)->getValue());
+                    $res_arr[$row-2]['Pre_Format_Delivery_Time']  = trim($sheet->getCell("S".$row)->getValue());
+                    $res_arr[$row-2]['Post_Formatter']  = trim($sheet->getCell("T".$row)->getValue());
+                    $res_arr[$row-2]['Post_Format_Delivery_Time']  = trim($sheet->getCell("U".$row)->getValue());
+
+                    if($sheet->getCell("V".$row)->getValue()==''){
+                        $res_arr[$row-2]['Delivery_Date_Expected']  ='';
+                    }else{
+                        $res_arr[$row-2]['Delivery_Date_Expected']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("V".$row)->getValue()))));
+                    }
+                    $res_arr[$row-2]['Completed']  = trim($sheet->getCell("W".$row)->getValue());
+                    $res_arr[$row-2]['Delivered_or_Not']  = trim($sheet->getCell("X".$row)->getValue());
+                    $res_arr[$row-2]['Attention']  = trim($sheet->getCell("Y".$row)->getValue());
+                    $res_arr[$row-2]['Customer_Requirements']  = trim($sheet->getCell("Z".$row)->getValue());
+                    $res_arr[$row-2]['External_Reference_File']  = trim($sheet->getCell("AA".$row)->getValue());
+                    $res_arr[$row-2]['First_Cooperation']  = trim($sheet->getCell("AB".$row)->getValue());
+                    $res_arr[$row-2]['Quality_Requirements']  = trim($sheet->getCell("AC".$row)->getValue());
+                    $res_arr[$row-2]['PA']  = trim($sheet->getCell("AD".$row)->getValue());
+                    $res_arr[$row-2]['PM']  = trim($sheet->getCell("AE".$row)->getValue());
+                    $res_arr[$row-2]['Sales']  = trim($sheet->getCell("AF".$row)->getValue());
+                    $res_arr[$row-2]['Approval_Project_Manager']  = trim($sheet->getCell("AG".$row)->getValue());
+                    $res_arr[$row-2]['Approval_General_Manager']  = trim($sheet->getCell("AH".$row)->getValue());
+                    $res_arr[$row-2]['Filled_by']  = trim($sheet->getCell("AI".$row)->getValue());
+                    $res_arr[$row-2]['Date']  = trim($sheet->getCell("AJ".$row)->getValue());
+                    $res_arr[$row-2]['Comment']  = trim($sheet->getCell("AK".$row)->getValue());
+
+                }
+
+                Db::name('pj_contract_review')->insertAll($res_arr);
+
+            }
+
+        }catch(\Exception $e){
+            $this->error('执行错误',$e->getMessage());
+        }
+        return json(['code'=>1,'msg'=>'导入成功']);
+
     }
 }

@@ -76,7 +76,9 @@ class Workbench extends Controller
                 // 进度异常
                 $exception = Db::name('pj_contract_review')
                     ->field('id, Filing_Code, Job_Name')
-                    ->where('Delivered_or_Not', 'No')
+                    ->where(function($query){
+                        $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                    })
                     ->where('delete_time',0)
                     ->where('Completed', 'not in', ['', 0, NULL])
                     ->where('Completed', '<', $now)
@@ -95,7 +97,9 @@ class Workbench extends Controller
                 // 进度异常
                 $exception = Db::name('pj_contract_review')
                     ->field('id, Filing_Code, Job_Name')
-                    ->where('Delivered_or_Not', 'No')
+                    ->where(function($query){
+                        $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                    })
                     ->where('delete_time',0)
                     ->where('Completed', 'not in', ['', 0, NULL])
                     ->where('Completed', '<', $now)
@@ -128,7 +132,9 @@ class Workbench extends Controller
             // 今日提交 交付时间 为今天的
             $today = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where('Delivered_or_Not', 'No')
+                ->where(function($query){
+                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                })
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
@@ -137,7 +143,9 @@ class Workbench extends Controller
             // 今日提交总页数 交付时间 为今天的
             $todayPages = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name,Pages')
-                ->where('Delivered_or_Not', 'No')
+                ->where(function($query){
+                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                })
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
@@ -188,6 +196,8 @@ class Workbench extends Controller
                 ->whereBetweenTime($where_time,$beginToday,$endToday)
                 ->order('id desc')
                 ->paginate($limit);
+
+
 
             // 今日提交总页数 交付时间 为今天的
             $todayPages = Db::name('pj_project_profile')
@@ -246,21 +256,39 @@ class Workbench extends Controller
                 ->order('id desc')
                 ->paginate($limit);
 
+            $where1 = [
+                'Delivered_or_Not' => 'No',
+                'Feedback_Completed' => 'No'
+            ];
 
             // 今日提交 交付时间 为今天的
             $today = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where('Delivered_or_Not', 'No')
+                ->where(function($query){
+                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                })
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
                 ->paginate($limit);
 
+            /*// 今日提交 反馈修订是否提交
+            $today2 = Db::name('pj_contract_review')
+                ->field('id, Filing_Code, Job_Name')
+                ->where('Feedback_Completed', 'No')
+                ->where($where_name, $name)
+                ->where('delete_time',0)
+                ->where('Completed', $now)
+                ->order('id desc')
+                ->paginate($limit);*/
+
             // 今日提交总页数 交付时间 为今天的
             $todayPages = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name,Pages')
-                ->where('Delivered_or_Not', 'No')
+                ->where(function($query){
+                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                })
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', $now)
@@ -270,7 +298,9 @@ class Workbench extends Controller
             // 进度异常
             $exception = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where('Delivered_or_Not', 'No')
+                ->where(function($query){
+                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                })
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', 'not in', ['', 0, NULL])

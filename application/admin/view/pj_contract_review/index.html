@@ -18,6 +18,7 @@
 						<a class="layui-btn com_btn" id="zjlpl">{:session('language') == '中文'? '总经理批准' : 'General Manager'}</a>
                         <a class="layui-btn com_btn" id="sjth">数据计算</a>
                         <a class="layui-btn com_btn" id="xzedit">批量修改</a>
+						<a class="layui-btn com_btn" id="daoru">{:session('language') == '中文'? '导入' : 'import'}</a>
 						<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 					</div>
 				</div>
@@ -570,6 +571,49 @@ layui.use(['table','form'], function(){
         layer.alert(msg);
         // console.log(num);
     });
+
+	$("#daoru").click(function () {
+		var html =
+				'<div class="layui-upload" id="upload_file" style="margin-bottom:15px;margin-top:15px;text-align:center">'
+				+ '     <button type="button" class="layui-btn layui-btn-radius layui-btn-primary" id="test8">上传xls,xlsx</button>'
+				+ '<br />'
+				+ '     <button type="button" style="margin-top:5px" class="layui-btn layui-btn-normal" id="test9">上传</button>'
+				+ '     <button type="button" style="margin-top:5px" class="layui-btn close">取消</button>'
+				+ '</div>'
+		layer.open({
+			title: '导入项目汇总',
+			area: ['300px', '200px'], //宽高
+			type: 1,
+			content: html
+		});
+		layui.use('upload', function () {
+			var upload = layui.upload;
+			upload.render({
+				elem: '#test8',
+				url: '/admin/pj_contract_review/import',
+				auto: false,
+				accept: 'file',
+				size: 10240,
+				//,multiple: true
+				bindAction: '#test9',
+				data: {
+
+				},
+				done: function (res) {
+					if (res.code == 1) {
+						layer.closeAll();
+						layer.msg(res.msg);
+						setTimeout(function () {
+							window.location.reload();
+						}, 1000);
+					} else {
+						layer.msg(res.msg);
+					}
+					return false;
+				}
+			});
+		});
+	});
 });
 </script>
 

@@ -412,8 +412,40 @@
 										</select>
 							        </div>
 							    </div>
-							</div>													
-							
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}">
+										{:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Customer_Feedback" lay-filter="Customer_Feedback" disabled="disabled">
+											<option value="Good" {$info.Customer_Feedback=="Good"?'selected':''}>Good</option>
+											<option value="Refer" {$info.Customer_Feedback=="Refer"?'selected':''}>Refer</option>
+											<option value="Revise" {$info.Customer_Feedback=="Revise"?'selected':''}>Revise</option>
+											<option value="Bad" {$info.Customer_Feedback=="Bad"?'selected':''}>Bad</option>
+											<option value="N/A" {$info.Customer_Feedback=="N/A"?'selected':''}>N/A</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '反馈修订是否提交' : 'Feedback Completed'}">
+										{:session('language') == '中文'? '反馈修订是否提交' : 'Feedback Completed'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Feedback_Completed" lay-filter="Feedback_Completed">
+											<option value="No" {$info.Feedback_Completed=="No"?'selected':''}>No</option>
+											<option value="Yes" {$info.Feedback_Completed=="Yes"?'selected':''}>Yes</option>
+											<option value="N/A" {$info.Feedback_Completed=="N/A"?'selected':''}>N/A</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '质量要求' : 'Quality Requirements'}">

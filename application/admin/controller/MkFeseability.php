@@ -84,6 +84,14 @@ class MkFeseability extends Common
                     $colsData[$k]['sort']='true';
                     $colsData[$k]['edit']='true';
                     break;
+                case 'Customer_Feedback':
+                    $colsData[$k]['width']=180;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Feedback_Completed':
+                    $colsData[$k]['width']=180;
+                    $colsData[$k]['sort']='true';
+                    break;
                 case 'Remarks':
                     $colsData[$k]['width']=180;
                     $colsData[$k]['sort']='true';
@@ -452,10 +460,19 @@ class MkFeseability extends Common
         // 获取提交的数据
 
         $data = $request->post();
+        //客户反馈
+        $fk = MkFeseabilityModel::where('id', $data['id'])->find();
+
+        if($fk['Customer_Feedback'] != $data['Customer_Feedback']){
+            $feedback = 'No';
+        }else{
+            $feedback = $fk['Feedback_Completed'];
+        }
         MkFeseabilityModel::update($data);
 
         // 文件编号关联
         $fc = MkFeseabilityModel::where('id', $data['id'])->value('Filing_Code');
+
 
         // 同步更新 交付日期
         MkInvoicingModel::where('Filing_Code', $fc)
@@ -483,6 +500,8 @@ class MkFeseability extends Common
                     'Sales'=>$data['Sales'],
                     'Customer_Requirements'=>$data['Customer_Requirements'],
                     'External_Reference_File'=>$data['External_Reference_File'],
+                    'Customer_Feedback' => $data['Customer_Feedback'],
+                    'Feedback_Completed' => $feedback,
 
                 ]
             );
@@ -500,6 +519,8 @@ class MkFeseability extends Common
         unset($data['PM']);
         unset($data['Approval_Sales_Admin_Manager']);
         unset($data['Approval_General_Manager']);
+        unset($data['Customer_Feedback']);
+        unset($data['Feedback_Completed']);
         Db::table('ky_mk_invoicing')->where('Filing_Code',$fc)->update($data);
 
 

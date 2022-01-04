@@ -24,7 +24,7 @@ class PjContractReview extends Model
      * @return Paginator
      * @throws \think\exception\DbException
      */
-    public function getList($search_type = '', $field = '', $keyword = '', $limit = 50)
+    public function getList($search_type = '', $field = '', $keyword = '', $limit = 50, $cate='')
     {
         $name = session('administrator')['name'];
 
@@ -77,6 +77,11 @@ class PjContractReview extends Model
         }else{
             // 否则 就只显示自己录入的数据
             $where['Filled_by'] = $name;
+        }
+
+        //判断文件是否交稿
+        if(!empty($cate)){
+            $query = $query->where('Delivered_or_Not',$cate);
         }
 
         // 如果有搜索类型，添加查询条件
@@ -161,5 +166,7 @@ class PjContractReview extends Model
 
         return $value;
     }
+
+
 
 }
