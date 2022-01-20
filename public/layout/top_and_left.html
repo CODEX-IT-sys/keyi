@@ -136,6 +136,38 @@
                 });
             });
 
+            //定时查询是否有新的FAQ消息
+            function mes(){
+
+                $.ajax({
+                    type:'post',
+                    url:"{:url('index/faq_status')}",
+                    data:{},
+                    dataType: 'json',
+                    success: function (res) {
+                        if(res.code == 0){
+                            parent.layer.open({ //在父窗口打开
+                                type: 2,
+                                title: '消息',
+                                maxmin: true,
+                                shadeClose: true, //点击遮罩关闭层
+                                area : ['900px' , '700px'],
+                                content: "{:url('index/msg_faq')}",
+                                btn: ['确认', '取消']
+                                ,end: function () {
+                                    // 框架重新加载
+                                    window.location.reload(true);
+                                }
+                            });
+                        }
+
+                    }
+                });
+
+            }
+            //定时开关
+            //setInterval(mes,30000);
+
             // 消息提醒 列表
             $('.notice_tip').click(function () {
 

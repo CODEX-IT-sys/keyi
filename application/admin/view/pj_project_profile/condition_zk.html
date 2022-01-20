@@ -1,0 +1,153 @@
+{extend name="./layout/form.html" /}
+
+{block name="body"}
+
+<body class="main_color">
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<div class="secWrap">
+    <div class="layui-container">
+        <form class="layui-form">
+
+            <div class="layui-form-item label_auto">
+                <label class="layui-form-label">{:session('language') == '中文'? '搜索类型' : 'Search Type'}</label>
+                <div class="layui-input-block margin-left-none">
+                    <input type="radio" name="search_type" value="or" title="{:session('language') == '中文'? '或' : 'OR'}" checked="">
+                    <input type="radio" name="search_type" value="and" title="{:session('language') == '中文'? '且' : 'AND'}">
+                </div>
+            </div>
+
+            <div class="forward">
+                <div class="forward_lead forward_add">
+                    <div class="layui-row">
+                        <div class="layui-form-item label_auto">
+                            <label class="layui-form-label">{:session('language') == '中文'? '字段选择' : 'Select Field'}</label>
+                            <div class="layui-input-inline">
+                                <select lay-verify="">
+                                    <option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
+                                    {volist name="$select_field" id="v"}
+                                    {if $v.Field != 'delete_time'}{if $v.Field != 'id'}
+                                    <option value="{$v.Field}">{:session('language') == '中文'? $v.Comment : str_replace('_' , ' ', $v.Field)}</option>
+                                    {/if}{/if}
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">{:session('language') == '中文'? '查询内容' : 'Keyword'}</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="keyword" placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}" autocomplete="off" class="layui-input vinput">
+                            </div>
+                        </div>
+                    </div>
+                    <span class="addCondition">
+                        <i class="iconfont icon-icon-test"></i>
+                    </span>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="layui-layer-btn layui-layer-btn- bottm_control">
+    <a class="layui-layer-btn0" id="submit">{:session('language') == '中文'? '确认' : 'OK'}</a>
+    <a class="layui-layer-btn1" id="cancel">{:session('language') == '中文'? '取消' : 'Cancel'}</a>
+</div>
+
+</body>
+
+{/block}
+
+{block name="js"}
+{js href="__JS__/select.js"}
+
+<script>
+
+    // 清孔历史缓存
+    localStorage.setItem('search_type', '');
+    localStorage.setItem('field', '');
+    localStorage.setItem('keyword', '');
+
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form, layer = layui.layer;
+
+        // 添加搜索条件
+        $('.addCondition').click(function(){
+
+            var htmls = '<div class="layui-row">\n' +
+                '                        <div class="layui-form-item label_auto">\n' +
+                '                            <label class="layui-form-label">{:session(\'language\') == \'中文\'? \'字段选择\' : \'Select Field\'}</label>\n' +
+                '                            <div class="layui-input-inline">\n' +
+                '                                <select lay-verify="">\n' +
+                '                                    <option value="">{:session(\'language\') == \'中文\'? \'请选择查找字段\' : \'Please Select\'}</option>\n' +
+                '                                    {volist name="$select_field" id="v"}\n' +
+                '                                    <option value="{$v.Field}">{:session(\'language\') == \'中文\'? $v.Comment : str_replace(\'_\' , \' \', $v.Field)}</option>\n' +
+                '                                    {/volist}\n' +
+                '                                </select>\n' +
+                '                            </div>\n' +
+                '                        </div>\n' +
+                '                        <div class="layui-form-item">\n' +
+                '                            <label class="layui-form-label">{:session(\'language\') == \'中文\'? \'查询内容\' : \'Keyword\'}</label>\n' +
+                '                            <div class="layui-input-inline">\n' +
+                '                                <input type="text" name="keyword" placeholder="{:session(\'language\') == \'中文\'? \'请输入查询内容\' : \'Please input keyword\'}" autocomplete="off" class="layui-input vinput">\n' +
+                '                            </div>\n' +
+                '                        </div>\n' +
+                '                    </div>';
+
+            $('.forward_lead').append(htmls);// 追加元素
+
+            form.render("select");//刷新select选择框渲染
+        });
+
+        // 提交
+        $('#submit').click(function(){
+
+            var search_type = $("input[name='search_type']:checked").val();
+
+            var s ='' ; var i ='';
+
+            $('.forward select').each(function () {
+
+                s+= $(this).val() + ",";
+            });
+
+            $(".forward input[name='keyword']").each(function () {
+
+                i+= $(this).val() + ",";
+            });
+
+            // 去除末尾的符号
+            s = s.substring(0, s.length - 1);
+            i = i.substring(0, i.length - 1);
+
+            /*console.log(search_type);
+            console.log(s);
+            console.log(i);*/
+
+            // 写入缓存 方便取值
+            localStorage.setItem('search_type', search_type);
+            localStorage.setItem('field', s);
+            localStorage.setItem('keyword', i);
+
+            // 关闭弹窗
+            qx();
+        });
+
+        // 取消
+        function qx(){
+            var index = top.layer.getFrameIndex(window.name);
+            top.layer.close(index);
+        }
+
+        $('#cancel').on('click', function() {
+            qx();
+        });
+    })
+
+</script>
+
+{/block}

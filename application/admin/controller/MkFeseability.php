@@ -389,6 +389,27 @@ class MkFeseability extends Common
                 Db::name('pj_contract_review')
                     ->where('Filing_Code', $v['Filing_Code'])
                     ->update($arr1);
+                //修改提前交付天数
+                $c_data = Db::name('pj_contract_review')
+                    ->where('Filing_Code', $v['Filing_Code'])->find();
+                if(!empty($c_data["Delivery_Date_Expected"]) && !empty($c_data["Completed"])){
+                    $expect = strtotime($c_data["Delivery_Date_Expected"]); //客户期望日期
+                    $expect = strtotime(date('Ymd',$expect));
+                    $completed = strtotime($c_data["Completed"]);//交付日期
+                    $early_days = round(($completed - $expect)/86400);
+                    if($early_days >100 || $early_days < -100){
+                        $early_days = -999;
+                    }
+                    $c_data['Early_days'] = $early_days;
+                }else{
+                    $c_data['Early_days'] = 'N/A';
+                }
+                $up_data = [
+                    'Early_days' => $c_data['Early_days']
+                ];
+                Db::name('pj_contract_review')
+                    ->where('Filing_Code', $v['Filing_Code'])
+                    ->update($up_data);
             }
 
             // 同步更新项目数据库表
@@ -474,6 +495,18 @@ class MkFeseability extends Common
         $fc = MkFeseabilityModel::where('id', $data['id'])->value('Filing_Code');
 
 
+        if(!empty($data["Delivery_Date_Expected"]) && !empty($data["Completed"])){
+            $expect = strtotime($data["Delivery_Date_Expected"]); //客户期望日期
+            $expect = strtotime(date('Ymd',$expect));
+            $completed = strtotime($data["Completed"]);//交付日期
+            $early_days = round(($completed - $expect)/86400);
+            if($early_days >100 || $early_days < -100){
+                $early_days = -999;
+            }
+
+        }else{
+            $early_days = 'N/A';
+        }
         // 同步更新 交付日期
         MkInvoicingModel::where('Filing_Code', $fc)
             ->update([
@@ -482,7 +515,10 @@ class MkFeseability extends Common
             ]);
 
         PjContractReviewModel::where('Filing_Code', $fc)
-            ->update(['Completed'=>$data['Completed']]);
+            ->update([
+                'Completed'=>$data['Completed'],
+                    'Early_days' => $early_days,
+            ]);
 
         PjProjectDatabaseModel::where('Filing_Code', $fc)
             ->update(['Completed'=>$data['Completed']]);
@@ -651,17 +687,31 @@ class MkFeseability extends Common
                          $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
                          $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
                          $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
-                         $pa08 = ['碧迪','赛默飞'];
-                         $pa09 = ['拜耳海外','卡尔蔡司'];
+                         $pa08 = [];
+                         $pa09 = ['拜耳海外','卡尔蔡司','碧迪','赛默飞'];
                          $pa10 = ['雅培','皆美'];
                          $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
                          $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
 
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
                         $pj_data['Date'] = substr($pj_data['Filing_Code'], 2, 8);
-                        
-                        $pj_db_data = Db::name('mk_feseability')->where('id', $v)->field($pj_db)->find();
 
+                        //提前交付天数
+                        if(!empty($pj_data["Delivery_Date_Expected"]) && !empty($pj_data["Completed"])){
+                            $expect = strtotime($pj_data["Delivery_Date_Expected"]); //客户期望日期
+                            $expect = strtotime(date('Ymd',$expect));
+                            $completed = strtotime($pj_data["Completed"]);//交付日期
+                            $early_days = round(($completed - $expect)/86400);
+                            if($early_days >100 || $early_days < -100){
+                                $early_days = -999;
+                            }
+                            $pj_data['Early_days'] = $early_days;
+                        }else{
+                            $pj_data['Early_days'] = 'N/A';
+                        }
+
+                        $pj_db_data = Db::name('mk_feseability')->where('id', $v)->field($pj_db)->find();
+                        $pj_db_data['Date'] = substr($pj_db_data['Filing_Code'], 2, 8);
                         //$gsqc = Db::name('mk_inquiry')->where('Contract_Number',$i['Contract_Number'])->value('Company_Full_Name');
                         //$js_data['Company_Full_Name'] = $gsqc;
                         //MkInvoicingModel::create($js_data);
@@ -801,8 +851,8 @@ class MkFeseability extends Common
                          $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
                          $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
                          $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
-                         $pa08 = ['碧迪','赛默飞'];
-                         $pa09 = ['拜耳海外','卡尔蔡司'];
+                         $pa08 = [];
+                         $pa09 = ['拜耳海外','卡尔蔡司','碧迪','赛默飞'];
                          $pa10 = ['雅培','皆美'];
                          $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
                          $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
@@ -811,8 +861,22 @@ class MkFeseability extends Common
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
                         $pj_data['Date'] = substr($pj_data['Filing_Code'], 2, 8);
 
-                        $pj_db_data = Db::name('mk_feseability')->where('id', $v)->field($pj_db)->find();
+                        //提前交付天数
+                        if(!empty($pj_data["Delivery_Date_Expected"]) && !empty($pj_data["Completed"])){
+                            $expect = strtotime($pj_data["Delivery_Date_Expected"]); //客户期望日期
+                            $expect = strtotime(date('Ymd',$expect));
+                            $completed = strtotime($pj_data["Completed"]);//交付日期
+                            $early_days = round(($completed - $expect)/86400);
+                            if($early_days >100 || $early_days < -100){
+                                $early_days = -999;
+                            }
+                            $pj_data['Early_days'] = $early_days;
+                        }else{
+                            $pj_data['Early_days'] = 'N/A';
+                        }
 
+                        $pj_db_data = Db::name('mk_feseability')->where('id', $v)->field($pj_db)->find();
+                        $pj_db_data['Date'] = substr($pj_db_data['Filing_Code'], 2, 8);
                         //$gsqc = Db::name('mk_inquiry')->where('Contract_Number',$i['Contract_Number'])->value('Company_Full_Name');
                         //$js_data['Company_Full_Name'] = $gsqc;
                         //MkInvoicingModel::create($js_data);

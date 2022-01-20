@@ -55,9 +55,9 @@
 					<select id="field" lay-verify="" lay-search>
 						<option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
 						{volist name="$select_field" id="v"}
-						{if $v.Field != 'delete_time'}{if $v.Field != 'id'}
+						{if $v.Field != 'delete_time'}{if $v.Field != 'id'}{if $v.Field != 'Original_Chinese_Characters'}{if $v.Field != 'Productivity'}
 						<option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'? $v.Comment : str_replace('_' , ' ', $v.Field)}</option>
-						{/if}{/if}
+						{/if}{/if}{/if}{/if}
 						{/volist}
 					</select>
 				</div>
@@ -114,11 +114,11 @@ layui.use(['table','form'], function(){
         for(var i = 0; i < l; i++){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
-                    if(language === '中文'){
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
-                    }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
-                    }
+					if(language === '中文'){
+						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+					}else{
+						cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+					}
                 }
             }
         }

@@ -50,7 +50,23 @@
 									</div>
 								</div>
 							</div>
-							
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '工作内容' : 'Work Content'}">
+										{:session('language') == '中文'? '工作内容' : 'Work Content'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Work_Content" id="content" lay-filter="Work_Content" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$Work_Content" id="v"}
+											<option value="{$v.en_name}" {$info.Work_Content==$v.en_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+								</div>
+							</div>
+
 							<div class="layui-col-xs4">
 								<div class="layui-form-item layui_ic">
 									<label class="layui-form-label" title="{:session('language') == '中文'? '工作日期' : 'Work Date'}">
@@ -212,21 +228,6 @@
 								</div>
 							</div>
 
-							<div class="layui-col-xs4">
-							    <div class="layui-form-item">
-							        <label class="layui-form-label" title="{:session('language') == '中文'? '工作内容' : 'Work Content'}">
-							            {:session('language') == '中文'? '工作内容' : 'Work Content'}
-							        </label>
-							        <div class="layui-input-block">
-										<select name="Work_Content" lay-filter="Work_Content" lay-search>
-											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
-											{volist name="$Work_Content" id="v"}
-											<option value="{$v.en_name}" {$info.Work_Content==$v.en_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
-											{/volist}
-										</select>
-							        </div>
-							    </div>
-							</div>
 
 
 							<div class="layui-col-xs4">
@@ -391,24 +392,44 @@
 
 		$('#yzs').blur(function(){
 			var bfb = $('#bfb').val();
-			console.log(bfb);
+			//console.log(bfb);
 			if(bfb!=100){
 				$('#yzs').val(0);
 				$('#zzs').val(0);
 				layer.msg('完成百分比为100才可填写');
 			}
+			var yzs = $.trim($('#yzs').val());
+			var zcfz = $.trim($('#zcfz').val());
+			var kczs = $.trim($('#kczs').val());
+
+			var jdbl = $.trim($('#jdbl').val());
+
+			yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; jdbl?jdbl:0;
+
+			if(zcfz < 15){
+				zcfz = 0;
+			}
+			alert(jdbl);
+			if( jdbl != 0 && jdbl != 'N/A'){
+				var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+			}else{
+				var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
+			}
+			zzs = zzs.toFixed(2);
+			$('#zzs').val(zzs);
 		});
 		//校对比率
 		$('#jdbl').blur(function(){
-			var cate = $('#category').val();
+			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
+
 			if(bfb!=100){
 				$('#jdbl').val('N/A');
 				layer.msg('完成百分比为100才可填写');
 			}else{
-				if(cate != 'RE'){
-					$('#jdbl').val('0');
-					layer.msg('只有校对人员才能填写');
+				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
+					$('#jdbl').val('N/A');
+					layer.msg('只有工作内容为校对相关才能填写');
 				}
 			}
 		})
@@ -419,14 +440,20 @@
             var zcfz = $.trim($('#zcfz').val());
             var kczs = $.trim($('#kczs').val());
 
-            yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0;
+            var jdbl = $.trim($('#jdbl').val());
+
+            yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; jdbl?jdbl:0;
 
             if(zcfz < 15){
             	zcfz = 0;
 			}
-
-            var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
-
+			//alert(jdbl);
+			if( jdbl != 0 && jdbl != 'N/A'){
+				var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+			}else{
+				var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
+			}
+			zzs = zzs.toFixed(2);
             $('#zzs').val(zzs);
         });
 

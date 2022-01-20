@@ -67,6 +67,38 @@ class Index extends Controller
             $msg_s = 1;
         }
 
+        //电脑软件
+        $software_ex = Db::name('faq')->where('cate_id',3)->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+        $software_all = Db::name('faq')->where('cate_id',3)->where('delete_time',0)->count('id');
+        $software =  $software_all - $software_ex;
+        //翻译问题
+        $translate_ex = Db::name('faq')->where('cate_id',2)->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+        $translate_all = Db::name('faq')->where('cate_id',2)->where('delete_time',0)->count('id');
+        $translate =  $translate_all - $translate_ex;
+        //排版问题
+        $revise_ex = Db::name('faq')->where('cate_id',1)->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+        $revise_all = Db::name('faq')->where('cate_id',1)->where('delete_time',0)->count('id');
+        $revise =  $revise_all - $revise_ex;
+        //项目管理
+        $project_ex = Db::name('faq')->where('cate_id',4)->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+        $project_all = Db::name('faq')->where('cate_id',4)->where('delete_time',0)->count('id');
+        $project =  $project_all - $project_ex;
+        //人事行政
+        $work_ex = Db::name('faq')->where('cate_id',5)->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+        $work_all = Db::name('faq')->where('cate_id',5)->where('delete_time',0)->count('id');
+        $work =  $work_all - $work_ex;
+
+        if(in_array('49',$id_arr)){
+            //FAQ消息状态
+            $faq_exist = Db::name('faq')->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+            $faq_all = Db::name('faq')->where('delete_time',0)->count('id');
+            $faq = $faq_all - $faq_exist;
+        }else{
+            //FAQ消息状态
+            $faq_exist = Db::name('faq')->where('delete_time',0)->where('status','like','%'.session('administrator')['name'].'%')->count('id');
+            $faq_all = Db::name('faq')->where('delete_time',0)->count('id');
+            $faq = $faq_all - $faq_exist-$project_all;
+        }
         // iframe url
         /*if($if_url == ''){
 
@@ -85,7 +117,7 @@ class Index extends Controller
         }*/
 
         // 返回视图
-        return view('', ['menu'=>$top, 'msg_s'=>$msg_s]);
+        return view('', ['menu'=>$top, 'msg_s'=>$msg_s, 'faq'=>$faq,'software'=>$software,'translate'=>$translate,'revise'=>$revise,'project'=>$project,'work'=>$work]);
     }
 
     // 欢迎页
@@ -103,6 +135,73 @@ class Index extends Controller
         session('language',$language);
 
         return json(['code'=>0, 'url'=>$if_url]);
+    }
+    //ajax获取faq是否有新消息
+    public function faq_status(){
+        $end = time();
+        $start = $end - 30;
+        //查询是否有新发布的FAQ消息
+        $list = Db::name('faq')
+            ->where('delete_time',0)
+            ->whereBetweenTime('create_time',$start,$end)
+            ->select();
+
+        if($list){
+            $data= [
+                'code' => 0,
+                'msg' => '成功',
+                'data' => 1,
+            ];
+
+        }else{
+            $data= [
+                'code' => 1,
+                'msg' => '失败',
+                'data' => 2,
+            ];
+        }
+        return $data;
+    }
+    //返回FAQ新消息内容
+    public function msg_faq(Request $request, $limit = 10)
+    {
+        $end = time();
+        $start = $end - 30;
+        //查询是否有新发布的FAQ消息
+        $list = Db::name('faq')
+            ->where('delete_time',0)
+            ->whereBetweenTime('create_time',$start,$end)
+            ->select();
+
+        $cate = Db::name('faq_cate')->where('delete_time',0)->field(['id','cn_name'])->select();
+        $id = array_column($cate,'id');
+        $cn_name =  array_column($cate,'cn_name');
+        $arr = array_combine($id,$cn_name);
+        if(!empty($list)){
+            foreach($list as $key=>$val){
+                $list[$key]['create_time'] = date('Y-m-d H:i:s',$val['create_time']);
+                $list[$key]['cate_id'] = $arr[$val['cate_id']];
+            }
+        }
+
+        // 非Ajax请求，直接返回视图
+        if (!$request->isAjax()) {
+            return view('msg_faq');
+        }
+        if(!empty($list)){
+            return [
+                'code' => 0,
+                'msg' => '成功',
+                'data' => $list,
+            ];
+        }else{
+            return [
+                'code' => 1,
+                'msg' => '失败',
+                'data' => $list,
+            ];
+        }
+        //return json(generate_layui_table_data($list));
     }
 
     // 消息列表 查询

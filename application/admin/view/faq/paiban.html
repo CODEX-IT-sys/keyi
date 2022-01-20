@@ -113,11 +113,16 @@ layui.use(['table','form'], function(){
                 if(colsData[i].Field !== 'id'){
 					if(colsData[i].Field !== 'content'){
 						if(language === '中文'){
-							// cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
-							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
-								style: colsData[i].style
+							if(colsData[i].Field == 'ev_status'){
+								cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
+									style: colsData[i].style,templet: '#titleTpl'
+								});
+							}else{
+								cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
+									style: colsData[i].style
 
-							});
+								});
+							}
 						}else{
 							cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
 						}
@@ -409,5 +414,11 @@ layui.use(['table','form'], function(){
     });
 });
 </script>
-
+<script type="text/html" id="titleTpl">
+	{{#  if(d.ev_status == '1'){ }}
+	<span style="color: dodgerblue;">已查看</span>
+	{{#  } else { }}
+	<span style="color: red;">未查看</span>
+	{{#  } }}
+</script>
 {/block}

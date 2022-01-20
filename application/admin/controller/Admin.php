@@ -42,6 +42,45 @@ class Admin extends Controller
         return json(generate_layui_table_data($list));
     }
 
+
+    //批量更新提前交付天数
+    public function jsTime(){
+        $data = Db::name('pj_contract_review')->where('delete_time',0)->field(['id','Delivery_Date_Expected','Completed','Early_days'])->select();
+        foreach($data as $key=>$val){
+            $expect = strtotime($val["Delivery_Date_Expected"]); //客户期望日期
+            $expect = strtotime(date('Ymd',$expect));
+
+            $completed = strtotime($val["Completed"]);
+            $early_days = round(($completed - $expect)/86400);
+            if($early_days >100 || $early_days < -100){
+                $early_days = -999;
+            }
+            $where = [
+                'delete_time'=>0,
+                'id' => $val['id']
+            ];
+            $updata = [
+                'Early_days' => $early_days
+            ];
+            $res = Db::table('ky_pj_contract_review')->where($where)->update($updata);
+        }
+    }
+    //批量修改项目数据库Date
+    public function gxDate(){
+        $data = Db::name('pj_project_database')->where('delete_time',0)->field(['id','Filing_Code'])->select();
+        foreach($data as $key=>$val){
+
+            $date = substr($val['Filing_Code'], 2, 8);
+            $where = [
+                'delete_time'=>0,
+                'id' => $val['id']
+            ];
+            $updata = [
+                'Date' => $date
+            ];
+            $res = Db::table('ky_pj_project_database')->where($where)->update($updata);
+        }
+    }
     public function test(){
         $list = Db::name('mk_invoicing')->field(['id','Date_of_Balance','payment_time'])->limit(0,100)->select();
        /* foreach($list as $key=>$val){

@@ -139,7 +139,10 @@ class PjProjectProfile extends Common
                 'Field'=>'File_Category',
                 'Comment'=>'文件分类'
             ],
-
+            [
+                'Field'=>'Format_Difficulty',
+                'Comment'=>'排版难易程度'
+            ],
             [
                 'Field'=>'Pre_Formatter',
                 'Comment'=>'预排版人员'
@@ -339,7 +342,143 @@ class PjProjectProfile extends Common
         return json(generate_layui_table_data($list));
     }
 
+    public function zhikong(Request $request, $search_type = '', $field = '', $keyword = '', $limit = 50){
 
+
+        $colsData[0] = [
+            'Field' => 'Filing_Code',
+            'Comment' => '文件编号',
+        ];
+        $colsData[1] = [
+            'Field' => 'Job_Name',
+            'Comment' => '文件名称',
+        ];
+        $colsData[2] = [
+            'Field' => 'Pages',
+            'Comment' => '页数',
+        ];
+        $colsData[3] = [
+            'Field' => 'Pre_Formatter',
+            'Comment' => '预排版人员',
+        ];
+        $colsData[4] = [
+            'Field' => 'Translator',
+            'Comment' => '翻译人员',
+        ];
+        $colsData[5] = [
+            'Field' => 'Reviser',
+            'Comment' => '校对人员',
+        ];
+        $colsData[6] = [
+            'Field' => 'Post_Formatter',
+            'Comment' => '后排版人员',
+        ];
+        $colsData[7] = [
+            'Field' => 'Completed',
+            'Comment' => '交付日期',
+        ];
+        $colsData[8] = [
+            'Field' => 'PA',
+            'Comment' => '项目组长',
+        ];
+
+        // 非Ajax请求，直接返回视图
+        if (!$request->isAjax()) {
+            return view('', [
+                'field'=>$field, 'keyword'=>$keyword,'select_field'=>$colsData, 'colsData' => json_encode($colsData),
+                'search_type'=>$search_type
+            ]);
+        }
+
+
+
+        // 字段不为空
+        if($search_type == 'and'){
+
+            //$map['b.Completed'] = ['like',"%2022%"];
+            // 如果有搜索类型，添加查询条件
+            $field_arr = explode(',' , $field);//字段数组
+            $keyword_arr = explode(',' , $keyword);//关键词数组
+
+            //多字段 且 查询
+            foreach ($field_arr as $k => $v){
+                foreach ($keyword_arr as $key => $val){
+                    if($k == $key){
+                        if($v != 'PA' && $v != 'Completed'){
+                            $map[] = ['a.'.$v,'LIKE',"%".$val."%"];
+
+                        }else{
+                            $map[] = ['b.'.$v,'LIKE',"%".$val."%"];
+                        }
+
+                    }
+                }
+            }
+
+            $list = Db::table('ky_pj_project_profile')
+                ->alias('a')
+                ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                ->where($map)
+                ->field(['a.Filing_Code','a.Job_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                    'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
+                    'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
+                    'a.Reviser','a.Post_Formatter','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                ->paginate($limit);
+
+
+        }else{
+
+            if(empty($field)){
+                $list = Db::table('ky_pj_project_profile')
+                    ->alias('a')
+                    ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                    ->field(['a.Filing_Code','a.Job_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                        'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
+                        'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
+                        'a.Reviser','a.Post_Formatter','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                    ->paginate($limit);
+            }else{
+                if($field != 'PA' && $field != 'Completed'){
+
+                    $list = Db::table('ky_pj_project_profile')
+                        ->alias('a')
+                        ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                        ->where('a.'.$field,'like','%'.$keyword.'%')
+
+                        ->field(['a.Filing_Code','a.Job_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                            'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
+                            'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
+                            'a.Reviser','a.Post_Formatter','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                        ->paginate($limit);
+
+                }else{
+                    $list = Db::table('ky_pj_project_profile')
+                        ->alias('a')
+                        ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                        ->where('b.'.$field,'like','%'.$keyword.'%')
+                        ->field(['a.Filing_Code','a.Job_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                            'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
+                            'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
+                            'a.Reviser','a.Post_Formatter','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                        ->paginate($limit);
+                }
+
+            }
+        }
+
+
+
+
+        /* return [
+           'code'=>0,
+             'message'=> '成功',
+             'data' => $list,
+             'count' => 500
+         ];*/
+        // 返回数据
+        return json(generate_layui_table_data($list));
+
+    }
 
     public function sessionOut(){
         session('simple',null);
@@ -374,7 +513,49 @@ class PjProjectProfile extends Common
         // 直接返回视图
         return view('', ['select_field'=>$colsData]);
     }
-
+    public function condition_zk()
+    {
+        // 数据库表字段集
+        //$colsData = getAllField('ky_pj_project_profile');
+        $colsData[0] = [
+            'Field' => 'Filing_Code',
+            'Comment' => '文件编号',
+        ];
+        $colsData[1] = [
+            'Field' => 'Job_Name',
+            'Comment' => '文件名称',
+        ];
+        $colsData[2] = [
+            'Field' => 'Pages',
+            'Comment' => '页数',
+        ];
+        $colsData[3] = [
+            'Field' => 'Pre_Formatter',
+            'Comment' => '预排版人员',
+        ];
+        $colsData[4] = [
+            'Field' => 'Translator',
+            'Comment' => '翻译人员',
+        ];
+        $colsData[5] = [
+            'Field' => 'Reviser',
+            'Comment' => '校对人员',
+        ];
+        $colsData[6] = [
+            'Field' => 'Post_Formatter',
+            'Comment' => '后排版人员',
+        ];
+        $colsData[7] = [
+            'Field' => 'Completed',
+            'Comment' => '交付日期',
+        ];
+        $colsData[8] = [
+            'Field' => 'PA',
+            'Comment' => '项目组长',
+        ];
+        // 直接返回视图
+        return view('', ['select_field'=>$colsData]);
+    }
     // 显示新建的表单页
     public function create()
     {

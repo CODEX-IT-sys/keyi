@@ -103,6 +103,17 @@
 			uploadImage: {
 				url: "{:url('upload')}" //图片上传接口
 				,type: 'post' //默认post
+			},
+			uploadVideo: {
+				url: "{:url('uploadvideo')}",
+				field: 'file',//上传时的文件参数字段名
+				accept: 'video',
+				acceptMime: 'video/*',
+				exts: 'mp4|flv|avi|rm|rmvb',
+				size: 1024 * 4* 100,
+				done: function (data) {
+					//文件上传接口返回code为0时的回调
+				},
 			}
 		});
 		var index = layedit.build('demo'); //建立编辑器

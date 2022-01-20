@@ -415,7 +415,7 @@ class PjProjectDatabase extends Common
 
         // 更新时间
         $data['Update_Time'] = date("Ymd");
-
+        $data['Date'] = substr($data['Filing_Code'], 2, 8);
         // 写入填表人
         $data['Filled_by'] = session('administrator')['name'];
 

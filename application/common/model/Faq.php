@@ -114,8 +114,24 @@ class Faq extends Model
 
 
 
-        // 返回分页对象
-        return $query->order('id desc')->paginate($limit);
+        return $query->order('id desc')->paginate($limit)->each(function($item, $key){
+            $name = session('administrator')['name'];
+            $status = $item['status'];
+            if(!empty($status)){
+                $status_arr = explode(',',$status);
+            }else{
+                $status_arr = [];
+            }
+
+            if(in_array($name,$status_arr)){
+                $item['ev_status'] = 1;
+            }else{
+                $item['ev_status'] = 0;
+            }
+
+            return $item;
+
+        });
     }
 
     public function getAll()

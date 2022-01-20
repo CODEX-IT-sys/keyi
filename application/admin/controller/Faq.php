@@ -39,6 +39,9 @@ class Faq extends Common
                 case 'Filled_by':
                     $colsData[$k]['hide']='true';
                     break;
+                case 'status':
+                    $colsData[$k]['hide']='true';
+                    break;
                 default:;
 
             }
@@ -96,6 +99,9 @@ class Faq extends Common
                 case 'Filled_by':
                     $colsData[$k]['hide']='true';
                     break;
+                case 'status':
+                    $colsData[$k]['hide']='true';
+                    break;
                 default:;
 
             }
@@ -148,6 +154,9 @@ class Faq extends Common
                     $colsData[$k]['hide']='true';
                     break;
                 case 'Filled_by':
+                    $colsData[$k]['hide']='true';
+                    break;
+                case 'status':
                     $colsData[$k]['hide']='true';
                     break;
                 default:;
@@ -205,6 +214,9 @@ class Faq extends Common
                 case 'Filled_by':
                     $colsData[$k]['hide']='true';
                     break;
+                case 'status':
+                    $colsData[$k]['hide']='true';
+                    break;
                 default:;
 
             }
@@ -235,7 +247,7 @@ class Faq extends Common
         return json(generate_layui_table_data($list));
     }
 
-
+    //人事行政
     public function workProgress(Request $request, $search_type = '', $field = '', $keyword = '', $limit = 50)
     {
         // 数据库表字段集
@@ -261,6 +273,9 @@ class Faq extends Common
                 case 'Filled_by':
                     $colsData[$k]['hide']='true';
                     break;
+                case 'status':
+                    $colsData[$k]['hide']='true';
+                    break;
                 default:;
 
             }
@@ -282,7 +297,7 @@ class Faq extends Common
                 'search_type'=>$search_type
             ]);
         }
-        $cate = '工作进度表';
+        $cate = '人事行政';
         // 调用模型获取列表
         $list = FaqModel::getList($search_type, $field, $keyword, $limit,$cate);
 
@@ -318,6 +333,19 @@ class Faq extends Common
     {
         // 查询信息
         $res = FaqModel::get($id);
+
+        //点击查看后 将查看人姓名加入审阅数组
+        $name = session('administrator')['name'];
+        $status = $res['status'];
+        $status_arr = explode(',',$status);
+        //判断是否已经存在，不存在则加入
+        if(!in_array($name,$status_arr)){
+            $s = $status.$name.',';
+            $up_status = [
+                'status' =>$s,
+            ];
+            Db::name('faq')->where('id',$id)->update($up_status);
+        }
         // 直接返回视图
         return view('read',[
             'info'=>$res,
@@ -442,6 +470,31 @@ class Faq extends Common
                 $url ='/uploads/'. $info->getSaveName();
                 $data['code'] = 0;
                 $data['msg'] = '';
+                $data['data']['src'] = $url ;
+                return json($data);
+            } else {
+                // 上传失败获取错误信息
+                echo $file->getError();
+            }
+        }
+    }
+
+    //视频上传
+    public function uploadvideo(Request $request)
+    {
+        //设置php 不超时
+        //@ini_set('memory_limit', '-1');
+        // @set_time_limit(0);
+        $param = $request->param();
+        $file = $request->file('file');
+        //var_dump($file);die;
+        // 移动到框架应用根目录/public/uploads/ 目录下
+        if ($file) {
+            $info = $file->move(  'uploads');
+            if ($info) {
+                $url ='/uploads/'. $info->getSaveName();
+                $data['code'] = 0;
+                $data['msg'] = $file->getError();
                 $data['data']['src'] = $url ;
                 return json($data);
             } else {

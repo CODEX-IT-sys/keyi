@@ -1,0 +1,108 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a>{:session('language') == '中文'? '新消息提醒' : 'Message Reminding'}</a>
+                    <a class="on">{:session('language') == '中文'? 'FAQ' : 'FAQ'}</a>
+                </div>
+
+            </div>
+            <div class="mainCt">
+                <div class="mainWrap">
+                    <div class="forwardTable">
+                        <table class="layui-hide" id="admin" lay-data="{id:'admin'}" lay-filter="admin"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+<!--行工具-->
+<script type="text/html" id="barDemo">
+    <div class="table_btn">
+        <a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'View'}</a>
+    </div>
+</script>
+
+<!--脚本-->
+<script type="text/javascript">
+
+    layui.use(['layer', 'table'], function () {
+        var layer = top.layer;
+        var table = layui.table;
+        var cols;
+
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+
+        if(language === '中文'){
+            cols = [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'title', title: '标题'},
+                {field: 'cate_id', title: '分类',width:100},
+                {field: 'create_time', title: '创建时间', width: 180,},
+                {width: 80, title: '操作', align: 'center', toolbar: '#barDemo'}
+            ]]
+        }else{
+            cols = [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'title', title: 'Title'},
+                {field: 'cate_id', title: 'Category',width:120},
+                {field: 'create_time', title: 'Create time', width: 180,},
+                {width: 80, title: '操作', align: 'center', toolbar: '#barDemo'}
+            ]]
+        }
+
+        // 渲染表格数据
+        tableIns = table.render({
+            elem: '#admin',
+            //toolbar: '#forwardBar',
+            toolbar:false,
+            url: "{:url('index/msg_faq')}",
+            cols: cols,
+
+        });
+
+
+
+        //监听工具条
+        table.on('tool(admin)', function (obj) {
+
+            var id = obj.data.id; //获得当前行数据
+            var layEvent = obj.event;//获得 lay-event 对应的值
+            if (layEvent === 'look') {
+
+                parent.layer.open({  // 在父窗口打开
+                    type: 2,
+                    title: '查看',
+                    maxmin: true,
+                    area: ['700px', '500px'],
+                    content: replaceEditUrlId("{:url('faq/read', ['id' => 1])}", id)
+                    ,end: function () {
+                        // 改变消息状态
+                        $.ajax({
+                            type: 'get',
+                            url: "{:url('index/msg_status')}",
+                            data: {status: 1, id:id},
+                            // 成功
+                            success: function (res) {
+
+                                window.location.reload();
+                            }
+                        })
+                    }
+                });
+            }
+        });
+    });
+</script>
+{/block}

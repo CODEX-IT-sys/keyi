@@ -17,26 +17,49 @@
                 <thead >
                 <tr>
                     <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                    <th lay-data="{field:'sumpage',sort:true}">负责的文件总页数</th>
-                    <th lay-data="{field:'num',sort: true}">负责的文件总份数</th>
+                    <th lay-data="{field:'sumpage',sort:true}">本月来稿文件总页数</th>
+                    <th lay-data="{field:'num',sort: true}">本月来稿文件总份数</th>
+                    <th lay-data="{field:'sumword',sort: true}">本月来稿文件总字数</th>
                 </tr>
                 </thead>
 
+            </table>
+            <table class="layui-table" lay-filter="demo2" lay-data="{limit:30,toolbar: true,}">
+                <thead >
+                <tr>
+                    <th lay-data="{field:'PA',sort: true}">项目助理</th>
+                    <th lay-data="{field:'sumpage2',sort:true}">本月已提交文件总页数</th>
+                    <th lay-data="{field:'num2',sort: true}">本月已提交文件总份数</th>
+                    <th lay-data="{field:'sumword2',sort: true}">本月已提交文件总字数</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $pa3 as $key=>$vo }
+                <tr>
+                    <td>{$vo.PA}</td>
+                    <td>{$vo.sumpage2}</td>
+                    <td>{$vo.num2}  </td>
+                    <td>{$vo.sumword2}  </td>
+                </tr>
+                {/foreach}
+                </tbody>
             </table>
             <table class="layui-table" lay-filter="demo1" lay-data="{limit:30,toolbar: true,}">
                 <thead >
              <tr>
                 <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                <th lay-data="{field:'sumpage1',sort:true}">未提交页数</th>
-                <th lay-data="{field:'num1',sort: true}">未提交份数</th>
+                <th lay-data="{field:'sumpage1',sort:true}">未提交文件总页数</th>
+                <th lay-data="{field:'num1',sort: true}">未提交文件总份数</th>
+                 <th lay-data="{field:'sumword1',sort: true}">未提交文件总字数</th>
             </tr> 
                 </thead>
                 <tbody>
-                {foreach $pa2 as $key=>$vo }
+                {foreach $pa2 as $key=>$v1 }
                 <tr>
-                <td>{$vo.PA}</td>
-                <td>{$vo.sumpage1}</td>
-                <td>{$vo.num1|default=0}  </td>
+                <td>{$v1.PA}</td>
+                <td>{$v1.sumpage1}</td>
+                <td>{$v1.num1}  </td>
+                <td>{$v1.sumword1}  </td>
                 </tr>
                 {/foreach}
                 </tbody>
@@ -61,9 +84,8 @@
 //             title:'页数统计表',
 //             limit:300,
 //         });
-
-
     });
+
 </script>
 
 <script>

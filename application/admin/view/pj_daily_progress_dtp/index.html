@@ -115,9 +115,9 @@ layui.use(['table','form'], function(){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
                     if(language === '中文'){
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:150, totalRow:true});
+                        cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:150, totalRow:true,fixed:colsData[i].fixed});
                     }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true,fixed:colsData[i].fixed});
                     }
                 }
             }

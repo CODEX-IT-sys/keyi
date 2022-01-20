@@ -38,9 +38,38 @@ class PjContractReview extends Common
                 case 'Job_Name':
                     $colsData[$k]['width']=300;
                     $colsData[$k]['fixed']='left';
+                    $colsData[$k]['sort']='true';
                     break;
                 case 'Pages':
                     $colsData[$k]['width']=60;
+                    break;
+                case 'Service':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'File_Category':
+                    $colsData[$k]['width']=200;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'First_Cooperation':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Customer_Feedback':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Feedback_Completed':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'PA':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
+                    break;
+                case 'Early_days':
+                    $colsData[$k]['width']=100;
+                    $colsData[$k]['sort']='true';
                     break;
                 case 'Source_Text_Word_Count':
                     $colsData[$k]['width']=90;
@@ -204,7 +233,7 @@ class PjContractReview extends Common
             ],
             [
                 'Field'=>'PA',
-                'Comment'=>'项目助理'
+                'Comment'=>'项目组长'
             ],
             [
                 'Field'=>'PM',
@@ -1000,6 +1029,19 @@ class PjContractReview extends Common
         // 文件创建时间
         $data['Date'] = substr($data['Filing_Code'], 2, 8);
 
+        if(!empty($data["Delivery_Date_Expected"]) && !empty($data["Completed"])){
+            $expect = strtotime($data["Delivery_Date_Expected"]); //客户期望日期
+            $expect = strtotime(date('Ymd',$expect));
+            $completed = strtotime($data["Completed"]);//交付日期
+            $early_days = round(($completed - $expect)/86400);
+            if($early_days >100 || $early_days < -100){
+                $early_days = -999;
+            }
+            $data['Early_days'] = $early_days;
+        }else{
+            $data['Early_days'] = -999;
+        }
+
         // 保存
         PjContractReviewModel::create($data);
 
@@ -1030,6 +1072,16 @@ class PjContractReview extends Common
 
         // 写入填表人
         $data['Filled_by'] = session('administrator')['name'];
+        if(!empty($data["Delivery_Date_Expected"]) && !empty($data["Completed"])){
+            $expect = strtotime($data["Delivery_Date_Expected"]); //客户期望日期
+            $expect = strtotime(date('Ymd',$expect));
+            $completed = strtotime($data["Completed"]);//交付日期
+            $early_days = round(($completed - $expect)/86400);
+            if($early_days >100 || $early_days < -100){
+                $early_days = -999;
+            }
+            $data['Early_days'] = $early_days;
+        }
 
         PjContractReviewModel::update($data);
 
@@ -1272,6 +1324,27 @@ class PjContractReview extends Common
                 $res=   Db::name('pj_project_profile')
                     ->where('Filing_Code', $v['Filing_Code'])
                     ->update($arr);
+                //修改提前交付天数
+                $c_data = Db::name('pj_contract_review')
+                    ->where('Filing_Code', $v['Filing_Code'])->find();
+                if(!empty($c_data["Delivery_Date_Expected"]) && !empty($c_data["Completed"])){
+                    $expect = strtotime($c_data["Delivery_Date_Expected"]); //客户期望日期
+                    $expect = strtotime(date('Ymd',$expect));
+                    $completed = strtotime($c_data["Completed"]);//交付日期
+                    $early_days = round(($completed - $expect)/86400);
+                    if($early_days >100 || $early_days < -100){
+                        $early_days = -999;
+                    }
+                    $c_data['Early_days'] = $early_days;
+                }else{
+                    $c_data['Early_days'] = 'N/A';
+                }
+                $up_data = [
+                    'Early_days' => $c_data['Early_days']
+                ];
+                Db::name('pj_contract_review')
+                    ->where('Filing_Code', $v['Filing_Code'])
+                    ->update($up_data);
             }
 
             // 同步更新 项目数据库表 相关信息

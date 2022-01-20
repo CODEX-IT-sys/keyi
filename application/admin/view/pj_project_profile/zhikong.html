@@ -1,0 +1,391 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '项目管理' : 'Project Management'}</a>
+                    <a class="on">{:session('language') == '中文'? '质控信息' : 'Project Database'}</a>
+                </div>
+                <div class="global_btn">
+
+                    <!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
+                </div>
+            </div>
+            <div class="mainCt">
+                <div class="mainWrap">
+                    <div class="forwardTable farTable">
+                        <table class="layui-hide" id="test" lay-filter="test"></table>
+                    </div>
+
+                    <!--文本说明-->
+                    <div class="explain">
+                        <h5 class="explainTitle">
+                            <i class="iconfont icon-tishi"></i>
+                            <span>说明</span>
+                            <span id="jisuan"  style="background: #0ba4da;float: right;">
+
+                            </span>
+                        </h5>
+                        <div class="explainCt">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="js"}
+<!--搜索-->
+<script type="text/html" id="forwardBar">
+
+    <div class="forward">
+        <div class="forward_lead">
+            <div class="layui-form-item label_auto">
+                <label class="layui-form-label">{:session('language') == '中文'? '字段选择' : 'Select Field'}</label>
+                <div class="layui-input-inline">
+                    <select id="field" lay-verify="" lay-search>
+                        <option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
+                        {volist name="$select_field" id="v"}
+
+                        <option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'? $v.Comment : str_replace('_' , ' ', $v.Field)}</option>
+
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:session('language') == '中文'? '查询内容' : 'Keyword'}</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="keyword" value="{$keyword}" placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            {if $field==''}
+            <span class="addCondition">
+				<i class="iconfont icon-icon-test"></i>
+			</span>
+            {/if}
+            <div class="searchBtn">
+                <button class="layui-btn search_btn" type="button">
+                    <i class="iconfont icon-sousuo"></i>
+                    <span>{:session('language') == '中文'? '查询' : 'Search'}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!--行工具-->
+<script type="text/html" id="barDemo">
+    <div class="table_btn">
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
+        <a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+        <!--<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'Look'}</a>-->
+    </div>
+</script>
+
+<!--脚本-->
+<script>
+    var tableIns;  // 数据表格对象，用于重载
+    layui.use(['table','form'], function(){
+        var table = layui.table, form = layui.form;
+        var field = '{$field}'; var keyword = '{$keyword}';
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+        var cols;
+        if(language === '中文'){
+
+            cols = [
+                {field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center'}
+                ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center'  }
+                ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
+                ,{field:'Pages', title:'页数',style:'color: red;',minWidth: 180,align:'center'}
+                ,{field:'Source_Text_Word_Count', title:'源语数量', minWidth: 100,align:'center'}
+                ,{field:'Language', title:'语种',minWidth: 100,align:'center'}
+                ,{field:'Product_Involved', title:'涉及产品',minWidth: 100, align:'center',style:'color: red;'}
+                ,{field:'File_Usage_and_Linguistic_Specification', title:'文件用途和语言规范',minWidth: 100,align:'center'}
+                ,{field:'File_Type', title:'文件类型',minWidth: 100,align:'center'}
+                ,{field:'Format_Difficulty', title:'排版难度',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Translation_Difficulty', title:'翻译难度',minWidth: 120,align:'center'}
+                ,{field:'One_Hundred_Percent_Repeated', title:'100%重复率',minWidth: 100,align:'center'}
+                ,{field:'Ninety_Five_to_Ninety_Nine_Percent_Repeated', title:' 95-99%重复率', style:'color: red;', minWidth: 150, align:'center'}
+                ,{field:'Total_Repetition_Rate', title:'总重复率',minWidth: 100,align:'center'}
+                ,{field:'Actual_Source_Text_Count', title:'实际源语数量',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Pre_Formatter', title:'预排版人员',minWidth: 150,align:'center' }
+                ,{field:'Translator', title:'翻译人员', minWidth: 150,align:'center'}
+                ,{field:'Reviser', title:'校对人员',minWidth: 150,align:'center'}
+                ,{field:'Post_Formatter', title:'后排版人员',  minWidth: 150,align:'center'}
+                ,{field:'Completed', title:'交付日期',minWidth: 150,align:'center'}
+                ,{field:'Delivered_or_Not', title:'是否交稿',minWidth: 150,align:'center'}
+                ,{field:'Attention', title:'客户联系人', minWidth: 150,align:'center'}
+                ,{field:'Customer_Requirements', title:'客户要求',minWidth: 150,align:'center'}
+                ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
+                ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center'}
+                ,{field:'PA', title:'项目组长',minWidth: 150,align:'center'}
+            ];
+
+
+
+        }else{
+
+            cols = [
+                {field:'Filing_Code', title:'文件编号',minWidth: 100,align:'center',totalRowText:'合计'}
+                ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center'  }
+                ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
+                ,{field:'Pages', title:'页数',style:'color: red;',minWidth: 180,align:'center'}
+                ,{field:'Source_Text_Word_Count', title:'源语数量', minWidth: 100,align:'center'}
+                ,{field:'Language', title:'语种',minWidth: 100,align:'center'}
+                ,{field:'Product_Involved', title:'涉及产品',minWidth: 100, align:'center',style:'color: red;'}
+                ,{field:'File_Usage_and_Linguistic_Specification', title:'文件用途和语言规范',minWidth: 100,align:'center'}
+                ,{field:'File_Type', title:'文件类型',minWidth: 100,align:'center'}
+                ,{field:'Format_Difficulty', title:'排版难度',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Translation_Difficulty', title:'翻译难度',minWidth: 120,align:'center'}
+                ,{field:'One_Hundred_Percent_Repeated', title:'100%重复率',minWidth: 100,align:'center'}
+                ,{field:'Ninety_Five_to_Ninety_Nine_Percent_Repeated', title:' 95-99%重复率', style:'color: red;', minWidth: 150, align:'center'}
+                ,{field:'Total_Repetition_Rate', title:'总重复率',minWidth: 100,align:'center'}
+                ,{field:'Actual_Source_Text_Count', title:'实际源语数量',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Pre_Formatter', title:'预排版人员',minWidth: 150,align:'center' }
+                ,{field:'Translator', title:'翻译人员', minWidth: 150,align:'center'}
+                ,{field:'Reviser', title:'校对人员',minWidth: 150,align:'center'}
+                ,{field:'Post_Formatter', title:'后排版人员',  minWidth: 150,align:'center'}
+                ,{field:'Completed', title:'交付日期',minWidth: 150,align:'center'}
+                ,{field:'Delivered_or_Not', title:'是否交稿',minWidth: 150,align:'center'}
+                ,{field:'Attention', title:'客户联系人', minWidth: 150,align:'center'}
+                ,{field:'Customer_Requirements', title:'客户要求',minWidth: 150,align:'center'}
+                ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
+                ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center'}
+                ,{field:'PA', title:'项目组长',minWidth: 150,align:'center'}
+            ];
+
+
+        }
+        //console.log(cols);
+
+        var search_type = '{$search_type}';
+        cols = [cols];
+        // 生成表格
+        tableIns = table.render({
+            elem: '#test'
+            ,url:"{:url('zhikong')}"
+            ,where: {field: field, keyword: keyword,search_type:search_type}
+            ,toolbar: '#forwardBar'
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: '质控信息'
+            ,cols : cols
+            ,limit:50, 			height: 'full-200',
+            even: true,
+            page: {
+                curr:location.hash.replace('#!fenye=', ''),
+                hash:'fenye'
+            },
+        });
+
+        // 回车亦可以搜索
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                $(".search_btn").trigger("click");
+            }
+        });
+
+        // 表头搜索
+        $('.search_btn').click(function () {
+
+            var searchfield = $('#field').val();
+            var searchkeyword = $.trim($('#keyword').val());
+
+            if (!searchkeyword) {
+                if(language === '中文') {
+                    layer.msg('搜索内容不能为空');
+                }else{
+                    layer.msg('Please input keyword');
+                }
+                return false;
+            }
+            // 页面 带参跳转 可以记住搜索参数
+            window.location.href = "{:url('zhikong')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
+
+            // 表格重载
+            /*table.reload('test', {
+             url: "{:url('index')}",
+             where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
+             page: true, limit:50
+             });*/
+        });
+
+        // 多条件 搜索弹框
+        $(function(){
+            var index;
+            $(".addCondition").live("click",function(){
+                index = parent.layer.open({ //在父窗口打开
+                    type: 2,
+                    title: '条件查询',
+                    maxmin: true,
+                    shadeClose: true, //点击遮罩关闭层
+                    area : ['700px' , '560px'],
+                    content: "{:url('pj_project_profile/condition_zk')}",
+                    end: function () {
+                        var search_type = localStorage.getItem('search_type');
+                        var s = localStorage.getItem('field');
+                        var i = localStorage.getItem('keyword');
+                        window.location.href = "{:url('zhikong')}" + '?field=' + s + '&keyword=' + i + '&search_type=' + search_type;
+                        // 表格重载
+                        // table.reload('test', {
+                        // 	url: "{:url('pj_project_database/index')}",
+                        // 	where: {search_type : search_type, field: s, keyword: i},  // 设定异步数据接口的额外参数
+                        // 	page: true, limit:50
+                        // });
+                    }
+                });
+            });
+        });
+
+        //批量删除(多选操作)
+        $('#del').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var idstr = ''; var cd = checkStatus.data.length;
+
+            if(cd !== 0){
+                for(var i=0; i<cd; i++){
+                    idstr +=  checkStatus.data[i].id + ',';
+                }
+                // 去除多余符号
+                idstr = idstr.substring(0, idstr.length - 1);
+
+                layer.confirm('确认删除？', function(index){
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'get',
+                        url: "{:url('pj_project_database/batch_delete')}",
+                        data: {id : idstr},
+                        // 删除成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+            }else{
+                if(language === '中文') {
+                    layer.alert('请先勾选要删除的数据再操作');
+                }else{
+                    layer.msg('Please check the box before operating');
+                }
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            //获得当前行数据
+            var id = obj.data.id;
+
+            // 删除
+            if(obj.event === 'del'){
+                layer.confirm('确认删除？', function(index){
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'delete',
+                        contentType: 'application/json',
+                        url: replaceEditUrlId("{:url('pj_project_database/delete', ['id' => 1])}", id),
+                        dataType: 'json',
+                        // 删除成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+
+            } else if(obj.event === 'edit'){
+
+                window.location.href =  replaceEditUrlId("{:url('pj_project_database/edit', ['id' => 1])}", id);
+
+            } else if(obj.event === 'look'){
+
+                window.location.href = replaceEditUrlId("{:url('pj_project_database/read', ['id' => 1])}", id);
+
+            }
+        });
+
+        /*字段筛选 全选 反选*/
+        table.on('toolbar()', function (obj) {
+            var config = obj.config;
+            var btnElem = $(this);
+            var tableId = config.id;
+            var tableView = config.elem.next();
+            switch (obj.event) {
+                case 'LAYTABLE_COLS':
+                    // 给筛选列添加全选还有反选的功能
+                    var panelElem = btnElem.find('.layui-table-tool-panel');
+                    var checkboxElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]');
+                    var checkboxCheckedElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]:checked');
+                    $('<li class="layui-form select_lead" lay-filter="LAY_TABLE_TOOL_COLS_FORM">' +
+                        '<input type="checkbox" lay-skin="primary" lay-filter="LAY_TABLE_TOOL_COLS_ALL" '+ ((checkboxElem.length === checkboxCheckedElem.length) ? 'checked' : '') + ' title="全选">' +
+                        '<span class="invert_select"><i class="iconfont icon-fanxuan"></i>反选</span>' +
+                        '</li>')
+                        .insertBefore(panelElem.find('li').first())
+                        .on('click', '.invert_select', function (event) {
+                            layui.stope(event);
+                            // 反选逻辑
+                            panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]+').click();
+                        });
+
+                    form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+                    break;
+            }
+        });
+
+        // 监听筛选列panel中的全选
+        form.on('checkbox(LAY_TABLE_TOOL_COLS_ALL)', function (obj) {
+            $(obj.elem).closest('ul')
+                .find('[lay-filter="LAY_TABLE_TOOL_COLS"]' + (obj.elem.checked ? ':not(:checked)' : ':checked') + '+').click();
+        });
+
+        // 监听筛选列panel中的单个记录的change
+        $(document).on('change', 'input[lay-filter="LAY_TABLE_TOOL_COLS"]', function (event) {
+            var elemCurr = $(this);
+            // 筛选列单个点击的时候同步全选的状态
+            $('input[lay-filter="LAY_TABLE_TOOL_COLS_ALL"]')
+                .prop('checked',
+                    elemCurr.prop('checked') ? (!$('input[lay-filter="LAY_TABLE_TOOL_COLS"]').not(':checked').length) : false);
+            form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+        });
+
+
+
+
+    });
+</script>
+
+{/block}

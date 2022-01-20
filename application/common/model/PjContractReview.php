@@ -116,7 +116,7 @@ class PjContractReview extends Model
         }
 
        // 返回分页对象
-        return $query->order('Date desc, id desc')->paginate($limit)->each(function($item, $key){
+        /*return $query->order('Date desc, id desc')->paginate($limit)->each(function($item, $key){
 
         $expect = strtotime($item["Delivery_Date_Expected"]); //客户期望日期
             $expect = strtotime(date('Ymd',$expect));
@@ -128,7 +128,8 @@ class PjContractReview extends Model
         }
             return $item;
 
-        });
+        });*/
+        return $query->order('Date desc, id desc')->paginate($limit);
     }
 
     public function getAll()

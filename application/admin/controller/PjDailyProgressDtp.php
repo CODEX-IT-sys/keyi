@@ -21,7 +21,24 @@ class PjDailyProgressDtp extends Common
     {
         // 数据库表字段集
         $colsData = getAllField('ky_pj_daily_progress_dtp');
+        foreach ($colsData as $k=>$v)
+        {
+            switch($v['Field']){
 
+                case 'Name_of_Formatter':
+                    $colsData[$k]['fixed']='left';
+                    break;
+                case 'Work_Date':
+                    $colsData[$k]['fixed']='left';
+                    break;
+                case 'Job_Name':
+                    $colsData[$k]['fixed']='left';
+                    break;
+                default:
+                    $colsData[$k]['width']=80;
+            }
+
+        }
         // 查询文本说明信息
         $intro = Db::name('xt_table_text')->where('id',10)->value('intro');
         if($request->has('search_type')){

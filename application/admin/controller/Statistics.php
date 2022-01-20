@@ -1042,13 +1042,16 @@ class Statistics extends Controller
             $lastTime=intval(date("Ymd",$lastTime));
         }
 
-        $pa=  Db::table('ky_pj_contract_review')->where('Delivered_or_Not','<>','CXL')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage,count(id) as num')->group('PA')->select();
-        $pa2=  Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','No')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',19701201,20351201)->field('PA,sum(Pages) as sumpage1,count(id) as num1')->group('PA')->select();
+        $pa=  Db::table('ky_pj_contract_review')->where('Delivered_or_Not','<>','CXL')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage,count(id) as num,sum(Source_Text_Word_Count) as sumword')->group('PA')->select();
+        $pa2= Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','No')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',19701201,20351201)->field('PA,sum(Pages) as sumpage1,count(id) as num1,sum(Source_Text_Word_Count) as sumword1')->group('PA')->select();
+        $pa3= Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','Yes')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Completed',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage2,count(id) as num2,sum(Source_Text_Word_Count) as sumword2')->group('PA')->select();
+
         $list=[];
 
         //dump($pa2);
         if (!request()->isAjax()) {
             $this->assign(['pa2'=>$pa2]);
+            $this->assign(['pa3'=>$pa3]);
             return $this->fetch();
         }
         return [
@@ -1056,6 +1059,74 @@ class Statistics extends Controller
             'msg'   => '',
             'count' => 0,
             'data'  =>$pa,
+        ];
+    }
+
+    public function pd(){
+        $data=request()->param('month');
+
+        if(isset($data)){
+            $time= strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+            if($data==''){
+
+                $time= time();
+                $year = date("Y", $time);
+
+                $month = date("m", $time);
+
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t',$firstTime);
+                $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+                $firstTime=intval(date("Ymd",$firstTime));
+                $lastTime=intval(date("Ymd",$lastTime));
+            }
+        }else{
+            $time= time();
+            $year = date("Y", $time);
+
+            $month = date("m", $time);
+
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+        }
+
+        $pd=  Db::table('ky_pj_project_database')->where('Delivered_or_Not','=','Yes')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Date',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage,count(id) as num')->group('PA')->select();
+
+        $pd2=  Db::table('ky_pj_project_database')->where('Delivered_or_Not','=','Yes')
+            ->where(function($query){
+                $query->where('Update_Company_TM','No')->whereOr('Update_File_TM','No');
+            })
+            ->where('delete_time',0)
+            ->where('PA','<>','')
+            ->whereBetweenTime('Date',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage1,count(id) as num1')->group('PA')->select();
+        $list=[];
+        //$pa3 = Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','Yes')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Completed',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage2,count(id) as num2')->group('PA')->select();
+        //dump($pa2);
+        if (!request()->isAjax()) {
+            $this->assign(['pd2'=>$pd2]);
+            return $this->fetch();
+        }
+        return [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => 0,
+            'data'  =>$pd,
         ];
     }
 }

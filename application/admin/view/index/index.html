@@ -16,21 +16,36 @@
 
     <li class="layui-nav-item">
         <a href="javascript:;">
+            {if $v.cn_name=="FAQ"}
+            <i class="iconfont {$v.icon}"></i>
+            <cite>{:session('language') == '中文'? $v.cn_name : $v.en_name}{if $faq != 0}<span class="layui-badge">{$faq}</span>{/if}</cite>
+            {else/}
             <i class="iconfont {$v.icon}"></i>
             <cite>{:session('language') == '中文'? $v.cn_name : $v.en_name}</cite>
+            {/if}
         </a>
 
         {volist name="$v.z" id="vo"}
 		<dl class="layui-nav-child">
-		    <dd>
-			{if $vo.cn_name=="表格管理"}
-				<a href="http://localhost/phpMyAdmin4.8.5/" target="_blank">
-				  {:session('language') == '中文'? '表格管理' : 'Table Management'}
-				</a>
-			{else/}
-				<a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}</a>
-			{/if}
-			</dd>
+            <dd>
+                {if $vo.cn_name=="表格管理"}
+                <a href="http://localhost/phpMyAdmin4.8.5/" target="_blank">
+                    {:session('language') == '中文'? '表格管理' : 'Table Management'}
+                </a>
+                {elseif $vo.cn_name=="电脑软件"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $faq != 0}<span class="layui-badge">{$software}</span>{/if}</a>
+                {elseif $vo.cn_name=="翻译问题"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$translate}</span>{/if}</a>
+                {elseif $vo.cn_name=="排版问题"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$revise}</span>{/if}</a>
+                {elseif $vo.cn_name=="项目管理"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $project != 0}<span class="layui-badge">{$project}</span>{/if}</a>
+                {elseif $vo.cn_name=="人事行政"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$work}</span>{/if}</a>
+                {else/}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}</a>
+                {/if}
+            </dd>
 		</dl>
         {/volist}
 

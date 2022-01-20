@@ -1,0 +1,77 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+
+        <form class="layui-form layui-inline" action="/admin/statistics/pd" id="sub">
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择月份</label>
+                <div class="layui-input-block">
+                    <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </form>
+        <div class="layui-form">
+            <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pd?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
+                <thead >
+                <tr>
+                    <th lay-data="{field:'PA',sort: true}">项目组长</th>
+                    <th lay-data="{field:'sumpage',sort:true}">需更库的文件页数</th>
+                    <th lay-data="{field:'num',sort: true}">需更库的文件份数</th>
+                </tr>
+                </thead>
+
+            </table>
+
+            <table class="layui-table" lay-filter="demo1" lay-data="{limit:30,toolbar: true,}">
+                <thead >
+                <tr>
+                    <th lay-data="{field:'PA',sort: true}">项目组长</th>
+                    <th lay-data="{field:'sumpage1',sort:true}">还未更库的文件页数</th>
+                    <th lay-data="{field:'num1',sort: true}">还未更库的文件份数</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $pd2 as $key=>$vo }
+                <tr>
+                    <td>{$vo.PA}</td>
+                    <td>{$vo.sumpage1}</td>
+                    <td>{$vo.num1|default=0}  </td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="main" style="height:400px;"></div>
+{/block}
+
+{block name="js"}
+{js href="__JS__/jquery-3.3.1.min.js"}
+<!--库文件-->
+<script>
+    layui.use('table', function() {
+        var table = layui.table;
+        // console.log(table);
+//转换静态表格(排序有问题)
+//         table.init('demo', {
+//             toolbar: true,
+//             title:'页数统计表',
+//             limit:300,
+//         });
+
+
+    });
+</script>
+
+<script>
+    $("input[name='month']").change(function () {
+        console.log( $("input[name='month']").val())
+        $('#sub').submit();
+    })
+</script>
+
+{/block}
