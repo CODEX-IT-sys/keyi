@@ -17,7 +17,7 @@
 					<a class="on">{:session('language') == '中文'? '任务预估02' : 'Task Estimation'}</a>
 				</div>
 				<div class="global_btn">
-					<a href="{:url('edit',['belong'=>'PM02'])}" class="layui-btn com_btn" >基础信息修改</a>
+					<a href="{:url('edit',['belong'=>'PM02'])}" class="layui-btn com_btn" >{:session('language') == '中文'? '基础信息修改' : 'Basic Information'}</a>
 
 					<!--<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>-->
 				</div>
@@ -109,7 +109,7 @@
 		}else{
 
 			cols = [
-				{field:'work_days', title:'work_days',minWidth: 100,align:'center',totalRowText:'合计'}
+				{field:'work_days', title:'work_days',minWidth: 100,align:'center',totalRowText:'Total'}
 				,{field:'pre_formatter', title:'pre_formatter',minWidth: 100,align:'center'  }
 				,{field:'pre_page', title:'pre_page/day', minWidth: 180,align:'center' }
 				,{field:'pre_total', title:'pre_total',style:'color: red;',minWidth: 180,align:'center'}

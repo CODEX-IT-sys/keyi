@@ -38,6 +38,10 @@ class PjDailyProgressTrRe extends Common
                         break;
                     case 'Job_Name':
                         $colsData[$k]['fixed']='left';
+                        $colsData[$k]['width']=200;
+                        break;
+                    case 'Filing_Code':
+                        $colsData[$k]['width']=180;
                         break;
                     case 'Original_Chinese_Characters':
                         $colsData[$k]['width']=100;

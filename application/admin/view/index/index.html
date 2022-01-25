@@ -37,11 +37,11 @@
                 {elseif $vo.cn_name=="翻译问题"}
                 <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$translate}</span>{/if}</a>
                 {elseif $vo.cn_name=="排版问题"}
-                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$revise}</span>{/if}</a>
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $revise != 0}<span class="layui-badge">{$revise}</span>{/if}</a>
                 {elseif $vo.cn_name=="项目管理"}
                 <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $project != 0}<span class="layui-badge">{$project}</span>{/if}</a>
                 {elseif $vo.cn_name=="人事行政"}
-                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $translate != 0}<span class="layui-badge">{$work}</span>{/if}</a>
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $work != 0}<span class="layui-badge">{$work}</span>{/if}</a>
                 {else/}
                 <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}</a>
                 {/if}

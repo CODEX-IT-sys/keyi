@@ -17,7 +17,7 @@
 					<a class="on">{:session('language') == '中文'? '人数预估' : 'Task Estimation'}</a>
 				</div>
 				<div class="global_btn">
-					<a href="{:url('create')}" class="layui-btn com_btn" >新增</a>
+					<a href="{:url('create')}" class="layui-btn com_btn" >{:session('language') == '中文'? '新增' : 'Add'}</a>
 
 					<!--<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>-->
 				</div>
@@ -77,16 +77,12 @@
 				{type: 'checkbox', fixed: 'left'}
 				,{field:'pj_name', title:'项目名称',minWidth: 100,align:'center',totalRowText:'合计'}
 				,{field:'work_days', title:'工作天数',minWidth: 100,align:'center'}
-
 				,{field:'pre_page', title:'预排版每日工作页数', minWidth: 180,align:'center' }
 				,{field:'pre_formatter', title:'预排版人数',style:'color: red;',minWidth: 100,align:'center'  }
-
 				,{field:'trs_page', title:'翻译每日工作页数',minWidth: 100,align:'center'}
 				,{field:'translator', title:'翻译人数', minWidth: 100,align:'center',style:'color: red;'}
-
 				,{field:'rev_page', title:'校对每日工作页数',minWidth: 100,align:'center'}
 				,{field:'revisor', title:'校对人数',minWidth: 100,align:'center',style:'color: red;'}
-
 				,{field:'post_page', title:'后排版每日工作页数',minWidth: 100,align:'center'}
 				,{field:'post_formatter', title:'后排版人数',minWidth: 120,align:'center', style:'color: red;'}
 				,{field:'submit_date', title:'提交日期',minWidth: 100,align:'center'}
@@ -100,23 +96,23 @@
 
 			cols = [
 				{type: 'checkbox', fixed: 'left'}
-				,{field:'pj_name', title:'项目名称',minWidth: 100,align:'center',totalRowText:'合计'}
-				,{field:'work_days', title:'工作天数',minWidth: 100,align:'center'}
-				,{field:'pre_formatter', title:'预排版人数',style:'color: red;',minWidth: 100,align:'center'  }
-				,{field:'pre_page', title:'预排版每日工作页数', minWidth: 180,align:'center' }
-				,{field:'pre_total', title:'预排版工作总页数',minWidth: 180,align:'center'}
-				,{field:'translator', title:'翻译人数', minWidth: 100,align:'center',style:'color: red;'}
-				,{field:'trs_page', title:'翻译每日工作页数',minWidth: 100,align:'center'}
-				,{field:'trs_total', title:'翻译工作总页数',minWidth: 100, align:'center'}
-				,{field:'revisor', title:'校对人数',minWidth: 100,align:'center',style:'color: red;'}
-				,{field:'rev_page', title:'校对每日工作页数',minWidth: 100,align:'center'}
-				,{field:'rev_total', title:'校对工作总页数',minWidth: 100,align:'center'}
-				,{field:'post_formatter', title:'后排版人数',minWidth: 120,align:'center', style:'color: red;'}
-				,{field:'post_page', title:'后排版每日工作页数',minWidth: 100,align:'center'}
-				,{field:'post_total', title:'后排版工作总页数', minWidth: 150, align:'center'}
-				,{field:'submit_date', title:'提交日期',minWidth: 100,align:'center'}
-				,{field:'submit_page', title:'提交总页数',minWidth: 100,align:'center',style:'color: red;'}
-				,{fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+				,{field:'pj_name', title:'Project Name',minWidth: 100,align:'center',totalRowText:'合计'}
+				,{field:'work_days', title:'Work Days',minWidth: 100,align:'center'}
+				,{field:'pre_formatter', title:'pre_formatter',style:'color: red;',minWidth: 100,align:'center'  }
+				,{field:'pre_page', title:'pre_page/day', minWidth: 180,align:'center' }
+				,{field:'pre_total', title:'pre_total',minWidth: 180,align:'center'}
+				,{field:'translator', title:'translator', minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'trs_page', title:'trs_page/day',minWidth: 100,align:'center'}
+				,{field:'trs_total', title:'trs_total',minWidth: 100, align:'center'}
+				,{field:'revisor', title:'revisor',minWidth: 100,align:'center',style:'color: red;'}
+				,{field:'rev_page', title:'rev_page/day',minWidth: 100,align:'center'}
+				,{field:'rev_total', title:'rev_total',minWidth: 100,align:'center'}
+				,{field:'post_formatter', title:'post_formatter',minWidth: 120,align:'center', style:'color: red;'}
+				,{field:'post_page', title:'post_page/day',minWidth: 100,align:'center'}
+				,{field:'post_total', title:'post_total', minWidth: 150, align:'center'}
+				,{field:'submit_date', title:'Completed',minWidth: 100,align:'center'}
+				,{field:'submit_page', title:'sumpage',minWidth: 100,align:'center',style:'color: red;'}
+				,{fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 150}
 			];
 
 

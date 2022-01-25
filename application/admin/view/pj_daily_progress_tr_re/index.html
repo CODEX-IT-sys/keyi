@@ -13,8 +13,8 @@
 					</div>
 					<div class="global_btn">
 						<a href="{:url('pj_daily_progress_tr_re/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
-						<a class="layui-btn com_btn" id="xzedit">批量修改</a>
-						<a class="layui-btn com_btn" id="sjth">数据计算</a>
+						<a class="layui-btn com_btn" id="xzedit">{:session('language') == '中文'? '批量修改' : 'Batch modification'}</a>
+						<a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
 						<!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
 					</div>
 				</div>
@@ -114,10 +114,16 @@ layui.use(['table','form'], function(){
         for(var i = 0; i < l; i++){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
-					if(language === '中文'){
-						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+					if(language === '中文')
+					{
+						if(colsData[i].Field == 'Name_of_Translator_or_Reviser' || colsData[i].Field == 'Category' || colsData[i].Field == 'Work_Date'){
+							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, width:100,totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+						}else{
+							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180,totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+						}
+
 					}else{
-						cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
+						cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200,totalRow:true,hide:colsData[i].hide,fixed:colsData[i].fixed});
 					}
                 }
             }

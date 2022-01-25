@@ -406,8 +406,7 @@ class Faq extends Common
             'dec' => $data['dec'],
             'cate_id' => $data['cate_id'],
             'content' =>$data['content'],
-            'Filled_by' =>$data['Filled_by'],
-            'update_time' => date('Ymd'),
+            'update_time' => time(),
         ];
 
         Db::name('faq')->where('id',$data['id'])->update($upData);

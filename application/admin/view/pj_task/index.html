@@ -17,7 +17,7 @@
 					<a class="on">{:session('language') == '中文'? '项目预估' : 'Task Estimation'}</a>
 				</div>
 				<div class="global_btn">
-					<a href="{:url('create')}" class="layui-btn com_btn" >新增</a>
+					<a href="{:url('create')}" class="layui-btn com_btn" >{:session('language') == '中文'? '新增' : 'Add'}</a>
 
 					<!--<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>-->
 				</div>
@@ -105,8 +105,8 @@
 		}else{
 
 			cols = [
-				{field:'pj_name', title:'项目名称',minWidth: 100,align:'center',totalRowText:'合计'}
-				,{field:'work_days', title:'工作天数',minWidth: 100,align:'center'}
+				{field:'pj_name', title:'Project Name',minWidth: 100,align:'center',totalRowText:'合计'}
+				,{field:'work_days', title:'Work Days',minWidth: 100,align:'center'}
 				,{field:'pre_formatter', title:'pre_formatter',minWidth: 100,align:'center'  }
 				,{field:'pre_page', title:'pre_page/day', minWidth: 180,align:'center' }
 				,{field:'pre_total', title:'pre_total',style:'color: red;',minWidth: 180,align:'center'}
