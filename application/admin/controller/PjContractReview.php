@@ -1037,6 +1037,9 @@ class PjContractReview extends Common
             if($early_days >100 || $early_days < -100){
                 $early_days = -999;
             }
+            if($early_days > 0 && $early_days < 101){
+                $early_days = '*'.$early_days;
+            }
             $data['Early_days'] = $early_days;
         }else{
             $data['Early_days'] = -999;
@@ -1080,6 +1083,9 @@ class PjContractReview extends Common
             if($early_days >100 || $early_days < -100){
                 $early_days = -999;
             }
+            if($early_days > 0 && $early_days < 101){
+                $early_days = '*'.$early_days;
+            }
             $data['Early_days'] = $early_days;
         }
 
@@ -1093,6 +1099,14 @@ class PjContractReview extends Common
         Db::name('mk_feseability')
             ->where('Filing_Code', $data['Filing_Code'])
             ->update($feedback);
+
+        //同步更新是否交稿到结算管理
+        $deliver = [
+            'Delivered_or_Not' => $data['Delivered_or_Not']
+        ];
+        Db::name('mk_invoicing')
+            ->where('Filing_Code',$data['Filing_Code'])
+            ->update($deliver);
 
         // 同步更新 项目数据库表 相关信息
         $d = ['Translator','Reviser','Pre_Formatter','Post_Formatter','Language','File_Type','File_Category',
@@ -1306,6 +1320,7 @@ class PjContractReview extends Common
             }*/
 
             $arr1=$arr;
+            $arr2=$arr;
             if(isset($arr['Completed'])){
                 $arr['Completed']=(int)$arr['Completed'];
             }
@@ -1335,6 +1350,9 @@ class PjContractReview extends Common
                     if($early_days >100 || $early_days < -100){
                         $early_days = -999;
                     }
+                    if($early_days > 0 && $early_days < 101){
+                        $early_days = '*'.$early_days;
+                    }
                     $c_data['Early_days'] = $early_days;
                 }else{
                     $c_data['Early_days'] = 'N/A';
@@ -1360,6 +1378,20 @@ class PjContractReview extends Common
                     ->where('Filing_Code', $v['Filing_Code'])
                     ->update($arr1);
             }
+
+            //同步更新是否交稿到结算管理
+            $deliver = ['Delivered_or_Not'];
+            foreach ($field as $key=>$val){
+                if(!in_array($val, $deliver)) {
+                    unset($arr2[$val]);
+                }
+            }
+            foreach ($Filing_Code as $k=>$v){
+                Db::name('mk_invoicing')
+                    ->where('Filing_Code',$v['Filing_Code'])
+                    ->update($arr2);
+            }
+
             // 提交事务
             Db::commit();
         } catch (ValidateException $e) {
@@ -1479,4 +1511,94 @@ class PjContractReview extends Common
         return json(['code'=>1,'msg'=>'导入成功']);
 
     }
+
+    //项目汇总批量拆分成多条项目描述
+    public function split($c_id){
+        // 文件库
+        $text_list = Db::name('pj_project_profile_text')->field('id, Project_Name')
+            ->where('Filled_by', session('administrator')['name'])
+            ->where('delete_time',0)->order('id desc')->select();
+        // 返回视图
+        return view('',['c_id'=>$c_id,'text_list'=>$text_list]);
+    }
+
+    public function add_split(Request $request){
+        // 获取提交的数据
+        $data = $request->post();
+        // 用户
+        $name = session('administrator')['name'];
+        //通过id查询项目汇总表信息
+        $xmhz = Db::name('pj_contract_review')->where('id',$data['c_id'])->find();
+        $len = $data['split_num'];
+        if($len>=1){
+            for($i=0;$i<$len;$i++){
+                $in_data = [
+                    'Filing_Code' => $xmhz['Filing_Code'],
+                    'Job_Name' => $xmhz['Job_Name'],
+                    'Project_Name' => $data['Project_Name'],
+                    'Company_Name' => $xmhz['Company_Name'],
+                    'Language' => $xmhz['Language'],
+                    'File_Type' => $xmhz['File_Type'],
+                    'File_Category' => $xmhz['File_Category'],
+                    'Translation_Delivery_Time' => $xmhz['Translation_Delivery_Time'],
+                    'Revision_Delivery_Time' => $xmhz['Revision_Delivery_Time'],
+                    'Pre_Format_Delivery_Time' => $xmhz['Pre_Format_Delivery_Time'],
+                    'Post_Format_Delivery_Time' => $xmhz['Post_Format_Delivery_Time'],
+                    'Format_Difficulty' => $xmhz['Format_Difficulty'],
+                    'Translation_Difficulty' => $xmhz['Translation_Difficulty'],
+                    'Pre_Formatter' => $xmhz['Pre_Formatter'],
+                    'Translator' => $xmhz['Translator'],
+                    'Reviser' => $xmhz['Reviser'],
+                    'Post_Formatter' => $xmhz['Post_Formatter'],
+                    'PA' => $xmhz['PA'],
+                    'Filled_by' => $name,
+                ];
+                Db::name('pj_project_profile')->insert($in_data);
+            }
+
+            // 返回操作结果
+            return json(['msg'=>'拆分成功']);
+        }
+
+    }
+
+
+    //批量添加项目描述
+    public function batch_ms($id){
+        $id_arr = explode(',' , $id);
+
+        $id_arr = array_reverse($id_arr);
+        // 用户
+        $name = session('administrator')['name'];
+        foreach($id_arr as $key=>$v){
+            //通过id查询项目汇总表信息
+            $xmhz = Db::name('pj_contract_review')->where('id',$v)->find();
+            $in_data = [
+                'Filing_Code' => $xmhz['Filing_Code'],
+                'Job_Name' => $xmhz['Job_Name'],
+                'Company_Name' => $xmhz['Company_Name'],
+                'Pages' => $xmhz['Pages'],
+                'Source_Text_Word_Count' => $xmhz['Source_Text_Word_Count'],
+                'Language' => $xmhz['Language'],
+                'File_Type' => $xmhz['File_Type'],
+                'File_Category' => $xmhz['File_Category'],
+                'Translation_Delivery_Time' => $xmhz['Translation_Delivery_Time'],
+                'Revision_Delivery_Time' => $xmhz['Revision_Delivery_Time'],
+                'Pre_Format_Delivery_Time' => $xmhz['Pre_Format_Delivery_Time'],
+                'Post_Format_Delivery_Time' => $xmhz['Post_Format_Delivery_Time'],
+                'Format_Difficulty' => $xmhz['Format_Difficulty'],
+                'Translation_Difficulty' => $xmhz['Translation_Difficulty'],
+                'Pre_Formatter' => $xmhz['Pre_Formatter'],
+                'Translator' => $xmhz['Translator'],
+                'Reviser' => $xmhz['Reviser'],
+                'Post_Formatter' => $xmhz['Post_Formatter'],
+                'PA' => $xmhz['PA'],
+                'Filled_by' => $name,
+            ];
+            Db::name('pj_project_profile')->insert($in_data);
+        }
+        // 返回数据
+        return json(['msg' => '操作成功']);
+    }
+
 }

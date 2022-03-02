@@ -99,8 +99,12 @@
 							            {:session('language') == '中文'? '漏译' : 'Omission'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Omission" lay-verify="required" value="{$info.Omission|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Omission" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Omission==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -110,8 +114,12 @@
 							            {:session('language') == '中文'? '多译' : 'Extra Translation'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Extra_Translation" lay-verify="required" value="{$info.Extra_Translation|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Extra_Translation" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Extra_Translation==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -121,8 +129,12 @@
 							            {:session('language') == '中文'? '理解程度' : 'Understanding'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Understanding" lay-verify="required" value="{$info.Understanding|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Understanding" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Understanding==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -132,8 +144,12 @@
 										{:session('language') == '中文'? '打字、数据错误' : 'Typo or Data Error'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Typo_or_Data_Error" lay-verify="required" value="{$info.Typo_or_Data_Error|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Typo_or_Data_Error" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Typo_or_Data_Error==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -143,8 +159,12 @@
 										{:session('language') == '中文'? '自身术语不统一' : 'Inconsistent within the File'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Inconsistent_within_the_File" lay-verify="required" value="{$info.Inconsistent_within_the_File|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Inconsistent_within_the_File" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Inconsistent_within_the_File==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -154,8 +174,12 @@
 										{:session('language') == '中文'? '未和其他译者统一术语' : 'Inconsistent with Other Translators'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Inconsistent_with_Other_Translators" value="{$info.Inconsistent_with_Other_Translators|default=''}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Inconsistent_with_Other_Translators" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Inconsistent_with_Other_Translators==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -165,8 +189,12 @@
 							            {:session('language') == '中文'? '术语翻译不恰当' : 'Mistranslation'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Mistranslation" lay-verify="required" value="{$info.Mistranslation|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Mistranslation" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Mistranslation==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -176,8 +204,12 @@
 							            {:session('language') == '中文'? '标点符号不恰当' : 'Incorrect Punctuation'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Incorrect_Punctuation" lay-verify="required" value="{$info.Incorrect_Punctuation|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Incorrect_Punctuation" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Incorrect_Punctuation==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -187,8 +219,12 @@
 										{:session('language') == '中文'? '不符合习惯用语' : 'Inconsistent with Target Language Features'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Inconsistent_with_Target_Language_Features" value="{$info.Inconsistent_with_Target_Language_Features|default=''}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Inconsistent_with_Target_Language_Features" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Inconsistent_with_Target_Language_Features==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -198,8 +234,12 @@
 							            {:session('language') == '中文'? '语法错误' : 'Grammar Mistakes'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Grammar_Mistakes" lay-verify="required" value="{$info.Grammar_Mistakes|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Grammar_Mistakes" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Grammar_Mistakes==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -209,8 +249,12 @@
 							            {:session('language') == '中文'? '表达流畅度' : 'Sentence Quality'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Sentence_Quality" lay-verify="required" value="{$info.Sentence_Quality|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Sentence_Quality" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Sentence_Quality==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -220,8 +264,12 @@
 										{:session('language') == '中文'? '是否认真参考了参考文件' : 'Refer to the References'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Refer_to_the_References" lay-verify="required" value="{$info.Refer_to_the_References|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Refer_to_the_References" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Refer_to_the_References==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							
@@ -231,8 +279,12 @@
 										{:session('language') == '中文'? '既往纠正问题是否仍反复出现' : 'Corrected Problems Reoccur'}
 									</label>
 							        <div class="layui-input-block">
-							            <input name="Corrected_Problems_Reoccur" lay-verify="required" value="{$info.Corrected_Problems_Reoccur|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
-							        </div>
+										<select name="Corrected_Problems_Reoccur" lay-search>
+											{volist name="$arr" id="v"}
+											<option value="{$v.name}" {$info.Corrected_Problems_Reoccur==$v.name?'selected':''}>{$v.name}</option>
+											{/volist}
+										</select>
+									</div>
 							    </div>
 							</div>
 							

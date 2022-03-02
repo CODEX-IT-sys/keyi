@@ -168,7 +168,7 @@ class PjDailyProgressTrRe extends Common
         $xmfy=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Translator');
         //兼职人员表
         $jz_arr = ['陈江波','乐阳','李显鹏','林巧','蒋雪婷','金岚艳','高睿','吕东霞','赵晨余','袁春蕾','吴奇芳','罗雅卓','李阳','薛佳楠','祝咏霖','张静','张莉',
-            '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky'];
+            '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky','客户译文'];
 
 
         if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
@@ -194,7 +194,7 @@ class PjDailyProgressTrRe extends Common
                 $where = [
                     'Filing_Code' => $data['Filing_Code'],
                     'Job_Name' => $data['Job_Name'],
-                    'Percentage_Completed' => '100%',
+                    'Percentage_Completed' => 100,
                     'delete_time' => 0,
                 ];
                 $record = Db('pj_daily_progress_tr_re')->where($where)
@@ -206,6 +206,38 @@ class PjDailyProgressTrRe extends Common
                         'Revision_Rate' => $data['Revision_Rate']
                     ];
                     $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+
+                    //生成翻译评估
+                    $tr_data = Db('pj_daily_progress_tr_re')
+                        ->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], ['eq', 'TR Modify Other'], 'or')
+                        ->find();
+                    $name = session('administrator')['name'];
+                    if($tr_data){
+                        $pg_data = [
+                            'Filing_Code' => $data['Filing_Code'],
+                            'Job_Name' => $data['Job_Name'],
+                            'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
+                            'Company_Name' => $tr_data['Company_Name'],
+                            'Language' => $tr_data['Language'],
+                            'Translation_Difficulty' => $tr_data['Translation_Difficulty'],
+                            'Filled_by' => $name,
+                            'create_time' => time(),
+                        ];
+                        $where = [
+                            'Filing_Code' => $data['Filing_Code'],
+                            'Job_Name' => $data['Job_Name'],
+                            'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
+                            'delete_time' => 0,
+                        ];
+                        //如果评估记录不存在则添加
+                        $res =  Db('pj_translation_evaluation')->where($where)->find();
+                        if(!$res){
+                            Db('pj_translation_evaluation')->insert($pg_data);
+                        }
+
+                    }
+
                 }else{
                     if(!in_array($xmfy,$jz_arr)){
                         return $this->error('翻译记录不存在，无法同步校对比率');
@@ -294,19 +326,22 @@ class PjDailyProgressTrRe extends Common
         }
 
         //校对比率的默认值
-        if($data['Percentage_Completed'] != 100 ){
-            $data['Revision_Rate'] = 'N/A';
-        }else{
-            if($data['Work_Content'] == 'Translate'){
-                $data['Revision_Rate'] = 0;
+        if(empty($data['Revision_Rate'])){
+            if($data['Percentage_Completed'] != 100 ){
+                $data['Revision_Rate'] = 'N/A';
+            }else{
+                if($data['Work_Content'] == 'Translate'){
+                    $data['Revision_Rate'] = 0;
+                }
             }
         }
+
 
         //查询项目描述表中的翻译人员
         $xmfy=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Translator');
         //兼职人员表
         $jz_arr = ['陈江波','乐阳','李显鹏','林巧','蒋雪婷','金岚艳','高睿','吕东霞','赵晨余','袁春蕾','吴奇芳','罗雅卓','李阳','薛佳楠','祝咏霖','张静','张莉',
-            '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky'];
+            '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky','客户译文'];
 
         if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
             || $data['Work_Content'] == 'RE (Sampling_Highlight)' || $data['Work_Content'] == 'RE Finalize'){
@@ -317,7 +352,7 @@ class PjDailyProgressTrRe extends Common
                 $where = [
                     'Filing_Code' => $data['Filing_Code'],
                     'Job_Name' => $data['Job_Name'],
-                    'Percentage_Completed' => '100%',
+                    'Percentage_Completed' => 100,
                     'delete_time' => 0,
                 ];
                 $record = Db('pj_daily_progress_tr_re')->where($where)
@@ -463,5 +498,23 @@ class PjDailyProgressTrRe extends Common
         }
 
         return json(['code'=>$res]);
+    }
+
+
+    //检查页数是否填写正确
+    public function check_yema(){
+        //计算项目描述表中的文件编号的页数
+        $data = input('get.');
+
+        $xmms = Db::name('pj_project_profile')->where('Filing_Code', $data['Filing_Code'])->where('Job_Name', $data['Job_Name'])->value('Pages');
+        //计算改文件的页数和
+        $ysh = Db::name('pj_daily_progress_tr_re')->where('Filing_Code', $data['Filing_Code'])->where('Job_Name', $data['Job_Name'])->where('Filled_by', $data['trre_name'])
+            ->where('Work_Content', $data['Work_Content'])->sum('Number_of_Pages_Completed');
+
+        if ($ysh + $data['yema'] > $xmms) {
+            return json(['code'=>1,'ys'=>$xmms]);
+        }
+
+        return json(['code'=>2,'ys'=>$xmms]);
     }
 }

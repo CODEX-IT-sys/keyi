@@ -55,6 +55,9 @@ class Admin extends Controller
             if($early_days >100 || $early_days < -100){
                 $early_days = -999;
             }
+            if($early_days > 0 && $early_days < 101){
+                $early_days = '*'.$early_days;
+            }
             $where = [
                 'delete_time'=>0,
                 'id' => $val['id']

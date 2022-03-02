@@ -30,7 +30,7 @@
 										{:session('language') == '中文'? '文件编号' : 'Filing_Code'}
 									</label>
 									<div class="layui-input-block">
-										<select name="Filing_Code" lay-filter="Filing_Code" lay-search>
+										<select name="Filing_Code" id="Filing_Code" lay-filter="Filing_Code" lay-search>
 											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
 											{volist name="$file_code" id="v"}
 											<option value="{$v.Filing_Code}">{$v.Filing_Code}</option>
@@ -60,7 +60,7 @@
 							            {:session('language') == '中文'? '翻译/校对人员姓名' : 'Name of Translator or Reviser'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Name_of_Translator_or_Reviser" value="{:session('administrator.name')}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+							            <input name="Name_of_Translator_or_Reviser" id="name" value="{:session('administrator.name')}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
 							        </div>
 							    </div>
 							</div>
@@ -102,7 +102,7 @@
 										{:session('language') == '中文'? '工作日期' : 'Work Date'}
 									</label>
 									<div class="layui-input-block">
-										<input class="Date layui-input" name="Work_Date" id="Work_Date" type="text">
+										<input class="Date layui-input" name="Work_Date" id="Work_Date" type="text"  autocomplete="off">
 										<i class="layui-icon layui-icon-date"></i>
 									</div>
 								</div>
@@ -125,7 +125,7 @@
 							            {:session('language') == '中文'? '完成页码(所有该文件进度和不能超过项目页数)' : 'Number of Pages Completed'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Number_of_Pages_Completed" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="number" value="0">
+							            <input name="Number_of_Pages_Completed"  id="yema" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="number" value="0">
 							        </div>
 							    </div>
 							</div>
@@ -172,7 +172,7 @@
 							            {:session('language') == '中文'? '已完成百分比' : 'Percentage Completed'}
 							        </label>
 							        <div class="layui-input-block">
-							            <input name="Percentage_Completed" lay-verify="required" autocomplete="off" id="bfb" placeholder="" class="layui-input" value="0" type="number">
+							            <input name="Percentage_Completed" lay-verify="required" autocomplete="off" id="bfb" placeholder="" class="layui-input" value="0" type="number" >
 							        </div>
 									<span class="signTip">%</span>
 							    </div>
@@ -184,7 +184,7 @@
 										{:session('language') == '中文'? '校对比率' : 'Revision Rate'}
 									</label>
 									<div class="layui-input-block">
-										<input name="Revision_Rate" id="jdbl"  autocomplete="off" placeholder="" class="layui-input">
+										<input name="Revision_Rate" id="jdbl"  readonly="readonly" autocomplete="off" placeholder="" class="layui-input">
 									</div>
 									<span class="signTip">%</span>
 								</div>
@@ -235,14 +235,23 @@
 								</div>
 							</div>
 
-
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '修订字数' : 'Revision Words'}">
+										{:session('language') == '中文'? '修订字数' : 'Revision Words'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Revision_Words" id="xdzs" autocomplete="off"  placeholder="" class="layui-input" type="number" >
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 								<div class="layui-form-item layui_ic">
 									<label class="layui-form-label" title="{:session('language') == '中文'? '开始时间' : 'Start Time'}">
 										{:session('language') == '中文'? '开始时间' : 'Start Time'}
 									</label>
 									<div class="layui-input-block">
-										<input class="showDate layui-input" name="Start_Time" type="text">
+										<input class="showDate layui-input" name="Start_Time" type="text" autocomplete="off">
 										<i class="layui-icon layui-icon-date"></i>
 									</div>
 								</div>
@@ -254,7 +263,7 @@
 										{:session('language') == '中文'? '结束时间' : 'End time'}
 									</label>
 									<div class="layui-input-block">
-										<input class="showDate layui-input" name="End_Time" type="text">
+										<input class="showDate layui-input" name="End_Time" type="text" autocomplete="off">
 										<i class="layui-icon layui-icon-date"></i>
 									</div>
 								</div>
@@ -464,8 +473,49 @@
             })
         });
 
-        // 计算 中文总字数
-        $('#yzs').change(function () {
+		//页数校验
+		$('#yema').blur(function(){
+			var yema = $('#yema').val();
+
+			var Filing_Code = $('#Filing_Code').val();
+			var Job_Name = $('#Job_Name').val();
+			var trre_name =$('#name').val();
+			var Work_Content = $('#content').val();
+
+			if(!Filing_Code){
+				alert('请先填写文件编号');
+				$('#yema').val(0);
+				return false;
+			}
+			if(!Job_Name){
+				alert('请先填写文件名称');
+				$('#yema').val(0);
+				return false;
+			}
+			//alert(Job_Name);
+
+			//异步拉取信息
+			$.ajax({
+				type: 'get',
+				url: "{:url('check_yema')}",
+				data: {'Filing_Code': Filing_Code, 'Job_Name':Job_Name,'trre_name': trre_name,'Work_Content':Work_Content,'yema':yema},
+				dataType: 'json',
+				success: function (res) {
+					console.log(res.code);
+					var ys = res.ys;
+					if(res.code == 1){
+						alert('该文件完成页数和和超过项目描述页数,请重新填写;\n项目页数为:'+ys);
+						$('#yema').val(0);
+					}
+
+				}
+			})
+
+		});
+
+
+		// 计算 中文总字数
+       /* $('#yzs').change(function () {
 
             var yzs = $.trim($('#yzs').val());
             var zcfz = $.trim($('#zcfz').val());
@@ -486,7 +536,7 @@
 
 			zzs = zzs.toFixed(2);
             $('#zzs').val(zzs);
-        });
+        });*/
 
         // 表单验证
 		var validatorFunc = function () {
@@ -565,8 +615,8 @@
 			return validator.start();
 		};
 
-
 		$('#yzs').blur(function(){
+			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
 			//console.log(bfb);
 			if(bfb!=100){
@@ -578,24 +628,57 @@
 			var zcfz = $.trim($('#zcfz').val());
 			var kczs = $.trim($('#kczs').val());
 
-			var jdbl = $.trim($('#jdbl').val());
+			var xdzs = $.trim($('#xdzs').val());
 
-			yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; jdbl?jdbl:0;
+			yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; xdzs?xdzs:0;
 
 			if(zcfz < 15){
 				zcfz = 0;
 			}
 			//alert(jdbl);
-			if( jdbl != 0 && jdbl != 'N/A'){
-				var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+			/*if( jdbl != 0 && jdbl != 'N/A'){
+				if(work_content == 'Revise' || work_content == 'RE Modify' || work_content == 'RE (Sampling)' || work_content == 'RE (Highlight)' || work_content == 'RE (Sampling_Highlight)' || work_content == 'RE Finalize' ){
+					var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+				}
 			}else{
 				var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
-			}
+			}*/
+			var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
 			zzs = zzs.toFixed(2);
 			$('#zzs').val(zzs);
-		});
 
-		$('#jdbl').blur(function(){
+			if(xdzs != 0){
+				var jdbl = (xdzs/zzs)*100;
+				jdbl = jdbl.toFixed(2);
+				$('#jdbl').val(jdbl);
+			}
+		});
+		//计算校对比率
+		$('#xdzs').blur(function(){
+			var work_content = $('#content').val();
+			var bfb = $('#bfb').val();
+			var zzs = $.trim($('#zzs').val());
+			var xdzs = $.trim($('#xdzs').val());
+
+			if(!zzs || zzs === '0.00'){
+				layer.msg('先计算中文字数统计');
+				return false;
+			}
+			if(bfb!=100){
+				$('#xdzs').val('0');
+				layer.msg('完成百分比为100才可填写');
+			}else{
+				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
+					$('#xdzs').val('0');
+					layer.msg('只有工作内容为校对相关才能填写');
+				}else{
+					var jdbl = (xdzs/zzs)*100;
+					jdbl = jdbl.toFixed(2);
+					$('#jdbl').val(jdbl);
+				}
+			}
+		})
+		/*$('#jdbl').blur(function(){
 			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
 
@@ -608,7 +691,7 @@
 					layer.msg('只有工作内容为校对相关才能填写');
 				}
 			}
-		})
+		})*/
 
 		// 数据提交
 		$('#save').on('click', function () {

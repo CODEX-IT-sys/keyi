@@ -111,6 +111,8 @@ class MkInquiry extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where(['job_id'=>8,'status'=> 0,'delete_time'=>0])->select();
 
+
+
         // 直接返回视图
         return view('form-Inquiry', [
             'gs'=>$gs, 'pm'=>$pm, 'first'=>$first, 'vat_rate'=>$vat_rate,
@@ -139,9 +141,12 @@ class MkInquiry extends Common
         // 单位
         $units = word(3);
 
+        // 质量要求
+        $zl = Db::name('xt_dict')->where('c_id',10)->select();
+
         // 直接返回视图
         return view('file_Inquiry', [
-            'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),
+            'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),'zl'=>$zl,
             'yy'=>$yy, 'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'vat_rate'=>$vat_rate
         ]);
     }
@@ -236,13 +241,16 @@ class MkInquiry extends Common
         // 单位
         $units = Db::name('xt_dict')->where('c_id',3)->select();
 
+        // 质量要求
+        $zl = Db::name('xt_dict')->where('c_id',10)->select();
+
         if(!$res['bh_date']){
             $res['bh_date'] = date('Ymd',time());
         }
 
         // 直接返回视图
         return view('file_Inquiry-view', [
-            'File_Type'=>$File_Type, 'service'=>json_encode($service), 'yy'=>$yy,
+            'File_Type'=>$File_Type, 'service'=>json_encode($service), 'yy'=>$yy,'zl'=>$zl,
             'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'info'=>$res, 'vat_rate'=>$vat_rate
         ]);
     }
@@ -307,7 +315,7 @@ class MkInquiry extends Common
             // 筛选 来稿确认表 字段
             $f_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
                 'Language','Currency','Unit_Price','Units','Quote_Quantity','Quote_Amount','VAT_Amount',
-                'Delivery_Date_Expected','Customer_Requirements','External_Reference_File', 'Remarks'];
+                'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks'];
 
             // 筛选 结算管理表 字段
             $in_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
@@ -459,7 +467,7 @@ class MkInquiry extends Common
                 // 筛选 来稿确认表 字段
                 $f_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
                     'Language','Currency','Unit_Price','Units','Quote_Quantity','Quote_Amount','VAT_Amount',
-                    'Delivery_Date_Expected','Customer_Requirements','External_Reference_File', 'Remarks',];
+                    'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks',];
 
                 // 筛选 结算管理表 字段
                 $in_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
@@ -823,21 +831,23 @@ class MkInquiry extends Common
                     }else{
                         $res_arr[$row-2]['Delivery_Date_Expected']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("O".$row)->getValue()))));
                     }
-                    $res_arr[$row-2]['Customer_Requirements']  = trim($sheet->getCell("P".$row)->getValue());
-                    $res_arr[$row-2]['External_Reference_File']  = trim($sheet->getCell("Q".$row)->getValue());
-                    $res_arr[$row-2]['Order_Status']  = trim($sheet->getCell("R".$row)->getValue());
-                    $res_arr[$row-2]['Request_a_Quote']  = trim($sheet->getCell("S".$row)->getValue());
-                    $res_arr[$row-2]['Remarks']  = trim($sheet->getCell("T".$row)->getValue());
-                    $res_arr[$row-2]['Filled_by']  = trim($sheet->getCell("U".$row)->getValue());
+                    $res_arr[$row-2]['Quality_Requirements']  = trim($sheet->getCell("P".$row)->getValue());
+                    $res_arr[$row-2]['Customer_Requirements']  = trim($sheet->getCell("Q".$row)->getValue());
+                    $res_arr[$row-2]['External_Reference_File']  = trim($sheet->getCell("R".$row)->getValue());
+                    $res_arr[$row-2]['Order_Status']  = trim($sheet->getCell("S".$row)->getValue());
+                    $res_arr[$row-2]['Request_a_Quote']  = trim($sheet->getCell("T".$row)->getValue());
+                    $res_arr[$row-2]['Remarks']  = trim($sheet->getCell("U".$row)->getValue());
+                    $res_arr[$row-2]['Filled_by']  = trim($sheet->getCell("V".$row)->getValue());
                     $res_arr[$row-2]['Update_Date']  = date("Ymd");
                     $res_arr[$row-2]['Quote_Amount']  = trim($sheet->getCell("M".$row)->getValue());
                     $res_arr[$row-2]['VAT_Amount']  = trim($sheet->getCell("N".$row)->getValue());
-                    if($sheet->getCell("W".$row)->getValue()==''){
+
+                    if($sheet->getCell("X".$row)->getValue()==''){
                         $res_arr[$row-2]['deliver_date']  ='';
                     }else{
-                        $res_arr[$row-2]['deliver_date']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("W".$row)->getValue()))));
+                        $res_arr[$row-2]['deliver_date']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("X".$row)->getValue()))));
                     }
-
+                    $res_arr[$row-2]['bh_date']  = trim($sheet->getCell("Y".$row)->getValue());
                     $res_arr[$row-2]['i_id']  = $iid;
 
 
@@ -871,7 +881,7 @@ class MkInquiry extends Common
             // 筛选 来稿确认表 字段
             $f_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
                 'Language','Currency','Unit_Price','Units','Quote_Quantity','Quote_Amount','VAT_Amount',
-                'Delivery_Date_Expected','Customer_Requirements','External_Reference_File', 'Remarks'];
+                'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks'];
 
             // 筛选 结算管理表 字段
             $in_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
@@ -911,6 +921,7 @@ class MkInquiry extends Common
             $fz_data['Customer_Requirements']=$a['Customer_Requirements'];
             $fz_data['External_Reference_File']=$a['External_Reference_File'];
             $fz_data['Remarks']=$a['Remarks'];
+            $fz_data['Quality_Requirements']=$a['Quality_Requirements'];
 
 
 

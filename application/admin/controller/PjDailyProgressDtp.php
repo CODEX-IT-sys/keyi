@@ -136,19 +136,55 @@ class PjDailyProgressDtp extends Common
             return $this->error('该文件完成页数和和超过项目描述页数');
         }
 
-      /*  if($data['Work_Content']=='Postformat'){
-            //获取y排版人员
-            $ypb=Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])
-                ->where('Work_Content','Preformat')->select();
-            $man=[];
-            foreach ($ypb as $k=>$v)
-            {
-                $man[]=$v['Name_of_Formatter'];
+        //判断是否自动生成预排评估
+        if($data['Work_Content']=='Postformat' && $data['Percentage_Completed'] == 100){
+
+            //查询项目描述表中的y排版人员
+            $xmyp = Db::name('pj_project_profile')->where('Filing_Code', $data['Filing_Code'])->where('Job_Name', $data['Job_Name'])->value('Pre_Formatter');
+            //如果没有预排人员 则不生成记录
+            if($xmyp != '' && $xmyp != 'N/A'){
+                //获取y排版人员个数
+                $record=Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])
+                    ->where('Work_Content','Preformat')->where('Percentage_Completed',100)->count();
+
+                if($record == 1){
+                    $ypb = Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])
+                        ->where('Work_Content','Preformat')->where('Percentage_Completed',100)->find();
+
+                    if($ypb){
+                        if($ypb['Name_of_Formatter'] != $data['Name_of_Formatter']){
+                            $name = session('administrator')['name'];
+
+                            $pg_data = [
+                                'Filing_Code' => $data['Filing_Code'],
+                                'Job_Name' => $data['Job_Name'],
+                                'Pre_Formatter' => $ypb['Name_of_Formatter'],
+                                'Company_Name' => $ypb['Company_Name'],
+                                'Language' => $ypb['Language'],
+                                'Format_Difficulty' => $ypb['Format_Difficulty'],
+                                'Filled_by' => $name,
+                                'create_time' => time(),
+                            ];
+                            $where = [
+                                'Filing_Code' => $data['Filing_Code'],
+                                'Job_Name' => $data['Job_Name'],
+
+                                'delete_time' => 0,
+                            ];
+                            //如果评估记录不存在则添加
+                            $res =  Db('pj_y_p_evaluation')->where($where)->find();
+                            //生成预排评估记录
+                            if(!$res){
+                                Db('pj_y_p_evaluation')->insert($pg_data);
+                            }
+
+                        }
+                    }
+                }
             }
-            if(in_array($data['Name_of_Formatter'],$man)){
-                $data['Number_of_Pages_Completed']=0;
-            }
-        }*/
+
+
+        }
         // 计算实际用时
         $s = strtotime($data['Start_Time']);
         $e = strtotime($data['End_Time']);

@@ -18,6 +18,7 @@
 						<a class="layui-btn com_btn" id="zjlpl">{:session('language') == '中文'? '总经理批准' : 'General Manager'}</a>
                         <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
                         <a class="layui-btn com_btn" id="xzedit">{:session('language') == '中文'? '批量修改' : 'Batch modification'}</a>
+						<a class="layui-btn com_btn" id="tjms">{:session('language') == '中文'? '批量添加描述' : 'Batch Add Description'}</a>
 						<a class="layui-btn com_btn" id="daoru">{:session('language') == '中文'? '导入' : 'import'}</a>
 						<a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 					</div>
@@ -95,7 +96,7 @@
 	<div class="table_btn">
 		<a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
 		<a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
-		<!--<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'Look'}</a>-->
+		<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '拆分' : 'Split'}</a>
 	</div>
 </script>
 
@@ -140,9 +141,9 @@ layui.use(['table','form'], function(){
         }
 		// 右侧操作工具
 		if(language === '中文') {
-			cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150});
+			cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 180});
 		}else{
-			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 150});
+			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 180});
 		}
 
 		return [cols];
@@ -162,7 +163,7 @@ layui.use(['table','form'], function(){
 		page: {
 			curr:location.hash.replace('#!fenye=', ''),
 			hash:'fenye',
-			limits:[10,20,30,40,50,60,70,80,90,100,10000]
+			limits:[10,20,30,40,50,60,70,80,90,100,300,500,10000]
 		},
     });
 
@@ -263,8 +264,14 @@ layui.use(['table','form'], function(){
 		  	window.location.href =  replaceEditUrlId("{:url('pj_contract_review/edit', ['id' => 1])}", id);
 
 	  	} else if(obj.event === 'look'){
-
-		  	window.location.href = replaceEditUrlId("{:url('pj_contract_review/read', ['id' => 1])}", id);
+			parent.layer.open({  // 在父窗口打开
+				type: 2,
+				title: '新增',
+				maxmin: true,
+				area: ['900px', '500px'],
+				content: replaceEditUrlId("{:url('pj_contract_review/split', ['c_id' => 1])}", id)
+			});
+		  	/*window.location.href = replaceEditUrlId("{:url('pj_contract_review/read', ['id' => 1])}", id);*/
 
 	  	} else if(obj.event === 'xsjl'){
 			// 市场行政确认
@@ -565,6 +572,51 @@ layui.use(['table','form'], function(){
 		});
 
 	})
+	$('#tjms').click(function(){
+		var checkStatus = table.checkStatus('test');
+		var idstr = ''; var cd = checkStatus.data.length;
+
+		if(cd !== 0){
+			for(var i=0; i<cd; i++){
+				idstr +=  checkStatus.data[i].id + ',';
+			}
+			// 去除多余符号
+			idstr = idstr.substring(0, idstr.length - 1);
+
+			layer.confirm('确认操作？', function(index){
+				// 向服务器发送请求
+				$.ajax({
+					type: 'get',
+					url: "{:url('pj_contract_review/batch_ms')}",
+					data: {id : idstr},
+					// 批量添加成功
+					success: function (res) {
+						layer.alert(res.msg, {title: '提示'}, function (index) {
+							// 表格重载
+							tableIns.reload();
+							// 关闭alert
+							layer.close(index);
+						});
+					},
+					error: function (jqXHR) {
+						// 删除失败
+						if (jqXHR.status === 422) {
+							layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+								layer.close(index);
+							});
+						}
+					}
+				});
+			});
+		}else{
+			if(language === '中文') {
+				layer.alert('请先勾选数据再操作');
+			}else{
+				layer.msg('Please check the box before operating');
+			}
+		}
+	})
+
     $('#sjth').click(function () {
         var checkStatus = table.checkStatus('test');
         var num = 0

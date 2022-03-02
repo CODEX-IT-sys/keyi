@@ -116,6 +116,16 @@
         {:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}
     </span>
     {{#  } }}
+    {{#  if(d.type == 9 ){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? '排版QCR完毕' : 'Format QCR'}
+    </span>
+    {{#  } }}
+    {{#  if(d.type == 10 ){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? '翻译QCR完毕' : 'Translated QCR'}
+    </span>
+    {{#  } }}
 
 </script>
 

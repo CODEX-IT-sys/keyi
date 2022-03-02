@@ -35,7 +35,8 @@ class Zanonymous extends Common
 
             $ft=Zanonymou::with('admin,content')->where('status','in',$data)->all();
         }
-//        dump($ft);
+        // dump($ft);
+        //dump(session('administrator'));
         $this->assign(['ft'=>$ft,'user'=> session('administrator')]);
         return $this->fetch();
     }

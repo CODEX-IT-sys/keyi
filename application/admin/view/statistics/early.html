@@ -1,0 +1,58 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+
+        <form class="layui-form layui-inline" action="/admin/statistics/early" id="sub">
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择月份</label>
+                <div class="layui-input-block">
+                    <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </form>
+        <div class="layui-form">
+            <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/early?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
+                <thead >
+                <tr>
+                    <th lay-data="{field:'PA',sort: true}">项目组长</th>
+                    <th lay-data="{field:'bl',sort:true}">提交交付天数比率</th>
+                </tr>
+                </thead>
+
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<div id="main" style="height:400px;"></div>
+{/block}
+
+{block name="js"}
+{js href="__JS__/jquery-3.3.1.min.js"}
+<!--库文件-->
+<script>
+    layui.use('table', function() {
+        var table = layui.table;
+        // console.log(table);
+//转换静态表格(排序有问题)
+//         table.init('demo', {
+//             toolbar: true,
+//             title:'页数统计表',
+//             limit:300,
+//         });
+
+
+    });
+</script>
+
+<script>
+    $("input[name='month']").change(function () {
+        console.log( $("input[name='month']").val())
+        $('#sub').submit();
+    })
+</script>
+
+{/block}

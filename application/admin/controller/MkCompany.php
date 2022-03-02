@@ -163,15 +163,15 @@ class MkCompany extends Common
         // 查询信息
         $res = MkCompanyModel::get($id);
 
-        // 主体公司
+       /* // 主体公司
         $gs = Db::name('xt_company')->field('id,cn_name,en_name')->select();
 
         // 主体公司ID
         $gs_id = Db::name('xt_company')->where('cn_name',$res['Subject_Company'])
-            ->whereOr('en_name',$res['Subject_Company'])->value('id');
+            ->whereOr('en_name',$res['Subject_Company'])->value('id');*/
 
         // 直接返回视图
-        return view('form-Customer-view',['info'=>$res, 'gs'=>$gs, 'gs_id'=>$gs_id]);
+        return view('form-Customer-view',['info'=>$res]);
     }
 
     //编辑视图

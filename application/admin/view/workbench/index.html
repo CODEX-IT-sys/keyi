@@ -54,6 +54,16 @@
 									</a>
 								</li>
 								{/if}
+
+
+								{if $job_id != 0}
+								<li id="6" {$type==6?'class="active"':''}>
+									<a>
+										<span>{:session('language') == '中文'? '反馈修订提醒' : 'Progress Exception Reminder'}</span>
+										<b>{$t['f']}</b>
+									</a>
+								</li>
+								{/if}
 							</ul>
 						</div>
 					</div>

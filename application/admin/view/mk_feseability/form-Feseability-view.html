@@ -283,7 +283,21 @@
 									</div>
 								</div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '质量要求' : 'Quality Requirements'}">
+										{:session('language') == '中文'? '质量要求' : 'Quality Requirements'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Quality_Requirements" lay-filter="Quality_Requirements" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$zl" id="v"}
+											<option value="{$v.en_name}" {$info.Quality_Requirements==$v.en_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 								<div class="layui-form-item layui_ic">
 									<label class="layui-form-label" title="{:session('language') == '中文'? '客户期望提交日期' : 'Delivery Date Expected'}">
@@ -375,10 +389,11 @@
 									</label>
 									<div class="layui-input-block">
 										<select name="Customer_Feedback" lay-filter="Customer_Feedback">
-											<option value="Good" {$info.Customer_Feedback=="Good"?'selected':''}>Good</option>
-											<option value="Refer" {$info.Customer_Feedback=="Refer"?'selected':''}>Refer</option>
-											<option value="Revise" {$info.Customer_Feedback=="Revise"?'selected':''}>Revise</option>
-											<option value="Bad" {$info.Customer_Feedback=="Bad"?'selected':''}>Bad</option>
+											<option value="轻微不良（Minor Bad）" {$info.Customer_Feedback=="轻微不良（Minor Bad）"?'selected':''}>轻微不良（Minor Bad）</option>
+											<option value="严重不良（Major Bad）" {$info.Customer_Feedback=="严重不良（Major Bad）"?'selected':''}>严重不良（Major Bad）</option>
+											<option value="咨询（Consultation）" {$info.Customer_Feedback=="咨询（Consultation）"?'selected':''}>咨询（Consultation）</option>
+											<option value="建议（Recommendation）" {$info.Customer_Feedback=="建议（Recommendation）"?'selected':''}>建议（Recommendation）</option>
+											<option value="表扬（Appreciation）" {$info.Customer_Feedback=="表扬（Appreciation）"?'selected':''}>表扬（Appreciation）</option>
 											<option value="N/A" {$info.Customer_Feedback=="N/A"?'selected':''}>N/A</option>
 										</select>
 									</div>

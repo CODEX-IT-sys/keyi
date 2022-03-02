@@ -80,11 +80,17 @@ class PjTranslationEvaluation extends Common
         // 查询信息
         $res = PjTranslationEvaluationModel::get($id);
 
+        $arr1 = ['A','B','C','D'];
+        $arr = [];
+        foreach($arr1 as $key=>$val){
+            $arr[$key]['name'] = $arr1[$key];
+        }
+
         // 翻译
         $tr = Admin::field('name')->where('status', 0)
             ->where('job_id', 'in', [10,11,8,4,15,6,19])->select();
 
-        return view('form-translation_evaluation-view', ['info'=>$res, 'tr'=>$tr]);
+        return view('form-translation_evaluation-view', ['info'=>$res, 'tr'=>$tr,'arr'=>$arr]);
     }
 
     // 新建/更新 保存数据

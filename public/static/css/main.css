@@ -1718,7 +1718,7 @@ input[type=button], input[type=submit], input[type=file], button {
 	background-color: #fff;
 	border-radius: 4px;
 	text-align: center;
-	width: calc(20% - 20px);
+	width: calc(16% - 20px);
 	margin: 0 0 0 20px;
 	padding: 20px 0;
 }

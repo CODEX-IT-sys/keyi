@@ -67,6 +67,10 @@ class MkFeseability extends Common
                     $colsData[$k]['width']=180;
                     $colsData[$k]['sort']='true';
                     break;
+                case 'Quality_Requirements':
+                    $colsData[$k]['width']=180;
+                    $colsData[$k]['sort']='true';
+                    break;
                 case 'Completed':
                     $colsData[$k]['width']=180;
                     $colsData[$k]['sort']='true';
@@ -136,11 +140,16 @@ class MkFeseability extends Common
                 'Field'=>'Language',
                 'Comment'=>'语种'
             ],
+            [
+                'Field'=>'Quality_Requirements',
+                'Comment'=>'质量要求'
+            ],
 
             [
-            'Field'=>'Delivery_Date_Expected',
-            'Comment'=>'客户期望提交日期'
-             ],
+                'Field'=>'Delivery_Date_Expected',
+                'Comment'=>'客户期望提交日期'
+            ],
+
             [
                 'Field'=>'Completed',
                 'Comment'=>'交付日期'
@@ -222,12 +231,15 @@ class MkFeseability extends Common
 
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where('job_id',8)->select();
+
+        // 质量要求
+        $zl = Db::name('xt_dict')->where('c_id',10)->select();
 		
 		// 直接返回视图
         return view('form-Feseability', [
             'gs'=>$gs, 'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),
 			'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units,
-            'pm'=>$pm, 'contract_code'=>$contract_code
+            'pm'=>$pm, 'contract_code'=>$contract_code,'zl'=>$zl,
         ]);
     }
 
@@ -268,6 +280,9 @@ class MkFeseability extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where('job_id',8)->select();
 
+        // 质量要求
+        $zl = Db::name('xt_dict')->where('c_id',10)->select();
+
         // 允许修改 批准项 的
         if(in_array(session('administrator')['job_id'],[1,8,9,20])){
             $show = 1;
@@ -278,7 +293,7 @@ class MkFeseability extends Common
         // 直接返回视图
         return view('form-Feseability-view',[
             'info'=>$res,'gs'=>$gs, 'gs_id'=>$gs_id, 'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),
-            'pm'=>$pm,'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units, 'show'=>$show
+            'pm'=>$pm,'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units, 'show'=>$show,'zl'=>$zl
         ]);
     }
 
@@ -319,6 +334,9 @@ class MkFeseability extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where('job_id',8)->select();
 
+        // 质量要求
+        $zl = Db::name('xt_dict')->where('c_id',10)->select();
+
         // 允许修改 批准项 的
         if(in_array(session('administrator')['job_id'],[1,8,9,20])){
             $show = 1;
@@ -328,7 +346,7 @@ class MkFeseability extends Common
 
         return view('form-Feseability-view', [
             'info'=>$res,'gs'=>$gs, 'gs_id'=>$gs_id, 'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),
-		    'pm'=>$pm, 'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units, 'show'=>$show
+		    'pm'=>$pm, 'yy'=>$yy, 'first'=>$first,'currency'=>$currency, 'units'=>$units, 'show'=>$show,'zl'=>$zl
         ]);
     }
 
@@ -379,7 +397,8 @@ class MkFeseability extends Common
             }
 
             // 同步更新 项目汇总表 相关信息
-            $d = ['Attention','Company_Name','File_Type','Service','Language','Delivery_Date_Expected','Completed','Customer_Requirements','External_Reference_File'];
+            $d = ['Attention','Company_Name','File_Type','Service','Delivery_Date_Expected','Completed','Customer_Requirements','External_Reference_File',
+                'Pages','Source_Text_Word_Count','Job_Name','Language','Quality_Requirements'];
             foreach ($field as $key=>$val){
                 if(!in_array($val, $d)) {
                     unset($arr1[$val]);
@@ -399,6 +418,9 @@ class MkFeseability extends Common
                     $early_days = round(($completed - $expect)/86400);
                     if($early_days >100 || $early_days < -100){
                         $early_days = -999;
+                    }
+                    if($early_days > 0 && $early_days < 101){
+                        $early_days = '*'.$early_days;
                     }
                     $c_data['Early_days'] = $early_days;
                 }else{
@@ -503,6 +525,9 @@ class MkFeseability extends Common
             if($early_days >100 || $early_days < -100){
                 $early_days = -999;
             }
+            if($early_days > 0 && $early_days < 101){
+                $early_days = '*'.$early_days;
+            }
 
         }else{
             $early_days = 'N/A';
@@ -538,7 +563,13 @@ class MkFeseability extends Common
                     'External_Reference_File'=>$data['External_Reference_File'],
                     'Customer_Feedback' => $data['Customer_Feedback'],
                     'Feedback_Completed' => $feedback,
-
+                    'Pages' => $data['Pages'],
+                    'Source_Text_Word_Count' => $data['Source_Text_Word_Count'],
+                    'Job_Name' => $data['Job_Name'],
+                    'Language' => $data['Language'],
+                    'File_Type' => $data['File_Type'],
+                    'Service' => $data['Service'],
+                    'Quality_Requirements' => $data['Quality_Requirements'],
                 ]
             );
         }
@@ -557,6 +588,7 @@ class MkFeseability extends Common
         unset($data['Approval_General_Manager']);
         unset($data['Customer_Feedback']);
         unset($data['Feedback_Completed']);
+        unset($data['Quality_Requirements']);
         Db::table('ky_mk_invoicing')->where('Filing_Code',$fc)->update($data);
 
 
@@ -644,7 +676,7 @@ class MkFeseability extends Common
             // 项目汇总 字段
             $pj = ['Filing_Code','Job_Name','Company_Name','Sales','Attention','Department','Pages',
                 'File_Type','Service','Language','Source_Text_Word_Count','Delivery_Date_Expected','Completed','PM',
-                'Customer_Requirements','External_Reference_File','First_Cooperation'];
+                'Customer_Requirements','External_Reference_File','First_Cooperation','Quality_Requirements'];
 
             // 项目数据库 字段
             $pj_db = ['Filing_Code','Job_Name','Company_Name','Pages', 'File_Type',
@@ -682,16 +714,16 @@ class MkFeseability extends Common
 
                         //$js_data = Db::name('mk_feseability')->where('id', $v)->field($js)->find();
                          $pa01 = ['飞利浦','泛生子'];
-                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology'];
+                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology','VVR','辉瑞'];
                          $pa03 = ['比司特','库克','嘉德诺','Cryolife','唯美','微创心脉','瓦里安','微创神通','梅里埃','华大智造','索诺瓦','法液空'];
-                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
+                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森','启明医疗'];
                          $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
                          $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
                          $pa08 = [];
-                         $pa09 = ['拜耳海外','卡尔蔡司','碧迪','赛默飞'];
-                         $pa10 = ['雅培','皆美'];
+                         $pa09 = ['拜耳海外','卡尔蔡司','赛默飞'];
+                         $pa10 = ['雅培','皆美','碧迪'];
                          $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
-                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
+                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特'];
 
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
                         $pj_data['Date'] = substr($pj_data['Filing_Code'], 2, 8);
@@ -704,6 +736,9 @@ class MkFeseability extends Common
                             $early_days = round(($completed - $expect)/86400);
                             if($early_days >100 || $early_days < -100){
                                 $early_days = -999;
+                            }
+                            if($early_days > 0 && $early_days < 101){
+                                $early_days = '*'.$early_days;
                             }
                             $pj_data['Early_days'] = $early_days;
                         }else{
@@ -811,7 +846,7 @@ class MkFeseability extends Common
             // 项目汇总 字段
             $pj = ['Filing_Code','Job_Name','Company_Name','Sales','Attention','Department','Pages',
                 'File_Type','Service','Language','Source_Text_Word_Count','Delivery_Date_Expected','Completed','PM',
-                'Customer_Requirements','External_Reference_File','First_Cooperation'];
+                'Customer_Requirements','External_Reference_File','First_Cooperation','Quality_Requirements'];
 
             // 项目数据库 字段
             $pj_db = ['Filing_Code','Job_Name','Company_Name','Pages', 'File_Type',
@@ -846,16 +881,16 @@ class MkFeseability extends Common
                 if($i['Approval_Sales_Admin_Manager'] != 'Yes') {
                     if($i['Approval_General_Manager'] != 'Yes'){
                          $pa01 = ['飞利浦','泛生子'];
-                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology'];
+                         $pa02 = ['礼来','药审中心','武田','乐普生物','乐普','ResApp','Cambridge','RapiGEN','Invivoscribe','TWI','VIVO','YAMAKIN','Absology','VVR','辉瑞'];
                          $pa03 = ['比司特','库克','嘉德诺','Cryolife','唯美','微创心脉','瓦里安','微创神通','梅里埃','华大智造','索诺瓦','法液空'];
-                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森'];
+                         $pa04 = ['爱德华','施乐辉','上海以心','健世科技','捷迈','蒙太因','艾力康','日机装','费森','启明医疗'];
                          $pa05 = ['博士伦','安斯泰来','泰利福','美纳里尼','高德美','费森卡比','美信美达','阿尔法','君实生物','泰利福海外'];
                          $pa06 = ['创领心律','士卓曼','爱齐','康乐保','安思尔','爱齐海外','登士柏','盖思特利','赛德迪康','唯炜澜谛','百多力'];
                          $pa08 = [];
-                         $pa09 = ['拜耳海外','卡尔蔡司','碧迪','赛默飞'];
-                         $pa10 = ['雅培','皆美'];
+                         $pa09 = ['拜耳海外','卡尔蔡司','赛默飞'];
+                         $pa10 = ['雅培','皆美','碧迪'];
                          $pa11 = ['第一三共','上海光电','朝日英达','欧姆龙','田边三菱'];
-                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特']; 
+                         $pa12 = ['贝朗','柏视医疗','贝恩','科利耳','赛诺微','巴尔特'];
                         //$js_data = Db::name('mk_feseability')->where('id', $v)->field($js)->find();
 
                         $pj_data = Db::name('mk_feseability')->where('id', $v)->field($pj)->find();
@@ -869,6 +904,9 @@ class MkFeseability extends Common
                             $early_days = round(($completed - $expect)/86400);
                             if($early_days >100 || $early_days < -100){
                                 $early_days = -999;
+                            }
+                            if($early_days > 0 && $early_days < 101){
+                                $early_days = '*'.$early_days;
                             }
                             $pj_data['Early_days'] = $early_days;
                         }else{

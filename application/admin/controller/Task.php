@@ -439,96 +439,98 @@ class Task extends Common
         $post_gpa = [];
         $post_gpe = [];
 
+        if(!empty($list)){
+            foreach($list as $key=>$val){
+                if(empty($preDate)){
+                    $list[$key]['work_days'] = 1;
+                }else{
+                    $nowDate = $val['Completed'];
+                    $days = round((strtotime($nowDate)-strtotime($preDate))/3600/24);
+                    //$list[$key]['work_days'] = $days;
+                    $preN = date('N', strtotime($preDate));
+                    $nowN = date('N', strtotime($nowDate));
 
-        foreach($list as $key=>$val){
-            if(empty($preDate)){
-                $list[$key]['work_days'] = 1;
-            }else{
-                $nowDate = $val['Completed'];
-                $days = round((strtotime($nowDate)-strtotime($preDate))/3600/24);
-                //$list[$key]['work_days'] = $days;
-                $preN = date('N', strtotime($preDate));
-                $nowN = date('N', strtotime($nowDate));
 
+                    $weekday = $this->get_weekend_days($preDate,$nowDate);
+                    $reduce = 0;
+                    if($preN == 6 || $preN == 7){
+                        $reduce += 1;
+                    }
+                    if($nowN == 6 || $nowN == 7){
+                        $reduce += 1;
+                    }
 
-                $weekday = $this->get_weekend_days($preDate,$nowDate);
-                $reduce = 0;
-                if($preN == 6 || $preN == 7){
-                    $reduce += 1;
+                    $list[$key]['work_days'] = $days-$weekday+$reduce;
                 }
-                if($nowN == 6 || $nowN == 7){
-                    $reduce += 1;
-                }
+                //计算完成后 将新的循环日期赋值给临时变量
+                $preDate = $val['Completed'];
 
-                $list[$key]['work_days'] = $days-$weekday+$reduce;
+                $work_days = $list[$key]['work_days'];
+                $list[$key]['pre_formatter'] = $base['pre_formatter'];
+                $list[$key]['pre_page'] = $base['pre_page'];
+                $list[$key]['translator'] = $base['translator'];
+                $list[$key]['trs_page'] = $base['trs_page'];
+                $list[$key]['revisor'] = $base['revisor'];
+                $list[$key]['rev_page'] = $base['rev_page'];
+                $list[$key]['post_formatter'] = $base['post_formatter'];
+                $list[$key]['post_page'] = $base['post_page'];
+
+                $pre_total = $base['pre_formatter']*$base['pre_page']*$work_days;
+                $list[$key]['pre_total']= $pre_total;
+                $trs_total = $base['translator']*$base['trs_page']*$work_days;
+                $list[$key]['trs_total']= $trs_total;
+                $rev_total = $base['revisor']*$base['rev_page']*$work_days;
+                $list[$key]['rev_total']= $rev_total;
+                $post_total = $base['post_formatter']*$base['post_page']*$work_days;
+                $list[$key]['post_total']= $post_total;
+
+                $list[$key]['trre_GapPages'] = $val['sumpage']-$list[$key]['trs_total']-$list[$key]['rev_total'];
+                $list[$key]['trre_GapPeople'] = number_format($list[$key]['trre_GapPages']/25, 2);
+                $list[$key]['pre_GapPages'] = $val['sumpage']-$list[$key]['pre_total'];
+                $list[$key]['pre_GapPeople'] = number_format($list[$key]['pre_GapPages']/$base['pre_page'],2);;
+                $list[$key]['post_GapPages'] = $val['sumpage']-$list[$key]['post_total'];
+                $list[$key]['post_GapPeople'] = number_format($list[$key]['post_GapPages']/$base['post_page'],2);
+
+                //合计行数据
+                $totalRow['pre_formatter'] = $base['pre_formatter'];
+                $totalRow['pre_page'] = $base['pre_page'];
+                $totalRow['translator'] = $base['translator'];
+                $totalRow['trs_page'] = $base['trs_page'];
+                $totalRow['revisor'] = $base['revisor'];
+                $totalRow['rev_page'] = $base['rev_page'];
+                $totalRow['post_formatter'] = $base['post_formatter'];
+                $totalRow['post_page'] = $base['post_page'];
+
+                $tpre += $pre_total;
+                $ttrs += $trs_total;
+                $trev += $rev_total;
+                $tpos += $post_total;
+                $sumpage += $val['sumpage'];
+
+                $tr_gpa[] = $list[$key]['trre_GapPages'];
+                $tr_gpe[] = $list[$key]['trre_GapPeople'];
+                $pre_gpa[] = $list[$key]['pre_GapPages'];
+                $pre_gpe[] = $list[$key]['pre_GapPeople'];
+                $post_gpa[] = $list[$key]['post_GapPages'];
+                $post_gpe[] = $list[$key]['post_GapPeople'];
+
+
+
             }
-            //计算完成后 将新的循环日期赋值给临时变量
-            $preDate = $val['Completed'];
+            $totalRow['pre_total'] = $tpre;
+            $totalRow['trs_total'] = $ttrs;
+            $totalRow['rev_total'] = $trev;
+            $totalRow['post_total'] = $tpos;
+            $totalRow['sumpage'] = $sumpage;
 
-            $work_days = $list[$key]['work_days'];
-            $list[$key]['pre_formatter'] = $base['pre_formatter'];
-            $list[$key]['pre_page'] = $base['pre_page'];
-            $list[$key]['translator'] = $base['translator'];
-            $list[$key]['trs_page'] = $base['trs_page'];
-            $list[$key]['revisor'] = $base['revisor'];
-            $list[$key]['rev_page'] = $base['rev_page'];
-            $list[$key]['post_formatter'] = $base['post_formatter'];
-            $list[$key]['post_page'] = $base['post_page'];
-
-            $pre_total = $base['pre_formatter']*$base['pre_page']*$work_days;
-            $list[$key]['pre_total']= $pre_total;
-            $trs_total = $base['translator']*$base['trs_page']*$work_days;
-            $list[$key]['trs_total']= $trs_total;
-            $rev_total = $base['revisor']*$base['rev_page']*$work_days;
-            $list[$key]['rev_total']= $rev_total;
-            $post_total = $base['post_formatter']*$base['post_page']*$work_days;
-            $list[$key]['post_total']= $post_total;
-
-            $list[$key]['trre_GapPages'] = $val['sumpage']-$list[$key]['trs_total']-$list[$key]['rev_total'];
-            $list[$key]['trre_GapPeople'] = number_format($list[$key]['trre_GapPages']/25, 2);
-            $list[$key]['pre_GapPages'] = $val['sumpage']-$list[$key]['pre_total'];
-            $list[$key]['pre_GapPeople'] = number_format($list[$key]['pre_GapPages']/$base['pre_page'],2);;
-            $list[$key]['post_GapPages'] = $val['sumpage']-$list[$key]['post_total'];
-            $list[$key]['post_GapPeople'] = number_format($list[$key]['post_GapPages']/$base['post_page'],2);
-
-            //合计行数据
-            $totalRow['pre_formatter'] = $base['pre_formatter'];
-            $totalRow['pre_page'] = $base['pre_page'];
-            $totalRow['translator'] = $base['translator'];
-            $totalRow['trs_page'] = $base['trs_page'];
-            $totalRow['revisor'] = $base['revisor'];
-            $totalRow['rev_page'] = $base['rev_page'];
-            $totalRow['post_formatter'] = $base['post_formatter'];
-            $totalRow['post_page'] = $base['post_page'];
-
-            $tpre += $pre_total;
-            $ttrs += $trs_total;
-            $trev += $rev_total;
-            $tpos += $post_total;
-            $sumpage += $val['sumpage'];
-
-            $tr_gpa[] = $list[$key]['trre_GapPages'];
-            $tr_gpe[] = $list[$key]['trre_GapPeople'];
-            $pre_gpa[] = $list[$key]['pre_GapPages'];
-            $pre_gpe[] = $list[$key]['pre_GapPeople'];
-            $post_gpa[] = $list[$key]['post_GapPages'];
-            $post_gpe[] = $list[$key]['post_GapPeople'];
-
-
-
+            $totalRow['trre_GapPages'] = number_format(array_sum($tr_gpa)/count($tr_gpa),2);
+            $totalRow['trre_GapPeople'] = number_format(array_sum($tr_gpe)/count($tr_gpe),2);
+            $totalRow['pre_GapPages'] = number_format(array_sum($pre_gpa)/count($pre_gpa),2);
+            $totalRow['pre_GapPeople'] = number_format(array_sum($pre_gpe)/count($pre_gpe),2);
+            $totalRow['post_GapPages'] = number_format(array_sum($post_gpa)/count($post_gpa),2);
+            $totalRow['post_GapPeople'] = number_format(array_sum($post_gpe)/count($post_gpe),2);
         }
-        $totalRow['pre_total'] = $tpre;
-        $totalRow['trs_total'] = $ttrs;
-        $totalRow['rev_total'] = $trev;
-        $totalRow['post_total'] = $tpos;
-        $totalRow['sumpage'] = $sumpage;
 
-        $totalRow['trre_GapPages'] = number_format(array_sum($tr_gpa)/count($tr_gpa),2);
-        $totalRow['trre_GapPeople'] = number_format(array_sum($tr_gpe)/count($tr_gpe),2);
-        $totalRow['pre_GapPages'] = number_format(array_sum($pre_gpa)/count($pre_gpa),2);
-        $totalRow['pre_GapPeople'] = number_format(array_sum($pre_gpe)/count($pre_gpe),2);
-        $totalRow['post_GapPages'] = number_format(array_sum($post_gpa)/count($post_gpa),2);
-        $totalRow['post_GapPeople'] = number_format(array_sum($post_gpe)/count($post_gpe),2);
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
@@ -708,96 +710,98 @@ class Task extends Common
         $post_gpa = [];
         $post_gpe = [];
 
+        if(!empty($list)){
+            foreach($list as $key=>$val){
+                if(empty($preDate)){
+                    $list[$key]['work_days'] = 1;
+                }else{
+                    $nowDate = $val['Completed'];
+                    $days = round((strtotime($nowDate)-strtotime($preDate))/3600/24);
+                    //$list[$key]['work_days'] = $days;
+                    $preN = date('N', strtotime($preDate));
+                    $nowN = date('N', strtotime($nowDate));
 
-        foreach($list as $key=>$val){
-            if(empty($preDate)){
-                $list[$key]['work_days'] = 1;
-            }else{
-                $nowDate = $val['Completed'];
-                $days = round((strtotime($nowDate)-strtotime($preDate))/3600/24);
-                //$list[$key]['work_days'] = $days;
-                $preN = date('N', strtotime($preDate));
-                $nowN = date('N', strtotime($nowDate));
 
+                    $weekday = $this->get_weekend_days($preDate,$nowDate);
+                    $reduce = 0;
+                    if($preN == 6 || $preN == 7){
+                        $reduce += 1;
+                    }
+                    if($nowN == 6 || $nowN == 7){
+                        $reduce += 1;
+                    }
 
-                $weekday = $this->get_weekend_days($preDate,$nowDate);
-                $reduce = 0;
-                if($preN == 6 || $preN == 7){
-                    $reduce += 1;
+                    $list[$key]['work_days'] = $days-$weekday+$reduce;
                 }
-                if($nowN == 6 || $nowN == 7){
-                    $reduce += 1;
-                }
+                //计算完成后 将新的循环日期赋值给临时变量
+                $preDate = $val['Completed'];
 
-                $list[$key]['work_days'] = $days-$weekday+$reduce;
+                $work_days = $list[$key]['work_days'];
+                $list[$key]['pre_formatter'] = $base['pre_formatter'];
+                $list[$key]['pre_page'] = $base['pre_page'];
+                $list[$key]['translator'] = $base['translator'];
+                $list[$key]['trs_page'] = $base['trs_page'];
+                $list[$key]['revisor'] = $base['revisor'];
+                $list[$key]['rev_page'] = $base['rev_page'];
+                $list[$key]['post_formatter'] = $base['post_formatter'];
+                $list[$key]['post_page'] = $base['post_page'];
+
+                $pre_total = $base['pre_formatter']*$base['pre_page']*$work_days;
+                $list[$key]['pre_total']= $pre_total;
+                $trs_total = $base['translator']*$base['trs_page']*$work_days;
+                $list[$key]['trs_total']= $trs_total;
+                $rev_total = $base['revisor']*$base['rev_page']*$work_days;
+                $list[$key]['rev_total']= $rev_total;
+                $post_total = $base['post_formatter']*$base['post_page']*$work_days;
+                $list[$key]['post_total']= $post_total;
+
+                $list[$key]['trre_GapPages'] = $val['sumpage']-$list[$key]['trs_total']-$list[$key]['rev_total'];
+                $list[$key]['trre_GapPeople'] = number_format($list[$key]['trre_GapPages']/25, 2);
+                $list[$key]['pre_GapPages'] = $val['sumpage']-$list[$key]['pre_total'];
+                $list[$key]['pre_GapPeople'] = number_format($list[$key]['pre_GapPages']/$base['pre_page'],2);;
+                $list[$key]['post_GapPages'] = $val['sumpage']-$list[$key]['post_total'];
+                $list[$key]['post_GapPeople'] = number_format($list[$key]['post_GapPages']/$base['post_page'],2);
+
+                //合计行数据
+                $totalRow['pre_formatter'] = $base['pre_formatter'];
+                $totalRow['pre_page'] = $base['pre_page'];
+                $totalRow['translator'] = $base['translator'];
+                $totalRow['trs_page'] = $base['trs_page'];
+                $totalRow['revisor'] = $base['revisor'];
+                $totalRow['rev_page'] = $base['rev_page'];
+                $totalRow['post_formatter'] = $base['post_formatter'];
+                $totalRow['post_page'] = $base['post_page'];
+
+                $tpre += $pre_total;
+                $ttrs += $trs_total;
+                $trev += $rev_total;
+                $tpos += $post_total;
+                $sumpage += $val['sumpage'];
+
+                $tr_gpa[] = $list[$key]['trre_GapPages'];
+                $tr_gpe[] = $list[$key]['trre_GapPeople'];
+                $pre_gpa[] = $list[$key]['pre_GapPages'];
+                $pre_gpe[] = $list[$key]['pre_GapPeople'];
+                $post_gpa[] = $list[$key]['post_GapPages'];
+                $post_gpe[] = $list[$key]['post_GapPeople'];
+
+
+
             }
-            //计算完成后 将新的循环日期赋值给临时变量
-            $preDate = $val['Completed'];
+            $totalRow['pre_total'] = $tpre;
+            $totalRow['trs_total'] = $ttrs;
+            $totalRow['rev_total'] = $trev;
+            $totalRow['post_total'] = $tpos;
+            $totalRow['sumpage'] = $sumpage;
 
-            $work_days = $list[$key]['work_days'];
-            $list[$key]['pre_formatter'] = $base['pre_formatter'];
-            $list[$key]['pre_page'] = $base['pre_page'];
-            $list[$key]['translator'] = $base['translator'];
-            $list[$key]['trs_page'] = $base['trs_page'];
-            $list[$key]['revisor'] = $base['revisor'];
-            $list[$key]['rev_page'] = $base['rev_page'];
-            $list[$key]['post_formatter'] = $base['post_formatter'];
-            $list[$key]['post_page'] = $base['post_page'];
-
-            $pre_total = $base['pre_formatter']*$base['pre_page']*$work_days;
-            $list[$key]['pre_total']= $pre_total;
-            $trs_total = $base['translator']*$base['trs_page']*$work_days;
-            $list[$key]['trs_total']= $trs_total;
-            $rev_total = $base['revisor']*$base['rev_page']*$work_days;
-            $list[$key]['rev_total']= $rev_total;
-            $post_total = $base['post_formatter']*$base['post_page']*$work_days;
-            $list[$key]['post_total']= $post_total;
-
-            $list[$key]['trre_GapPages'] = $val['sumpage']-$list[$key]['trs_total']-$list[$key]['rev_total'];
-            $list[$key]['trre_GapPeople'] = number_format($list[$key]['trre_GapPages']/25, 2);
-            $list[$key]['pre_GapPages'] = $val['sumpage']-$list[$key]['pre_total'];
-            $list[$key]['pre_GapPeople'] = number_format($list[$key]['pre_GapPages']/$base['pre_page'],2);;
-            $list[$key]['post_GapPages'] = $val['sumpage']-$list[$key]['post_total'];
-            $list[$key]['post_GapPeople'] = number_format($list[$key]['post_GapPages']/$base['post_page'],2);
-
-            //合计行数据
-            $totalRow['pre_formatter'] = $base['pre_formatter'];
-            $totalRow['pre_page'] = $base['pre_page'];
-            $totalRow['translator'] = $base['translator'];
-            $totalRow['trs_page'] = $base['trs_page'];
-            $totalRow['revisor'] = $base['revisor'];
-            $totalRow['rev_page'] = $base['rev_page'];
-            $totalRow['post_formatter'] = $base['post_formatter'];
-            $totalRow['post_page'] = $base['post_page'];
-
-            $tpre += $pre_total;
-            $ttrs += $trs_total;
-            $trev += $rev_total;
-            $tpos += $post_total;
-            $sumpage += $val['sumpage'];
-
-            $tr_gpa[] = $list[$key]['trre_GapPages'];
-            $tr_gpe[] = $list[$key]['trre_GapPeople'];
-            $pre_gpa[] = $list[$key]['pre_GapPages'];
-            $pre_gpe[] = $list[$key]['pre_GapPeople'];
-            $post_gpa[] = $list[$key]['post_GapPages'];
-            $post_gpe[] = $list[$key]['post_GapPeople'];
-
-
-
+            $totalRow['trre_GapPages'] = number_format(array_sum($tr_gpa)/count($tr_gpa),2);
+            $totalRow['trre_GapPeople'] = number_format(array_sum($tr_gpe)/count($tr_gpe),2);
+            $totalRow['pre_GapPages'] = number_format(array_sum($pre_gpa)/count($pre_gpa),2);
+            $totalRow['pre_GapPeople'] = number_format(array_sum($pre_gpe)/count($pre_gpe),2);
+            $totalRow['post_GapPages'] = number_format(array_sum($post_gpa)/count($post_gpa),2);
+            $totalRow['post_GapPeople'] = number_format(array_sum($post_gpe)/count($post_gpe),2);
         }
-        $totalRow['pre_total'] = $tpre;
-        $totalRow['trs_total'] = $ttrs;
-        $totalRow['rev_total'] = $trev;
-        $totalRow['post_total'] = $tpos;
-        $totalRow['sumpage'] = $sumpage;
 
-        $totalRow['trre_GapPages'] = number_format(array_sum($tr_gpa)/count($tr_gpa),2);
-        $totalRow['trre_GapPeople'] = number_format(array_sum($tr_gpe)/count($tr_gpe),2);
-        $totalRow['pre_GapPages'] = number_format(array_sum($pre_gpa)/count($pre_gpa),2);
-        $totalRow['pre_GapPeople'] = number_format(array_sum($pre_gpe)/count($pre_gpe),2);
-        $totalRow['post_GapPages'] = number_format(array_sum($post_gpa)/count($post_gpa),2);
-        $totalRow['post_GapPeople'] = number_format(array_sum($post_gpe)/count($post_gpe),2);
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {

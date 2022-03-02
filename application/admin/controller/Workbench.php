@@ -76,14 +76,17 @@ class Workbench extends Controller
                 // 进度异常
                 $exception = Db::name('pj_contract_review')
                     ->field('id, Filing_Code, Job_Name')
-                    ->where(function($query){
-                        $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                    })
+                    /* ->where(function($query){
+                         $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
+                     })*/
+                    ->where('Delivered_or_Not','No')
                     ->where('delete_time',0)
                     ->where('Completed', 'not in', ['', 0, NULL])
                     ->where('Completed', '<', $now)
                     ->order('id desc')
                     ->paginate($limit);
+
+
 
                 // 管理层
                 $job_id = 1;
@@ -97,9 +100,7 @@ class Workbench extends Controller
                 // 进度异常
                 $exception = Db::name('pj_contract_review')
                     ->field('id, Filing_Code, Job_Name')
-                    ->where(function($query){
-                        $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                    })
+                    ->where('Delivered_or_Not','No')
                     ->where('delete_time',0)
                     ->where('Completed', 'not in', ['', 0, NULL])
                     ->where('Completed', '<', $now)
@@ -132,9 +133,7 @@ class Workbench extends Controller
             // 今日提交 交付时间 为今天的
             $today = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where(function($query){
-                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                })
+                ->where('Delivered_or_Not','No')
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
@@ -143,15 +142,21 @@ class Workbench extends Controller
             // 今日提交总页数 交付时间 为今天的
             $todayPages = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name,Pages')
-                ->where(function($query){
-                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                })
+                ->where('Delivered_or_Not','No')
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
                 ->select();
 
-        // 项目部 (10翻译人员  11校对人员  12、13预、后排版人员)
+            // 反馈修订是否提交
+            $feedback = Db::name('pj_contract_review')
+                ->field('id, Filing_Code, Job_Name')
+                ->where('Feedback_Completed', 'No')
+                ->where('delete_time',0)
+                ->order('id desc')
+                ->paginate($limit);
+
+            // 项目部 (10翻译人员  11校对人员  12、13预、后排版人员)
         } else if(in_array($job_id, [4,5,6,10,11,12,13,15,19])){
 
             // 针对不同人员 查询字段不同
@@ -226,7 +231,7 @@ class Workbench extends Controller
             $job_id = 0;
 
         } else if(in_array($job_id,[7,8,9])) {
-            // 项目管理人员(7项目助理、8项目经理、9总经理)
+            // 项目管理人员(7项目组长、8项目经理、9总经理)
             if($job_id == 7){
                 $where_name = 'PA';
             }
@@ -264,31 +269,26 @@ class Workbench extends Controller
             // 今日提交 交付时间 为今天的
             $today = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where(function($query){
-                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                })
+                ->where('Delivered_or_Not','No')
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', $now)
                 ->order('id desc')
                 ->paginate($limit);
 
-            /*// 今日提交 反馈修订是否提交
-            $today2 = Db::name('pj_contract_review')
+            // 反馈修订是否提交
+            $feedback = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
                 ->where('Feedback_Completed', 'No')
                 ->where($where_name, $name)
                 ->where('delete_time',0)
-                ->where('Completed', $now)
                 ->order('id desc')
-                ->paginate($limit);*/
+                ->paginate($limit);
 
             // 今日提交总页数 交付时间 为今天的
             $todayPages = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name,Pages')
-                ->where(function($query){
-                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                })
+                ->where('Delivered_or_Not','No')
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', $now)
@@ -298,9 +298,7 @@ class Workbench extends Controller
             // 进度异常
             $exception = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
-                ->where(function($query){
-                    $query->where('Delivered_or_Not','No')->whereOr('Feedback_Completed','No');
-                })
+                ->where('Delivered_or_Not','No')
                 ->where($where_name, $name)
                 ->where('delete_time',0)
                 ->where('Completed', 'not in', ['', 0, NULL])
@@ -406,6 +404,18 @@ class Workbench extends Controller
         }
         $t['e'] = $e_data['count'];
 
+        if(empty($feedback)){
+            $f_data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => 0,
+                'data'  => [],
+            ];
+        } else {
+            $f_data = generate_layui_table_data($feedback);
+        }
+        $t['f'] = $f_data['count'];
+
 
         // 判断 type 参数 赋值列表
         switch ($type) {
@@ -433,7 +443,7 @@ class Workbench extends Controller
                 $data = $e_data;
                 break;
             case 6:
-                $data = $tp_data;
+                $data = $f_data;
                 break;
         }
 

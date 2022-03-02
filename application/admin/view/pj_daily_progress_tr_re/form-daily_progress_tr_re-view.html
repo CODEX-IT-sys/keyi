@@ -177,7 +177,7 @@
 										{:session('language') == '中文'? '校对比率' : 'Revision Rate'}
 									</label>
 									<div class="layui-input-block">
-										<input name="Revision_Rate" id="jdbl"  value="{$info.Revision_Rate|default=''}" autocomplete="off" placeholder="" class="layui-input">
+										<input name="Revision_Rate" id="jdbl"  value="{$info.Revision_Rate|default=''}" readonly="readonly" autocomplete="off" placeholder="" class="layui-input">
 									</div>
 									<span class="signTip">%</span>
 								</div>
@@ -227,7 +227,16 @@
 									</div>
 								</div>
 							</div>
-
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '修订字数' : 'Revision Words'}">
+										{:session('language') == '中文'? '修订字数' : 'Revision Words'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Revision_Words" id="xdzs" value="{$info.Revision_Words|default=''}" autocomplete="off"  placeholder="" class="layui-input" type="number" >
+									</div>
+								</div>
+							</div>
 
 
 							<div class="layui-col-xs4">
@@ -392,6 +401,7 @@
 
 		$('#yzs').blur(function(){
 			var bfb = $('#bfb').val();
+			var work_content = $('#content').val();
 			//console.log(bfb);
 			if(bfb!=100){
 				$('#yzs').val(0);
@@ -402,21 +412,33 @@
 			var zcfz = $.trim($('#zcfz').val());
 			var kczs = $.trim($('#kczs').val());
 
-			var jdbl = $.trim($('#jdbl').val());
+			var xdzs = $.trim($('#xdzs').val());
 
-			yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; jdbl?jdbl:0;
+			yzs?yzs:0; zcfz?zcfz:0; kczs?kczs:0; xdzs?xdzs:0;
 
 			if(zcfz < 15){
 				zcfz = 0;
 			}
-			alert(jdbl);
-			if( jdbl != 0 && jdbl != 'N/A'){
-				var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+			//alert(jdbl);
+			/*if( jdbl != 0 && jdbl != 'N/A'){
+				if(work_content == 'Revise' || work_content == 'RE Modify' || work_content == 'RE (Sampling)' || work_content == 'RE (Highlight)' || work_content == 'RE (Sampling_Highlight)' || work_content == 'RE Finalize' ){
+					var zzs = Number(yzs) * ((100 - Number(zcfz))/100)*Number(jdbl/100) - Number(kczs);
+				}
+
 			}else{
 				var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
-			}
+			}*/
+			var zzs = Number(yzs) * ((100 - Number(zcfz))/100) - Number(kczs);
+
+
 			zzs = zzs.toFixed(2);
 			$('#zzs').val(zzs);
+
+			if(xdzs != 0){
+				var jdbl = (xdzs/zzs)*100;
+				jdbl = jdbl.toFixed(2);
+				$('#jdbl').val(jdbl);
+			}
 		});
 		//校对比率
 		$('#jdbl').blur(function(){
@@ -433,8 +455,33 @@
 				}
 			}
 		})
+		//计算校对比率
+		$('#xdzs').blur(function(){
+			var work_content = $('#content').val();
+			var bfb = $('#bfb').val();
+			var zzs = $.trim($('#zzs').val());
+
+			var xdzs = $.trim($('#xdzs').val());
+			if(!zzs){
+				layer.msg('先计算中文字数统计');
+			}
+
+			if(bfb!=100){
+				$('#xdzs').val('0');
+				layer.msg('完成百分比为100才可填写');
+			}else{
+				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
+					$('#xdzs').val('0');
+					layer.msg('只有工作内容为校对相关才能填写');
+				}else{
+					var jdbl = (xdzs/zzs)*100;
+					jdbl = jdbl.toFixed(2);
+					$('#jdbl').val(jdbl);
+				}
+			}
+		})
         // 计算 中文总字数
-        $('#yzs').change(function () {
+     /*   $('#yzs').change(function () {
 
             var yzs = $.trim($('#yzs').val());
             var zcfz = $.trim($('#zcfz').val());
@@ -455,7 +502,7 @@
 			}
 			zzs = zzs.toFixed(2);
             $('#zzs').val(zzs);
-        });
+        });*/
 
 		// 表单验证
 		var validatorFunc = function () {

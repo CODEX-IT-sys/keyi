@@ -1129,4 +1129,112 @@ class Statistics extends Controller
             'data'  =>$pd,
         ];
     }
+
+    //项目组长提前交付比率
+    public function early(){
+        $data=request()->param('month');
+
+        if(isset($data)){
+            $time= strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+            if($data==''){
+
+                $time= time();
+                $year = date("Y", $time);
+
+                $month = date("m", $time);
+
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t',$firstTime);
+                $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+                $firstTime=intval(date("Ymd",$firstTime));
+                $lastTime=intval(date("Ymd",$lastTime));
+            }
+        }else{
+            $time= time();
+            $year = date("Y", $time);
+
+            $month = date("m", $time);
+
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t',$firstTime);
+            $lastTime = $firstTime + 86400 * $day  - 1; //结束时间戳
+            $firstTime=intval(date("Ymd",$firstTime));
+            $lastTime=intval(date("Ymd",$lastTime));
+        }
+
+        $total=  Db::table('ky_pj_contract_review')
+            ->where('Delivered_or_Not','<>','CXL')
+            ->where('delete_time',0)
+            ->where('PA','<>','')
+            ->whereBetweenTime('Completed',$firstTime,$lastTime)
+            ->field('PA,count(id) as num')->group('PA')->select();
+
+        $zs=  Db::table('ky_pj_contract_review')
+            ->where('Delivered_or_Not','<>','CXL')
+            ->where('Early_days','>' ,0)
+            ->where('delete_time',0)
+            ->where('PA','<>','')
+            ->whereBetweenTime('Completed',$firstTime,$lastTime)
+            ->field('PA,count(id) as num')->group('PA')->select();
+
+        $zs_arr = [];
+        foreach($zs as $key=>$val){
+            $zs_arr[$val['PA']] = $val['num'];
+        }
+
+        $fs=  Db::table('ky_pj_contract_review')
+            ->where('Delivered_or_Not','<>','CXL')
+            ->where('Early_days','<' ,0)
+            ->where('delete_time',0)
+            ->where('PA','<>','')
+            ->whereBetweenTime('Completed',$firstTime,$lastTime)
+            ->field('PA,count(id) as num')->group('PA')->select();
+        $fs_arr = [];
+        foreach($fs as $key=>$val){
+            $fs_arr[$val['PA']] = $val['num'];
+        }
+        //var_dump($fs_arr);die;
+        foreach($total as $key=>$val){
+            $pa = $val['PA'];
+            $bl = 1;
+            if(array_key_exists($pa,$zs_arr)){
+                $bl = $bl - $zs_arr[$pa]/$val['num'];
+            }
+            if(array_key_exists($pa,$fs_arr)){
+                $bl = $bl + $fs_arr[$pa]/$val['num'];
+            }
+            $total[$key]['bl'] = (number_format($bl,2)*100).'%';
+        }
+        //var_dump($total);die;
+        $list=$total;
+        //$pa3 = Db::table('ky_pj_contract_review')->where('Delivered_or_Not','=','Yes')->where('delete_time',0)->where('PA','<>','')->whereBetweenTime('Completed',$firstTime,$lastTime)->field('PA,sum(Pages) as sumpage2,count(id) as num2')->group('PA')->select();
+        //dump($pa2);
+        /* foreach($pd2 as $key=>$val){
+             $pd2[$key]['num1'] = strval($val['num1']);
+         }*/
+        //var_dump($pd2);
+        if (!request()->isAjax()) {
+            $this->assign(['list'=>$list]);
+            return $this->fetch();
+        }
+        return [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => 0,
+            'data'  =>$list,
+        ];
+    }
 }

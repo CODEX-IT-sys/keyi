@@ -33,7 +33,7 @@ class PjContractReview extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(in_array($job_id, [1,8,9,20])) {
+        if(in_array($job_id, [1,8,9,16,20])) {
 
             $query = $this;
 

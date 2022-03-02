@@ -30,7 +30,7 @@ class XtFile extends Controller
         $job_id = session('administrator')['job_id'];
 
         // 查询器对象 判断管理层
-        if(in_array($job_id, [1,8,9,20])) {
+        if(in_array($job_id, [1,8,9,20]) || $name == '张攀' || $name == '闻心宇') {
 
             // 可见所有项目
             $list = Db::name('pj_project_profile_text')

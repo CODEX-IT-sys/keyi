@@ -42,8 +42,9 @@
                             <i class="layui-badge fly-badge-vip">截止时间:{$v.endtime}</i>
                             </a>
                         </div>
-                        {if $v.sponsor==$user.id}
-                        <div class="fly-list-badge">
+
+                        {if $v.sponsor == $user.id}
+                        <div class="fly-list-badge" style="margin-right: 50px;">
                             <a href="{:url('del')}?id={$v.id}" class="layui-badge layui-bg-red">删除</a>
                         </div>
                         {/if}
