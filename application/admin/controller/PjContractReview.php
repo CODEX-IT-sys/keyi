@@ -157,6 +157,21 @@ class PjContractReview extends Common
                 case 'Customer_Requirements':
                     $colsData[$k]['width']=180;
                     break;
+                case 'trre_range':
+                    $colsData[$k]['width'] = 150;
+                    break;
+                case 'lang_style':
+                    $colsData[$k]['width'] = 150;
+                    break;
+                case 'format':
+                    $colsData[$k]['width'] = 150;
+                    break;
+                case 'deliverables':
+                    $colsData[$k]['width'] = 180;
+                    break;
+                case 'other_remark':
+                    $colsData[$k]['width'] = 180;
+                    break;
                 default:
                     $colsData[$k]['width']=80;
 
@@ -222,6 +237,10 @@ class PjContractReview extends Common
             [
                 'Field'=>'Post_Format_Delivery_Time',
                 'Comment'=>'后排版交付时间'
+            ],
+            [
+                'Field'=>'Delivery_Date_Expected',
+                'Comment'=>'客户期望提交日期'
             ],
             [
                 'Field'=>'Delivered_or_Not',
@@ -796,12 +815,25 @@ class PjContractReview extends Common
         // 项目经理
         $pm = Admin::field('name')->where(['job_id'=> 8, 'status'=> 0])->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
+
         // 直接返回视图
         return view('form-contract_review', [
             'file_code'=>$file_code, 'File_Type'=>$File_Type, 'document_type'=>json_encode($document_type),
             'service_type'=>json_encode($service_type), 'pa'=>$pa, 'pm'=>$pm,
             'yy'=>$yy, 'pb'=>$pb, 'fy'=>$fy, 'first'=>$first, 'zl'=>$zl, 'sales'=>$sales,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp)
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp),
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -904,11 +936,24 @@ class PjContractReview extends Common
         // 项目经理
         $pm = Admin::field('name')->where(['job_id'=> 8, 'status'=> 0])->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
+
         // 直接返回视图
         return view('form-contract_review-view',[
             'File_Type'=>$File_Type, 'document_type'=>json_encode($document_type), 'service_type'=>json_encode($service_type),
             'info'=>$res, 'yy'=>$yy, 'pb'=>$pb, 'fy'=>$fy, 'first'=>$first, 'zl'=>$zl, 'sales'=>$sales, 'pm'=>$pm,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -1011,10 +1056,22 @@ class PjContractReview extends Common
         // 项目经理
         $pm = Admin::field('name')->where('job_id', 8)->where('status', 0)->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
         return view('form-contract_review-view', [
             'File_Type'=>$File_Type, 'document_type'=>json_encode($document_type), 'service_type'=>json_encode($service_type),
             'info'=>$res, 'yy'=>$yy, 'pb'=>$pb, 'fy'=>$fy, 'first'=>$first, 'zl'=>$zl, 'sales'=>$sales, 'pm'=>$pm,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -1551,6 +1608,11 @@ class PjContractReview extends Common
                     'Reviser' => $xmhz['Reviser'],
                     'Post_Formatter' => $xmhz['Post_Formatter'],
                     'PA' => $xmhz['PA'],
+                    'trre_range' => $xmhz['trre_range'],
+                    'lang_style' => $xmhz['lang_style'],
+                    'format' => $xmhz['format'],
+                    'deliverables' => $xmhz['deliverables'],
+                    'other_remark' => $xmhz['other_remark'],
                     'Filled_by' => $name,
                 ];
                 Db::name('pj_project_profile')->insert($in_data);
@@ -1593,6 +1655,11 @@ class PjContractReview extends Common
                 'Reviser' => $xmhz['Reviser'],
                 'Post_Formatter' => $xmhz['Post_Formatter'],
                 'PA' => $xmhz['PA'],
+                'trre_range' => $xmhz['trre_range'],
+                'lang_style' => $xmhz['lang_style'],
+                'format' => $xmhz['format'],
+                'deliverables' => $xmhz['deliverables'],
+                'other_remark' => $xmhz['other_remark'],
                 'Filled_by' => $name,
             ];
             Db::name('pj_project_profile')->insert($in_data);

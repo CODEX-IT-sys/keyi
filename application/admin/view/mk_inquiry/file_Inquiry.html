@@ -243,7 +243,88 @@
 									</div>
 								</div>
 							</div>
-														
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '翻译校对范围' : 'Translation/
+Revision scope'}">
+										{:session('language') == '中文'? '翻译校对范围' : 'Translation/
+										Revision scope'}
+									</label>
+									<div class="layui-input-block">
+										<select name="trre_range"  lay-filter="VAT_Rate" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$trre_range" id="v"}
+											<option value="{$v.cn_name}" {$info.trre_range==$v.cn_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '语言风格' : 'Language Style'}">
+										{:session('language') == '中文'? '语言风格' : 'Language Style'}
+									</label>
+									<div class="layui-input-block">
+										<select name="lang_style"  lay-filter="VAT_Rate" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$language" id="v"}
+											<option value="{$v.cn_name}" {$info.lang_style==$v.cn_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '排版' : 'Format'}">
+										{:session('language') == '中文'? '排版' : 'Format'}
+									</label>
+									<div class="layui-input-block">
+										<select name="format"  lay-filter="VAT_Rate" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$format" id="v"}
+											<option value="{$v.cn_name}" {$info.format==$v.cn_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '提交内容' : 'Deliverables'}">
+										{:session('language') == '中文'? '提交内容' : 'Deliverables'}
+									</label>
+									<div class="layui-input-block">
+										<select name="deliverables" lay-filter="VAT_Rate" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											{volist name="$deliver" id="v"}
+											<option value="{$v.cn_name}" {$info.deliverables==$v.cn_name?'selected':''}>{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+											{/volist}
+										</select>
+									</div>
+
+								</div>
+							</div>
+							<div class="layui-col-xs12">
+								<div class="layui-form-item">
+									<label class="layui-form-label"
+										   title="{:session('language') == '中文'? '文件其他情况备注' : 'File Other Remark'}">
+										{:session('language') == '中文'? '文件其他情况备注' : 'File Other Remark'}
+									</label>
+									<div class="layui-input-block">
+                                        <textarea placeholder="" id="other_remark"
+												  name="other_remark"
+												  class="layui-textarea">{$info.other_remark}</textarea>
+									</div>
+								</div>
+							</div>
                             <div class="layui-col-xs12">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label" title="{:session('language') == '中文'? '客户要求' : 'Customer Requirements'}">

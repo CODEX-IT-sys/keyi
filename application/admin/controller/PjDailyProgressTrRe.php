@@ -142,9 +142,9 @@ class PjDailyProgressTrRe extends Common
         $data = $request->post();
         $admin=$this->userinfo();
         //如果不是翻译,排版.完成页数为0
-        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
+        /*if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
             $data['Number_of_Pages_Completed']=0;
-        };
+        };*/
         //计算项目描述表中的文件编号的页数
         $xmms=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Pages');
         //计算改文件的页数和
@@ -153,7 +153,7 @@ class PjDailyProgressTrRe extends Common
 
          if($ysh+$data['Number_of_Pages_Completed']>$xmms){
 
-          return $this->error('该文件完成页数和和超过项目描述页数');
+          return $this->error('该文件完成页数和和超过项目描述页数,总页数：'.$xmms);
         }
         //校对比率的默认值
         if($data['Percentage_Completed'] != 100 ){
@@ -197,6 +197,8 @@ class PjDailyProgressTrRe extends Common
                     'Percentage_Completed' => 100,
                     'delete_time' => 0,
                 ];
+                /*$record = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();*/
                 $record = Db('pj_daily_progress_tr_re')->where($where)
                     ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();
                 if($record > 1){
@@ -309,9 +311,9 @@ class PjDailyProgressTrRe extends Common
 
         $admin=$this->userinfo();
         //如果不是翻译,排版.完成页数为0
-        if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
+        /*if($data['Work_Content']!='Revise'&&$data['Work_Content']!='TR Modify Other'&&$data['Work_Content']!='Translate'&&$data['Work_Content']!='RE (Sampling)'&&$data['Work_Content']!='RE (Highlight)'&&$data['Work_Content']!='RE (Sampling_Highlight)'){
             $data['Number_of_Pages_Completed']=0;
-        };
+        };*/
         //计算项目描述表中的文件编号的页数
         $xmms=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Pages');
         //去除正在修改的页数
@@ -322,7 +324,7 @@ class PjDailyProgressTrRe extends Common
             ->where('Work_Content',$data['Work_Content'])->sum('Number_of_Pages_Completed');
 
         if($ysh+$data['Number_of_Pages_Completed']-$page>$xmms){
-            return $this->error('该文件完成页数和和超过项目描述页数');
+            return $this->error('该文件完成页数和和超过项目描述页数,总页数：'.$xmms);
         }
 
         //校对比率的默认值

@@ -111,12 +111,24 @@ class MkInquiry extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where(['job_id'=>8,'status'=> 0,'delete_time'=>0])->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
 
 
         // 直接返回视图
         return view('form-Inquiry', [
             'gs'=>$gs, 'pm'=>$pm, 'first'=>$first, 'vat_rate'=>$vat_rate,
-            'currency'=>$currency, 'contract_code'=>$contract_code
+            'currency'=>$currency, 'contract_code'=>$contract_code,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -144,10 +156,25 @@ class MkInquiry extends Common
         // 质量要求
         $zl = Db::name('xt_dict')->where('c_id',10)->select();
 
+        //需求模板
+        $template = Db::name('mk_inquiry')->where('id',$i_id)->field('trre_range,lang_style,format,deliverables,other_remark')->find();
+
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
         // 直接返回视图
         return view('file_Inquiry', [
             'File_Type'=>$File_Type, 'service_type'=>json_encode($service_type),'zl'=>$zl,
-            'yy'=>$yy, 'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'vat_rate'=>$vat_rate
+            'yy'=>$yy, 'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'vat_rate'=>$vat_rate,'info'=>$template,
+             'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -176,10 +203,13 @@ class MkInquiry extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where(['job_id'=>8,'status'=> 0,'delete_time'=>0])->select();
 
+
+
         // 直接返回视图
         return view('form-Inquiry-view', [
             'info'=>$res,'gs'=>$gs, 'gs_id'=>$gs_id, 'pm'=>$pm,
-            'vat_rate'=>$vat_rate,'currency'=>$currency, 'first'=>$first
+            'vat_rate'=>$vat_rate,'currency'=>$currency, 'first'=>$first,
+
         ]);
     }
 
@@ -208,9 +238,21 @@ class MkInquiry extends Common
         // 项目经理 通知
         $pm = Db::name('admin')->field('id, name')->where(['job_id'=>8,'status'=> 0,'delete_time'=>0])->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
         return view('form-Inquiry-view', [
             'info'=>$res, 'gs'=>$gs, 'gs_id'=>$gs_id, 'pm'=>$pm,
-            'vat_rate'=>$vat_rate,'currency'=>$currency, 'first'=>$first
+            'vat_rate'=>$vat_rate,'currency'=>$currency, 'first'=>$first,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -248,10 +290,23 @@ class MkInquiry extends Common
             $res['bh_date'] = date('Ymd',time());
         }
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
+
         // 直接返回视图
         return view('file_Inquiry-view', [
             'File_Type'=>$File_Type, 'service'=>json_encode($service), 'yy'=>$yy,'zl'=>$zl,
-            'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'info'=>$res, 'vat_rate'=>$vat_rate
+            'i_id'=>$i_id, 'currency'=>$currency, 'units'=>$units, 'info'=>$res, 'vat_rate'=>$vat_rate,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -315,7 +370,7 @@ class MkInquiry extends Common
             // 筛选 来稿确认表 字段
             $f_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
                 'Language','Currency','Unit_Price','Units','Quote_Quantity','Quote_Amount','VAT_Amount',
-                'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks'];
+                'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks','trre_range','lang_style','format','deliverables','other_remark'];
 
             // 筛选 结算管理表 字段
             $in_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
@@ -467,7 +522,7 @@ class MkInquiry extends Common
                 // 筛选 来稿确认表 字段
                 $f_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
                     'Language','Currency','Unit_Price','Units','Quote_Quantity','Quote_Amount','VAT_Amount',
-                    'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks',];
+                    'Delivery_Date_Expected','Quality_Requirements','Customer_Requirements','External_Reference_File', 'Remarks','trre_range','lang_style','format','deliverables','other_remark'];
 
                 // 筛选 结算管理表 字段
                 $in_field = ['Job_Name','Pages','Source_Text_Word_Count','File_Type','Service', 'VAT_Rate',
@@ -848,6 +903,11 @@ class MkInquiry extends Common
                         $res_arr[$row-2]['deliver_date']  =date('Y-m-d H:i',strtotime(gmdate('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("X".$row)->getValue()))));
                     }
                     $res_arr[$row-2]['bh_date']  = trim($sheet->getCell("Y".$row)->getValue());
+                    $res_arr[$row - 2]['trre_range'] = trim($sheet->getCell("Z" . $row)->getValue());
+                    $res_arr[$row - 2]['lang_style'] = trim($sheet->getCell("AA" . $row)->getValue());
+                    $res_arr[$row - 2]['format'] = trim($sheet->getCell("AB" . $row)->getValue());
+                    $res_arr[$row - 2]['deliverables'] = trim($sheet->getCell("AC" . $row)->getValue());
+                    $res_arr[$row - 2]['other_remark'] = trim($sheet->getCell("AD" . $row)->getValue());
                     $res_arr[$row-2]['i_id']  = $iid;
 
 
@@ -922,6 +982,11 @@ class MkInquiry extends Common
             $fz_data['External_Reference_File']=$a['External_Reference_File'];
             $fz_data['Remarks']=$a['Remarks'];
             $fz_data['Quality_Requirements']=$a['Quality_Requirements'];
+            $fz_data['trre_range'] = $a['trre_range'];
+            $fz_data['lang_style'] = $a['lang_style'];
+            $fz_data['format'] = $a['format'];
+            $fz_data['deliverables'] = $a['deliverables'];
+            $fz_data['other_remark'] = $a['other_remark'];
 
 
 

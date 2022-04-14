@@ -124,7 +124,6 @@ layui.use(['table','form'], function(){
                     if(language === '中文'){
 						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
 							style: colsData[i].style
-
 						});
                     }else{
                         cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
@@ -161,6 +160,12 @@ layui.use(['table','form'], function(){
 			hash:'fenye',
 			limits:[10,20,30,40,50,60,70,80,90,100,10000]
 		},
+		//解决实际源语数量排序问题
+		parseData: function (res) {
+			$.each(res.data, function (i, d) {
+				res.data[i].Actual_Source_Text_Count = parseFloat(res.data[i].Actual_Source_Text_Count);
+			});
+		}
     });
 
 

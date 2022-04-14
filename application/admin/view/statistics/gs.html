@@ -1,0 +1,194 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <div class="top">
+            <div class="position_lead">
+                <i class="iconfont icon-navigation"></i>
+                <a href="#">{:session('language') == '中文'? '数据统计' : 'Project Management'}</a>
+                <a class="on">{:session('language') == '中文'? '每日项目节点统计' : 'Company Pages'}</a>
+            </div>
+            <div class="global_btn">
+
+
+                <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
+
+            </div>
+        </div>
+
+        <form class="layui-form layui-inline" action="/admin/statistics/gs" id="sub">
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择日期</label>
+                <div class="layui-input-block">
+                    <input type="date" name="month" placeholder="" value="{:input('month')}" autocomplete="off"
+                           class="layui-input">
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select Type'}</label>
+                <div class="layui-input-inline">
+                    <select id="pa" name="pa" lay-filter="pa">
+                        <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
+                        <option value="PA02" {$pa=='PA02'?'selected':''}>PA02 </option>
+                        <option value="PA03" {$pa=='PA03'?'selected':''}>PA03 </option>
+                        <option value="PA04" {$pa=='PA04'?'selected':''}>PA04 </option>
+                        <option value="PA05" {$pa=='PA05'?'selected':''}>PA05 </option>
+                        <option value="PA06" {$pa=='PA06'?'selected':''}>PA06 </option>
+                        <option value="PA09" {$pa=='PA09'?'selected':''}>PA09 </option>
+                        <option value="PA10" {$pa=='PA10'?'selected':''}>PA10 </option>
+                        <option value="PA11" {$pa=='PA11'?'selected':''}>PA11 </option>
+                        <option value="PA12" {$pa=='PA12'?'selected':''}>PA12 </option>
+                    </select>
+                </div>
+            </div>
+
+        </form>
+
+
+        <div class="forwardTable farTable">
+            <table class="layui-hide" id="test" lay-filter="test">
+
+            </table>
+            <div class="explain">
+                <h5 class="explainTitle">
+                    <span id="jisuan"  style="background: #0ba4da;float: right;"></span>
+                </h5>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="main" style="height:400px;"></div>
+{/block}
+
+{block name="js"}
+{js href="__JS__/jquery-3.3.1.min.js"}
+<!--库文件-->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=iSyHvmega5x4qy23DSPlCxE09dLz5qTM"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+<script>
+    var tableIns;  // 数据表格对象，用于重载
+    layui.use(['table', 'form'], function () {
+        var table = layui.table, form = layui.form;
+
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+        // 数据表格字段
+        var time = $("input[name='month']").val();
+        var pa =  $("#pa").find("option:selected").val();
+
+        var myDate = new Date();
+        var myYear = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+        var myMonth = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        var myToday = myDate.getDate(); //获取当前日(1-31)
+        var time1 = myYear+'-'+myMonth+'-'+myToday;
+
+        if(!time){
+            time = time1;
+        }
+
+        var url = "{:url('statistics/gs')}" +  '?month=' + time+'&pa='+pa;
+        var cols;
+        if (language === '中文') {
+
+            cols = [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'Company_Name', title: '公司名称', width: 100, align: 'center',totalRowText: '合计'}
+                ,{field: 'Date', title: '来稿日期', sort:true,width: 200, align: 'center'}
+                ,{field: 'Completed', title: '交付日期', sort:true,width: 200, align: 'center'}
+                , {field: 'sumpage', title: '未提交页数', minWidth: 100, align: 'center'}
+                , {field: 'wks', title: '翻译未开始页数', minWidth: 100, align: 'center'}
+                , {field: 'trjd', title: '项目翻译进度', minWidth: 100, align: 'center'}
+            ];
+
+
+        } else {
+
+            cols = [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'Company_Name', title: '公司名称', width: 100, align: 'center',totalRowText: '合计'}
+                ,{field: 'Date', title: '来稿日期', sort:true,width: 200, align: 'center'}
+                ,{field: 'Completed', title: '交付日期', sort:true,width: 200, align: 'center'}
+                , {field: 'sumpage', title: '未提交页数', minWidth: 100, align: 'center'}
+                , {field: 'wks', title: '翻译未开始页数', minWidth: 100, align: 'center'}
+            ];
+
+
+        }
+        //console.log(cols);
+
+
+        cols = [cols];
+
+
+        // 生成表格
+        tableIns = table.render({
+            elem: '#test'
+            , url: url
+            , where: {}
+            , toolbar: '#forwardBar'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , title: '每日项目节点统计'
+            , totalRow: true
+            , cols: cols
+            , limit: 100, height: 'full-200',
+            even: true,
+            page: {
+                curr: location.hash.replace('#!fenye=', ''),
+                hash: 'fenye',
+                limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            },
+        });
+
+        // 表格类型切换时
+        form.on('select(pa)', function (data) {
+
+            $('#sub').submit();
+
+        });
+
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var num = 0
+            var num2 = 0
+
+            for (v in checkStatus.data) {
+
+                num += parseInt(checkStatus.data[v]['sumpage'])||0;
+                num2 += parseInt(checkStatus.data[v]['wks'])||0;
+
+            }
+            var msg = "未提交页数:" + num + ';未开始页数:' + num2;
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        });
+
+    });
+</script>
+
+
+<script>
+
+    $("input[name='month']").change(function () {
+
+        $('#sub').submit();
+    })
+
+
+</script>
+
+
+{/block}

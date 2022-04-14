@@ -98,7 +98,7 @@ class PjZhikong extends Common
 
             $list = Db::table('ky_pj_project_profile')
                 ->alias('a')
-                ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                ->leftjoin('ky_pj_contract_review b','a.Filing_Code = b.Filing_Code')
                 ->where($map)
                 ->field(['a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                     'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',

@@ -246,7 +246,7 @@ class Workbench extends Controller
             $pending = Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
                 ->where('Delivered_or_Not', 'No')
-                ->where('PA', NULL)
+                ->where('PA', '')
                 ->where('delete_time',0)
                 ->order('id desc')
                 ->paginate($limit);

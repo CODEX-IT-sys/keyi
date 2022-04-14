@@ -996,7 +996,7 @@ class Statistics extends Controller
 
     }
 
-
+    //项目组长文件统计
     public function pa()
     {
         $data=request()->param('month');
@@ -1237,4 +1237,221 @@ class Statistics extends Controller
             'data'  =>$list,
         ];
     }
+
+
+    public function dayup(){
+        $data = request()->param('month');
+
+        $name = session('administrator')['name'];
+
+        if($name == '王畅'){
+            $name = 'PA01';
+        }
+        if (isset($data)) {
+            $time = strtotime($data);
+            $firstTime = intval(date("Ymd", $time));
+        }else{
+            $time = time();
+            $firstTime = intval(date("Ymd", $time));
+        }
+
+
+        $cid = Db::table('ky_xt_dict_cate')->where('en_name',$name)->find();
+        $group = Db::table('ky_xt_dict')->where('c_id',$cid['id'])->field('id,cn_name')->select();
+        $list = [];
+
+        //未提交页数
+        $wtj = Db::table('ky_pj_contract_review')
+            ->where('Delivered_or_Not', '=', 'No')
+            ->where('delete_time', 0)
+            ->where('PA',$name)
+            ->where('Date','<=', $firstTime)
+            ->sum('Pages');
+
+        $pbzs = 0;
+        $fyzs = 0;
+        $jdzs = 0;
+        foreach($group as $key=>$val){
+            //入职日期
+            $rz_date = Db::table('ky_admin')
+                ->where('name',$val['cn_name'])
+                ->field('entry_time,job_id')
+                ->find();
+            $list[$key]['rz'] = $rz_date['entry_time'];
+
+            $job_name = Db::table('ky_xt_job')->where('id',$rz_date['job_id'])->value('cn_name');
+            $list[$key]['job'] = $job_name;
+
+            $pb = Db::table('ky_pj_daily_progress_dtp')
+                ->where('Work_Date',$firstTime)
+                ->where('delete_time', 0)
+                ->where('Name_of_Formatter',$val['cn_name'])
+                ->wherein('Work_Content', ['Preformat', 'Postformat'])
+                ->sum('Number_of_Pages_Completed');
+
+            $tr = Db::table('ky_pj_daily_progress_tr_re')
+                ->where('Work_Date',$firstTime)
+                ->where('delete_time', 0)
+                ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                ->wherein('Work_Content', ['Translate', 'TR Finalize','TR Modify Other'])
+                ->sum('Number_of_Pages_Completed');
+
+            $jd = Db::table('ky_pj_daily_progress_tr_re')
+                ->where('Work_Date',$firstTime)
+                ->where('delete_time', 0)
+                ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                ->wherein('Work_Content', ['Revise', 'RE Finalize'])
+                ->sum('Number_of_Pages_Completed');
+
+            $pbzs += $pb;
+            $fyzs += $tr;
+            $jdzs += $jd;
+            $list[$key]['name'] = $val['cn_name'];
+            $list[$key]['pb'] = $pb;
+            $list[$key]['tr'] = $tr;
+            $list[$key]['jd'] = $jd;
+        }
+
+        $totalRow['pb'] = $pbzs;
+        $totalRow['tr'] = $fyzs;
+        $totalRow['jd'] = $jdzs;
+
+        // 非Ajax请求，直接返回视图
+        if (!request()->isAjax()) {
+
+            $this->assign(['list'=>$list,'wtj'=>$wtj,'time'=>$time]);
+
+            return $this->fetch();
+        }
+
+
+        return [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => 0,
+            'data'  =>$list,
+            'totalRow' => $totalRow,
+            'wtj' => $wtj,
+        ];
+
+    }
+
+    //每日项目节点统计
+    public function gs(){
+        $data = request()->param('month');
+        $pa = request()->param('pa');
+        if($pa){
+            $where = [
+                'PA' => $pa,
+            ];
+        }else{
+            $where = [
+                'PA' => 'PA01',
+            ];
+            $pa = 'PA01';
+        }
+
+        $name = session('administrator')['name'];
+        // 用户id
+        $job_id = session('administrator')['job_id'];
+        if($job_id == 7){
+            $pa = $name;
+            $where = [
+                'PA' => $pa,
+            ];
+
+        }
+        if (isset($data)) {
+            $time = strtotime($data);
+            $firstTime = intval(date("Ymd", $time));
+        }else{
+            $time = strtotime(time());
+            $firstTime = intval(date("Ymd", $time));
+        }
+
+
+        $list = [];
+
+        $all =  Db::table('ky_pj_contract_review')
+            ->where('Delivered_or_Not', '=', 'No')
+            ->where('delete_time', 0)
+            ->where($where)
+            ->where('Date', '<=',$firstTime)
+            ->field('sum(Pages) as sumpage,Company_Name,Completed,Date')
+            ->group('Company_Name,Completed,Date')
+            ->select();
+
+        $t_wtj = 0;
+        $t_wks = 0;
+        foreach($all as $key=>$val){
+            $code = Db::table('ky_pj_contract_review')
+                ->where('delete_time', 0)
+                ->where($where)
+                ->where('Date',$val['Date'])
+                ->where('Completed',$val['Completed'])
+                ->where('Company_Name',$val['Company_Name'])
+                ->field('Filing_Code,Pages')
+                ->select();
+            $wks = 0;
+            $fy_num = 0;
+            if(!empty($code)){
+                foreach($code as $k1=>$v1){
+                    //判断是否已经后排
+                    $yp = Db::table('ky_pj_daily_progress_dtp')
+                        ->where('Work_Content','Postformat')
+                        ->where('delete_time', 0)
+                        ->where('Work_Date', '<=',$firstTime)
+                        ->where('Filing_Code',$v1['Filing_Code'])
+                        ->find();
+                    if(!$yp){
+                        $tr = Db::table('ky_pj_daily_progress_tr_re')
+                            ->where('delete_time', 0)
+                            ->where('Work_Date', '<=',$firstTime)
+                            ->where('Filing_Code',$v1['Filing_Code'])
+                            ->find();
+                        if(!$tr){
+                            $wks += $v1['Pages'];
+                        }
+                    }
+
+                    /* $yfy = Db::table('ky_pj_daily_progress_tr_re')
+                         ->where('delete_time', 0)
+                         ->where('Work_Content','Translate')
+                         ->where('Percentage_Completed','100')
+                         ->where('Filing_Code',$v1['Filing_Code'])
+                         ->find();
+                     $fy_num += $yfy['Number_of_Pages_Completed'];*/
+                }
+            }
+
+            $all[$key]['wks'] = $wks;
+               $trjd = ($val['sumpage']-$wks)/$val['sumpage'];
+            $trjd = number_format($trjd,'2');
+            $trjd = $trjd*100;
+            $all[$key]['trjd'] = $trjd."%";
+            $t_wtj += $val['sumpage'];
+            $t_wks += $wks;
+
+        }
+
+        $totalRow['sumpage'] = $t_wtj;
+        $totalRow['wks'] = $t_wks;
+        // 非Ajax请求，直接返回视图
+        if (!request()->isAjax()) {
+
+            $this->assign(['list'=>$all,'time'=>$time,'pa'=>$pa,'job_id'=>$job_id]);
+
+            return $this->fetch();
+        }
+        return [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => 0,
+            'data'  =>$all,
+            'totalRow' => $totalRow,
+        ];
+
+
+    }
+
 }

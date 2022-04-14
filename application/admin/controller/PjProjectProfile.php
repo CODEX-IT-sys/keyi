@@ -112,6 +112,26 @@ class PjProjectProfile extends Common
                     $colsData[$k]['sort']='true';
                     $colsData[$k]['width']=100;
                     break;
+                case 'trre_range':
+                    $colsData[$k]['width'] = 150;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'lang_style':
+                    $colsData[$k]['width'] = 150;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'format':
+                    $colsData[$k]['width'] = 150;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'deliverables':
+                    $colsData[$k]['width'] = 180;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'other_remark':
+                    $colsData[$k]['width'] = 180;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
                 default:
                     $colsData[$k]['width']=80;
 
@@ -188,7 +208,10 @@ class PjProjectProfile extends Common
                 'Field'=>'Comment',
                 'Comment'=>'备注'
             ],
-
+            [
+                'Field' => 'PA',
+                'Comment' => '项目组长'
+            ],
         ];
 
         if($request->has('search_type')){
@@ -318,6 +341,26 @@ class PjProjectProfile extends Common
                     case 'Post_Formatter':
                         $colsData[$k]['sort']='true';
                         $colsData[$k]['width']=100;
+                        break;
+                    case 'trre_range':
+                        $colsData[$k]['width'] = 150;
+                        $colsData[$k]['hide'] = 'true';
+                        break;
+                    case 'lang_style':
+                        $colsData[$k]['width'] = 150;
+                        $colsData[$k]['hide'] = 'true';
+                        break;
+                    case 'format':
+                        $colsData[$k]['width'] = 150;
+                        $colsData[$k]['hide'] = 'true';
+                        break;
+                    case 'deliverables':
+                        $colsData[$k]['width'] = 180;
+                        $colsData[$k]['hide'] = 'true';
+                        break;
+                    case 'other_remark':
+                        $colsData[$k]['width'] = 180;
+                        $colsData[$k]['hide'] = 'true';
                         break;
                     default:
                         $colsData[$k]['width']=80;
@@ -610,11 +653,24 @@ class PjProjectProfile extends Common
             ->where('Filled_by', session('administrator')['name'])
             ->where('delete_time',0)->order('id desc')->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
+
         // 直接返回视图
         return view('form-project_profile', [
             'file_code'=>$file_code,'yy'=>$yy, 'pb'=>$pb, 'fy'=>$fy, 'File_Type'=>$File_Type,
             'document_type'=>json_encode($document_type), 'text_list'=>$text_list,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
@@ -713,6 +769,18 @@ class PjProjectProfile extends Common
         // 项目助理
         $pa = Admin::field('name')->where('job_id', 7)->where('status', 0)->select();
 
+        //翻译校对范围
+        $trre_range = Db::name('xt_dict')->where('c_id',17)->select();
+
+        //语言风格
+        $language = Db::name('xt_dict')->where('c_id',18)->select();
+
+        //排版
+        $format = Db::name('xt_dict')->where('c_id',19)->select();
+
+        //提交内容
+        $deliver = Db::name('xt_dict')->where('c_id',20)->select();
+
         // 文件库
         $text_list = Db::name('pj_project_profile_text')->field('id, Project_Name')
             ->where('Filled_by', session('administrator')['name'])
@@ -721,7 +789,8 @@ class PjProjectProfile extends Common
         return view('form-project_profile-view', [
             'info'=>$res,'yy'=>$yy, 'pb'=>$pb, 'fy'=>$fy, 'File_Type'=>$File_Type,
             'document_type'=>json_encode($document_type), 'text_list'=>$text_list,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,
+            'trre_range'=>$trre_range,'language'=>$language,'format'=>$format,'deliver'=>$deliver,
         ]);
     }
 
