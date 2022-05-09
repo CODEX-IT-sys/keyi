@@ -35,7 +35,7 @@ class PjDailyProgressDtp extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(!in_array($job_id, [1,8,9,16,17,20])) {
+        if(!in_array($job_id, [1,8,9,16,17,20,22])) {
 
             if($job_id == 7){
                 //判断是属于哪个组的

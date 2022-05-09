@@ -23,7 +23,7 @@ class PjDailyProgressTrRe extends Common
         $colsData = getAllField('ky_pj_daily_progress_tr_re');
 
         $job_id = session('administrator')['job_id'];
-        if(!in_array($job_id, [1,8,9,16,17,20])){
+        if(!in_array($job_id, [1,8,9,16,17,20,22])){
             foreach ($colsData as $k=>$v)
             {
                 switch($v['Field']){
@@ -185,10 +185,7 @@ class PjDailyProgressTrRe extends Common
                     'delete_time' => 0,
                 ];
 
-                $re_num = Db('pj_daily_progress_tr_re')->where($re_where)->find();
-                if($re_num){
-                    return $this->error('该文件的校对记录已存在');
-                }
+
 
                 //同步校对比率到翻译同事
                 $where = [
@@ -201,9 +198,7 @@ class PjDailyProgressTrRe extends Common
                     ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();*/
                 $record = Db('pj_daily_progress_tr_re')->where($where)
                     ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();
-                if($record > 1){
-                    return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
-                }elseif($record == 1){
+               if($record == 1){
                     $upData = [
                         'Revision_Rate' => $data['Revision_Rate']
                     ];
@@ -240,10 +235,6 @@ class PjDailyProgressTrRe extends Common
 
                     }
 
-                }else{
-                    if(!in_array($xmfy,$jz_arr)){
-                        return $this->error('翻译记录不存在，无法同步校对比率');
-                    }
                 }
             }
 
@@ -478,7 +469,7 @@ class PjDailyProgressTrRe extends Common
 
 
         $info = PjProjectProfileModel::where('Filing_Code', $code)
-            ->field('Company_Name, Language, Translation_Difficulty, Total_Repetition_Rate, Excluding_Words')
+            ->field('Pages,Company_Name, Language, Translation_Difficulty, Total_Repetition_Rate, Excluding_Words,Actual_Source_Text_Count')
             ->where('Job_Name', $name)->find();
 
         // 返回值
@@ -518,5 +509,103 @@ class PjDailyProgressTrRe extends Common
         }
 
         return json(['code'=>2,'ys'=>$xmms]);
+    }
+
+    //检查该文件是否已经有一条百分比为100的记录
+    public function check_fanyi()
+    {
+        //计算项目描述表中的文件编号的页数
+        $data = input('get.');
+
+        $where = [
+            'Filing_Code' => $data['Filing_Code'],
+            'Job_Name' => $data['Job_Name'],
+            'Percentage_Completed' => 100,
+            'delete_time' => 0,
+            'Name_of_Translator_or_Reviser' => $data['trre_name'],
+        ];
+
+        $re_num = Db('pj_daily_progress_tr_re')->where($where)->find();
+        if($re_num){
+            return json(['code' => 1]);
+        }else{
+            return json(['code' => 2]);
+        }
+
+
+    }
+
+    //校验校对比率同步问题 翻译是否有多条百分比为100记录 或者进度还没有填
+    public function check_rate(){
+        $data = input('get.');
+
+        //查询项目描述表中的翻译人员
+        $xmfy = Db::name('pj_project_profile')->where('Filing_Code', $data['Filing_Code'])->where('Job_Name', $data['Job_Name'])->value('Translator');
+        //兼职人员表
+        $jz_arr = ['陈江波', '乐阳', '李显鹏', '林巧', '蒋雪婷', '金岚艳', '高睿', '吕东霞', '赵晨余', '袁春蕾', '吴奇芳', '罗雅卓', '李阳', '薛佳楠', '祝咏霖', '张静', '张莉',
+            '胡颖', 'Paulo', 'Nathalie', 'Jesus', 'Domenico', 'AnnaBraithwaite', 'AnnaRosenqvist', 'Tim', 'Yesi', 'BorisPervozvansky', '客户译文'];
+
+
+        if ($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
+            || $data['Work_Content'] == 'RE (Sampling_Highlight)' || $data['Work_Content'] == 'RE Finalize') {
+
+            //只有当完成百分比为100时才同步校对比率
+            if ($data['Percentage_Completed'] == 100) {
+                //判断是否已存在校对记录
+                $re_where = [
+                    'Filing_Code' => $data['Filing_Code'],
+                    'Job_Name' => $data['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'Work_Content' => $data['Work_Content'],
+                    'delete_time' => 0,
+                ];
+
+                $re_num = Db('pj_daily_progress_tr_re')->where($re_where)->find();
+                if ($re_num) {
+                    $result = [
+                        'code'=> 1,
+                        'msg' => '该文件的校对记录已存在'
+                    ];
+                    return json(['code' => 1]);
+                }
+
+                //同步校对比率到翻译同事
+                $where = [
+                    'Filing_Code' => $data['Filing_Code'],
+                    'Job_Name' => $data['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'delete_time' => 0,
+                ];
+                $record = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], ['eq', 'TR Modify Other'], 'or')->count();
+                if ($record > 1) {
+                    $result = [
+                        'code'=> 2,
+                        'msg' => '翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率'
+                    ];
+                    return json(['code' => 2]);
+                } elseif ($record == 1) {
+
+
+                    $result = [
+                        'code'=> 4,
+                        'msg' => '提交成功'
+                    ];
+                    return json(['code' => 4]);
+
+                } else {
+                    if (!in_array($xmfy, $jz_arr)) {
+                        $result = [
+                            'code'=> 3,
+                            'msg' => '翻译记录不存在，无法同步校对比率'
+                        ];
+
+                        return json(['code' => 3]);
+                    }
+                }
+            }
+
+
+        }
     }
 }

@@ -229,10 +229,11 @@ class PjDailyProgressDtp extends Common
 
         //获取工作内容页数和
         $ysh   =Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->where('Name_of_Formatter',$data['Name_of_Formatter'])
-            ->where('Work_Content',$data['Work_Content'])->sum('Number_of_Pages_Completed');
+            ->where('Work_Content',$data['Work_Content'])->where('delete_time',0)->sum('Number_of_Pages_Completed');
 
         //计算项目描述表中的文件编号的页数
         $xmms=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Pages');
+
         //去除正在修改的页数
         $page=Db::name('pj_daily_progress_dtp')->where('id',$data['id'])->value('Number_of_Pages_Completed');
 

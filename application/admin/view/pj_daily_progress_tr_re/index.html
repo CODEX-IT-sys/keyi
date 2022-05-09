@@ -355,13 +355,15 @@ layui.use(['table','form'], function(){
 		var num2 = 0
 		var num3 = 0
 		var num4 = 0
+		var num5 = 0
 		for (v in checkStatus.data) {
+			num5 += parseInt(checkStatus.data[v]['Actual_Source_Text_Count'])||0;
 			num4 += checkStatus.data[v]['Actual_Work_Time']||0;
 			num3 += parseInt(checkStatus.data[v]['Original_Chinese_Characters'])||0;
 			num2 += parseInt(checkStatus.data[v]['Total_Chinese_Characters'])||0;
 			num += parseInt(checkStatus.data[v]['Number_of_Pages_Completed'])||0;
 		}
-		var msg = "完成页码:" + num + ';中文字数统计:' + num2+';原总字数:'+num3+';实际用时:'+num4.toFixed(2);
+		var msg = "完成页码:" + num + ';实际源语数量:' + num5+'中文字数统计:' + num2+';原总字数:'+num3+';实际用时:'+num4.toFixed(2);
 
 		$('#jisuan').html(msg)
 		layer.alert(msg);

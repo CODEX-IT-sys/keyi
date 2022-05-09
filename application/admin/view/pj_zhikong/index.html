@@ -86,8 +86,8 @@
 <!--行工具-->
 <script type="text/html" id="barDemo">
     <div class="table_btn">
-        <a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
-        <a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+        <a class="layui-btn layui-btn-xs com_btn" lay-event="view_project">{:session('language') == '中文'? '项目文件' : 'View Project'}</a>
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="check">{:session('language') == '中文'? 'QCR' : 'Check'}</a>
         <!--<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'Look'}</a>-->
     </div>
 </script>
@@ -104,7 +104,8 @@
         if(language === '中文'){
 
             cols = [
-                {field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center',sort:true}
+                {field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
+                ,{field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center',sort:true}
                 ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
                 ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
                 ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
@@ -132,6 +133,8 @@
                 ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
                 ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center',sort:true}
                 ,{field:'PA', title:'项目组长',minWidth: 150,align:'center',sort:true}
+                , {field: 'Spot_Check', title: 'QCR状态', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 180}
             ];
 
 
@@ -139,7 +142,8 @@
         }else{
 
             cols = [
-                {field:'Filing_Code', title:'文件编号',minWidth: 100,align:'center',sort:true}
+                {field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
+                ,{field:'Filing_Code', title:'文件编号',minWidth: 100,align:'center',sort:true}
                 ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
                 ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
                 ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
@@ -166,7 +170,10 @@
                 ,{field:'Customer_Requirements', title:'客户要求',minWidth: 150,align:'center'}
                 ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
                 ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center',sort:true}
-                ,{field:'PA', title:'项目组长',minWidth: 150,align:'center',sort:true}
+                ,{field:'PA', title:'PA',minWidth: 150,align:'center',sort:true}
+                ,{field: 'Spot_Check', title: 'QCR状态', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{fixed: 'right', title: 'Operation', align: 'center', toolbar: '#barDemo', width: 180}
+
             ];
 
 
@@ -339,6 +346,16 @@
 
                 window.location.href = replaceEditUrlId("{:url('pj_project_database/read', ['id' => 1])}", id);
 
+            }else if(obj.event === 'view_project'){
+
+                var purl = replaceEditUrlId("{:url('xt_file/file_list', ['Project_Name' => 1])}", obj.data.Project_Name);
+                window.open(purl);
+            }else if (obj.event === 'check') {
+
+                var purl = replaceEditUrlId("{:url('pj_check/create', ['id' => 1])}", id);
+
+                window.open(purl);
+
             }
         });
 
@@ -391,5 +408,23 @@
 
     });
 </script>
+<script type="text/html" id="titleTpl">
 
+    {{#  if(d.Spot_Check == '待QCR'){ }}
+    <span style="color: red;">待QCR</span>
+    {{#  } else if(d.Spot_Check == '待翻译QCR'){ }}
+    <span style="color: red;">待翻译QCR</span>
+    {{#  } else if(d.Spot_Check == '待排版QCR'){ }}
+    <span style="color: red;">待排版QCR</span>
+    {{#  } else if(d.Spot_Check == '翻译QCR') { }}
+    <span style="color: dodgerblue;">翻译QCR</span>
+    {{#  } else if(d.Spot_Check == '排版QCR'){ }}
+    <span style="color: dodgerblue;">排版QCR</span>
+    {{#  } else if(d.Spot_Check == '翻译QCR,排版QCR'){ }}
+    <span style="color: dodgerblue;">翻译QCR,排版QCR</span>
+
+    {{#  } else if(d.Spot_Check == '已QCR'){ }}
+    <span style="color: dodgerblue;">已QCR</span>
+    {{#  } }}
+</script>
 {/block}

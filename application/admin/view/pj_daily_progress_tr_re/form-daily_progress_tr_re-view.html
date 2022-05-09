@@ -122,7 +122,18 @@
 							        </div>
 							    </div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label"
+										   title="{:session('language') == '中文'? '实际源语数量' : 'Company Name'}">
+										{:session('language') == '中文'? '实际源语数量' : 'Company Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Actual_Source_Text_Count" value="{$info.Actual_Source_Text_Count|default=0}" autocomplete="off" placeholder="" class="layui-input"
+											   type="text">
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '语种' : 'Language'}">

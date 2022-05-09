@@ -37,10 +37,61 @@ class PjTranslationEvaluation extends Model
         // 查询器对象 判断管理层
         if(!in_array($job_id, [1,8,9,20])) {
 
-            $query = $this->where(function ($query) use($name) {
-                $query->where('Filled_by', 'in', [$name, NULL])
-                    ->whereOr('Translator', $name);
-            });
+            if ($job_id == 7) {
+                $cid = Db::name('xt_dict_cate')->where('en_name', $name)->field(['id'])->find();
+
+                if ($cid) {
+                    $c_id = $cid['id'];
+                    $name_arr = Db::name('xt_dict')->where('c_id', $c_id)->select();
+                    $name_arr = array_column($name_arr, 'cn_name');
+
+                    if ($name == 'PA03') {
+                        //兼职新人组
+                        $xid = Db::name('xt_dict_cate')->where('en_name', 'PA777')->field(['id'])->find();
+                        $x_id = $xid['id'];
+                        $x_arr = Db::name('xt_dict')->where('c_id', $x_id)->select();
+                        $x_arr = array_column($x_arr, 'cn_name');
+                        $name_arr = array_merge($name_arr, $x_arr);
+
+                    }
+                    //获取机动组人员
+                    $jid = Db::name('xt_dict_cate')->where('en_name', 'PA99')->field(['id'])->find();
+                    $j_id = $jid['id'];
+                    $j_arr = Db::name('xt_dict')->where('c_id', $j_id)->select();
+                    $j_arr = array_column($j_arr, 'cn_name');
+                    $name_arr = array_merge($name_arr, $j_arr);
+
+                    $query = $this->where(function ($query) use ($name, $name_arr) {
+                        $query->where('Filled_by', 'in', $name_arr)
+                            ->whereOr('Translator', 'in', $name_arr);
+                    });
+                }
+
+            } else {
+                if($name == '周美玲'){
+                    $name_arr = Db::name('xt_dict')->where('c_id','in',['21','26','32'])->select();
+                    $name_arr = array_column($name_arr,'cn_name');
+                    $query = $query = $this->where(function ($query) use($name_arr) {
+                        $query->where('Filled_by', 'in', $name_arr);
+
+                    });
+                }elseif($name == '李晓艺'){
+                    $name_arr = Db::name('xt_dict')->where('c_id','in',['24','25'])->select();
+                    $name_arr = array_column($name_arr,'cn_name');
+
+                    $query = $query = $this->where(function ($query) use($name_arr) {
+                        $query->where('Filled_by', 'in', $name_arr);
+
+                    });
+                }else{
+                    $query = $this->where(function ($query) use($name) {
+                        $query->where('Filled_by', 'in', [$name, NULL])
+                            ->whereOr('Translator', $name);
+                    });
+                }
+            }
+
+
         }
 
         // 如果有搜索类型，添加查询条件
@@ -76,7 +127,20 @@ class PjTranslationEvaluation extends Model
 
         // 返回分页对象
         if(in_array($job_id,['10','11','12','13'])){
-            return $query->order('id desc')->where('Filled_by',$name)->paginate($limit);
+            if($name == '周美玲'){
+                $name_arr = Db::name('xt_dict')->where('c_id','in',['21','26','32'])->select();
+                $name_arr = array_column($name_arr,'cn_name');
+                return $query->order('id desc')->where('Filled_by','in',$name_arr)->paginate($limit);
+            }elseif($name == '李晓艺'){
+                $name_arr = Db::name('xt_dict')->where('c_id','in',['24','25'])->select();
+                $name_arr = array_column($name_arr,'cn_name');
+
+                return $query->order('id desc')->where('Filled_by','in',$name_arr)->paginate($limit);
+            }else{
+                return $query->order('id desc')->where('Filled_by',$name)->paginate($limit);
+            }
+
+
         }
         // 返回分页对象
         return $query->order('id desc')->paginate($limit);

@@ -18,6 +18,7 @@
 						<a href="{:url('pj_project_profile/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 						<a class="layui-btn com_btn" id="xzedit">{:session('language') == '中文'? '批量修改' : 'Batch modification'}</a>
 						<a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
+						<a class="layui-btn com_btn" id="daoru">{:session('language') == '中文'? '导入源语' : 'import'}</a>
 						<a class="layui-btn com_btn" id="simple">{:session('language') == '中文'? '简洁' : 'Concise'}</a>
 						<a href="{:url('sessionOut')}" class="layui-btn com_btn" id="complex">{:session('language') == '中文'? '完整' : 'Complete'}</a>
 						<!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
@@ -93,6 +94,7 @@
 	<div class="table_btn">
 		<a class="layui-btn layui-btn-xs com_btn" lay-event="view_file">{:session('language') == '中文'? '查看资料' : 'View File'}</a>
 		<a class="layui-btn layui-btn-xs com_btn" lay-event="view_project">{:session('language') == '中文'? '项目文件' : 'View Project'}</a>
+		<a class="layui-btn layui-btn-xs com_btn" lay-event="check">{:session('language') == '中文'? 'QCR' : 'Spot Check'}</a>
 		<a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
 		<a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
 		<!--<a class="layui-btn layui-btn-xs com_btn" lay-event="data_read">{:session('language') == '中文'? '数据读取' : 'Data Read'}</a>-->
@@ -133,9 +135,9 @@ layui.use(['table','form'], function(){
         }
 		// 右侧操作工具
 		if(language === '中文') {
-			cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 295});
+			cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 350});
 		}else{
-			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 420});
+			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 520});
 		}
 
 		return [cols];
@@ -278,6 +280,34 @@ layui.use(['table','form'], function(){
 
 			var purl = replaceEditUrlId("{:url('xt_file/file_list', ['Project_Name' => 1])}", obj.data.Project_Name);
 			window.open(purl);
+		}else if(obj.event === 'check'){
+
+			parent.layer.open({  // 在父窗口打开
+				type: 2,
+				title: '选择QCR类别',
+				maxmin: true,
+				area: ['900px', '500px'],
+				content: replaceEditUrlId("{:url('pj_project_profile/split', ['c_id' => 1])}", id)
+			});
+			/*// 点击修改抽查状态为待抽查
+			layer.confirm('确认？', function (index) {
+				// 向服务器发送请求
+				$.ajax({
+					type: 'get',
+					contentType: 'application/json',
+					url: replaceEditUrlId("{:url('pj_project_profile/spot_check', ['id' => 1])}", id),
+					dataType: 'json',
+					// 成功回调
+					success: function (res) {
+						layer.alert(res.msg, {title: '提示'}, function (index) {
+							// 表格重载
+							tableIns.reload();
+							// 关闭alert
+							layer.close(index);
+						});
+					}
+				});
+			});*/
 		}
   	});
 
@@ -446,6 +476,48 @@ layui.use(['table','form'], function(){
 		});
 
 	})
+
+	//导入源语数量
+	$("#daoru").click(function () {
+		var html =
+				'<div class="layui-upload" id="upload_file" style="margin-bottom:15px;margin-top:15px;text-align:center">'
+				+ '     <button type="button" class="layui-btn layui-btn-radius layui-btn-primary" id="test8">上传xls,xlsx</button>'
+				+ '<br />'
+				+ '     <button type="button" style="margin-top:5px" class="layui-btn layui-btn-normal" id="test10">上传</button>'
+				+ '     <button type="button" style="margin-top:5px" class="layui-btn close">取消</button>'
+				+ '</div>'
+		layer.open({
+			title: '导入源语数量',
+			area: ['300px', '200px'], //宽高
+			type: 1,
+			content: html
+		});
+		layui.use('upload', function () {
+			var upload = layui.upload;
+			upload.render({
+				elem: '#test8',
+				url: '/admin/pj_project_profile/import',
+				auto: false,
+				accept: 'file',
+				size: 10240,
+				//,multiple: true
+				bindAction: '#test10',
+				data: {},
+				done: function (res) {
+					if (res.code == 1) {
+						layer.closeAll();
+						layer.msg(res.msg);
+						setTimeout(function () {
+							window.location.reload();
+						}, 1000);
+					} else {
+						layer.msg(res.msg);
+					}
+					return false;
+				}
+			});
+		});
+	});
 });
 </script>
 

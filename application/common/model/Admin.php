@@ -77,6 +77,7 @@ class Admin extends Model
     {
         $admin = Db::name('admin')
             ->field(['id', 'password', 'name', 'status', 'job_id'])
+            ->where('delete_time',0)
 		    ->where('name', $name)->find();
 
         if ($admin === null) {

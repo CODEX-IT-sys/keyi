@@ -34,11 +34,44 @@ class PjHPEvaluation extends Model
 
         // 查询器对象 判断管理层
         if(!in_array($job_id, [1,8,9,20])) {
+            if ($job_id == 7) {
+                $cid = Db::name('xt_dict_cate')->where('en_name', $name)->field(['id'])->find();
 
-            // 否则 就只显示 自己录入 或者 评价人员 的数据
-            $query = $this->where(function ($query) use($name) {
-                $query->where('Filled_by', $name)->whereOr('Post_Formatter', $name);
-            });
+                if ($cid) {
+                    $c_id = $cid['id'];
+                    $name_arr = Db::name('xt_dict')->where('c_id', $c_id)->select();
+                    $name_arr = array_column($name_arr, 'cn_name');
+
+                    if ($name == 'PA03') {
+                        //兼职新人组
+                        $xid = Db::name('xt_dict_cate')->where('en_name', 'PA777')->field(['id'])->find();
+                        $x_id = $xid['id'];
+                        $x_arr = Db::name('xt_dict')->where('c_id', $x_id)->select();
+                        $x_arr = array_column($x_arr, 'cn_name');
+                        $name_arr = array_merge($name_arr, $x_arr);
+
+                    }
+                    //获取机动组人员
+                    $jid = Db::name('xt_dict_cate')->where('en_name', 'PA99')->field(['id'])->find();
+                    $j_id = $jid['id'];
+                    $j_arr = Db::name('xt_dict')->where('c_id', $j_id)->select();
+                    $j_arr = array_column($j_arr, 'cn_name');
+                    $name_arr = array_merge($name_arr, $j_arr);
+
+                    $query = $this->where(function ($query) use ($name, $name_arr) {
+                        $query->where('Filled_by', 'in', $name_arr)
+                            ->whereOr('Post_Formatter', 'in', $name_arr);
+                    });
+                }
+
+            } else {
+                // 否则 就只显示自己录入的 或 项目助理数据
+                $query = $this->where(function ($query) use($name) {
+                    $query->where('Filled_by', 'in', [$name, NULL])
+                        ->whereOr('Post_Formatter', $name);
+                });
+            }
+
         }
 
         // 如果有搜索类型，添加查询条件

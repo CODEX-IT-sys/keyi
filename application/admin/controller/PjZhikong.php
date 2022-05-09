@@ -62,6 +62,10 @@ class PjZhikong extends Common
             'Field' => 'PA',
             'Comment' => '项目组长',
         ];
+        $colsData[10] = [
+            'Field' => 'Spot_Check',
+            'Comment' => '抽查状态',
+        ];
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
@@ -100,10 +104,10 @@ class PjZhikong extends Common
                 ->alias('a')
                 ->leftjoin('ky_pj_contract_review b','a.Filing_Code = b.Filing_Code')
                 ->where($map)
-                ->field(['a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                     'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                     'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                    'a.Reviser','a.Post_Formatter','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                    'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                 ->order('a.Filing_Code desc')
                 ->paginate($limit);
 
@@ -114,10 +118,10 @@ class PjZhikong extends Common
                 $list = Db::table('ky_pj_project_profile')
                     ->alias('a')
                     ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
-                    ->field(['a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                    ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                         'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                         'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                        'a.Reviser','a.Post_Formatter','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                        'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                     ->order('a.Filing_Code desc')
                     ->paginate($limit);
             }else{
@@ -128,10 +132,10 @@ class PjZhikong extends Common
                         ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
                         ->where('a.'.$field,'like','%'.$keyword.'%')
 
-                        ->field(['a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                        ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                            'a.Reviser','a.Post_Formatter','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                            'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                         ->order('a.Filing_Code desc')
                         ->paginate($limit);
 
@@ -140,10 +144,10 @@ class PjZhikong extends Common
                         ->alias('a')
                         ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
                         ->where('b.'.$field,'like','%'.$keyword.'%')
-                        ->field(['a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
+                        ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                            'a.Reviser','a.Post_Formatter','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                            'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                         ->order('a.Filing_Code desc')
                         ->paginate($limit);
                 }

@@ -206,13 +206,13 @@ layui.use(['table','form'], function(){
 					var search_type = localStorage.getItem('search_type');
 					var s = localStorage.getItem('field');
 					var i = localStorage.getItem('keyword');
-
+					window.location.href = "{:url('index')}" + '?field=' + s + '&keyword=' + i + '&search_type=' + search_type;
 					// 表格重载
-					table.reload('test', {
+				/*	table.reload('test', {
 						url: "{:url('mk_feseability/index')}",
 						where: {search_type : search_type, field: s, keyword: i},  // 设定异步数据接口的额外参数
 						page: true, limit:50
-					});
+					});*/
 				}
 			});
 		});

@@ -129,7 +129,18 @@
 							        </div>
 							    </div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label"
+										   title="{:session('language') == '中文'? '实际源语数量' : 'Company Name'}">
+										{:session('language') == '中文'? '实际源语数量' : 'Company Name'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Actual_Source_Text_Count" autocomplete="off" placeholder="" class="layui-input"
+											   type="text">
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '语种' : 'Language'}">
@@ -450,7 +461,9 @@
                 success: function (res) {
                     //console.log(res.data);
                     var info = res.data;
-
+					var pages = info.Pages;
+					var str = '当前文件共'+pages+'页';
+					alert(str);
                     // 文本框写入默认值
                     $.each(info, function (name, value) {
                         // input
@@ -678,20 +691,77 @@
 				}
 			}
 		})
-		/*$('#jdbl').blur(function(){
-			var work_content = $('#content').val();
+		//百分比变化
+		$('#bfb').blur(function(){
+
+			var Filing_Code = $('#Filing_Code').val();
+			var Job_Name = $('#Job_Name').val();
+			var trre_name = $('#name').val();
+			var Work_Content = $('#content').val();
 			var bfb = $('#bfb').val();
 
-			if(bfb!=100){
-				$('#jdbl').val('N/A');
-				layer.msg('完成百分比为100才可填写');
-			}else{
-				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
-					$('#jdbl').val('0');
-					layer.msg('只有工作内容为校对相关才能填写');
+			if(bfb == 100){
+
+				if(Work_Content == 'Revise' || Work_Content == 'RE Modify' || Work_Content == 'RE Finalize' ){
+
+					//校对比率同步问题验证
+					$.ajax({
+						async:false,
+						type: 'get',
+						url: "{:url('check_rate')}",
+						data: {
+							'Filing_Code': Filing_Code,
+							'Job_Name': Job_Name,
+							'trre_name': trre_name,
+							'Work_Content': Work_Content,
+							'Percentage_Completed': bfb
+						} ,
+						dataType: 'json',
+						success:function(res){
+							console.log(res);
+							if(res.code == 1){
+								alert('该文件的校对记录已存在');
+								return false;
+							}else if(res.code == 2){
+								alert('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
+								return false;
+							}else if(res.code == 3){
+								alert('翻译记录不存在，无法同步校对比率,请告知翻译人员填写进度');
+								return false;
+							}
+
+						}
+					})
+				}else if(Work_Content == 'Translate' || Work_Content == 'TR Modify' || Work_Content == 'TR Finalize' || Work_Content == 'TR Modify Other' ){
+
+					//校对比率同步问题验证
+
+					$.ajax({
+						async:false,
+						type: 'get',
+						url: "{:url('check_fanyi')}",
+						data: {
+							'Filing_Code': Filing_Code,
+							'Job_Name': Job_Name,
+							'trre_name': trre_name,
+							'Work_Content': Work_Content,
+							'Percentage_Completed': bfb
+						} ,
+						dataType: 'json',
+						success:function(res){
+							console.log(res);
+							if(res.code == 1){
+								alert('该文件已经有一条已完成百分比为100的记录，请修改');
+								$('#bfb').val(0);
+								return false;
+							}
+
+						}
+					})
 				}
+
 			}
-		})*/
+		})
 
 		// 数据提交
 		$('#save').on('click', function () {

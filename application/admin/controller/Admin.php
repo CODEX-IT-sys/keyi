@@ -68,6 +68,30 @@ class Admin extends Controller
             $res = Db::table('ky_pj_contract_review')->where($where)->update($updata);
         }
     }
+    //修改实际源语数量
+    public function xgActualNumber(){
+
+        $list = Db::name('pj_daily_progress_tr_re')
+            ->where('Work_Date','>=',20220501)
+            ->where('delete_time',0)
+            ->field(['id','Filing_Code','Job_Name','Actual_Source_Text_Count'])
+            ->select();
+        foreach($list as $key=>$val){
+            $number = Db::name('pj_project_profile')
+                ->where('Filing_Code',$val['Filing_Code'])
+                ->where('Job_Name',$val['Job_Name'])
+                ->value('Actual_Source_Text_Count');
+
+            $up_data = [
+                'Actual_Source_Text_Count' => $number,
+            ];
+
+            $res = Db::name('pj_daily_progress_tr_re')->where('id',$val['id'])->update($up_data);
+
+        }
+
+    }
+
     //批量修改项目数据库Date
     public function gxDate(){
         $data = Db::name('pj_project_database')->where('delete_time',0)->field(['id','Filing_Code'])->select();

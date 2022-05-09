@@ -1238,13 +1238,13 @@ class Statistics extends Controller
         ];
     }
 
-
+    //每日提交页数统计
     public function dayup(){
         $data = request()->param('month');
 
         $name = session('administrator')['name'];
 
-        if($name == '王畅'){
+        if($name == '王畅' || $name='PMA02'){
             $name = 'PA01';
         }
         if (isset($data)) {
@@ -1271,6 +1271,8 @@ class Statistics extends Controller
         $pbzs = 0;
         $fyzs = 0;
         $jdzs = 0;
+        $fynmzs = 0;
+        $jdnmzs = 0;
         foreach($group as $key=>$val){
             //入职日期
             $rz_date = Db::table('ky_admin')
@@ -1293,28 +1295,57 @@ class Statistics extends Controller
                 ->where('Work_Date',$firstTime)
                 ->where('delete_time', 0)
                 ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
-                ->wherein('Work_Content', ['Translate', 'TR Finalize','TR Modify Other'])
+                ->wherein('Work_Content', ['Translate', 'TR Modify Other'])
                 ->sum('Number_of_Pages_Completed');
+
+            $tr_zs = Db::table('ky_pj_daily_progress_tr_re')
+                ->where('Work_Date',$firstTime)
+                ->where('delete_time', 0)
+                ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                ->wherein('Work_Content', ['Translate','TR Modify Other'])
+                ->select();
+            $trzs_sum = 0;
+            foreach($tr_zs as $k1=>$v1){
+                $trzs_sum += $v1['Actual_Source_Text_Count']*$v1['Percentage_Completed']/100;
+            }
 
             $jd = Db::table('ky_pj_daily_progress_tr_re')
                 ->where('Work_Date',$firstTime)
                 ->where('delete_time', 0)
                 ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
-                ->wherein('Work_Content', ['Revise', 'RE Finalize'])
+                ->wherein('Work_Content', ['Revise'])
                 ->sum('Number_of_Pages_Completed');
+
+            $jd_zs = Db::table('ky_pj_daily_progress_tr_re')
+                ->where('Work_Date',$firstTime)
+                ->where('delete_time', 0)
+                ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                ->wherein('Work_Content', ['Revise'])
+                ->select();
+            $jdzs_sum = 0;
+            foreach($jd_zs as $k2=>$v2){
+                $jdzs_sum += $v2['Actual_Source_Text_Count']*$v2['Percentage_Completed']/100;
+            }
+
 
             $pbzs += $pb;
             $fyzs += $tr;
             $jdzs += $jd;
+            $fynmzs += round($trzs_sum);
+            $jdnmzs += round($jdzs_sum);
             $list[$key]['name'] = $val['cn_name'];
             $list[$key]['pb'] = $pb;
             $list[$key]['tr'] = $tr;
             $list[$key]['jd'] = $jd;
+            $list[$key]['tr_zs'] = round($trzs_sum);
+            $list[$key]['jd_zs'] = round($jdzs_sum);
         }
 
         $totalRow['pb'] = $pbzs;
         $totalRow['tr'] = $fyzs;
         $totalRow['jd'] = $jdzs;
+        $totalRow['tr_zs'] = $fynmzs;
+        $totalRow['jd_zs'] = $jdnmzs;
 
         // 非Ajax请求，直接返回视图
         if (!request()->isAjax()) {
@@ -1383,6 +1414,7 @@ class Statistics extends Controller
 
         $t_wtj = 0;
         $t_wks = 0;
+
         foreach($all as $key=>$val){
             $code = Db::table('ky_pj_contract_review')
                 ->where('delete_time', 0)
@@ -1390,45 +1422,180 @@ class Statistics extends Controller
                 ->where('Date',$val['Date'])
                 ->where('Completed',$val['Completed'])
                 ->where('Company_Name',$val['Company_Name'])
-                ->field('Filing_Code,Pages')
+                ->field('Filing_Code,Pages,Translator,Reviser,Pre_Formatter,Post_Formatter,Translation_Delivery_Time,Revision_Delivery_Time')
                 ->select();
             $wks = 0;
             $fy_num = 0;
+            $tran = '';
+            $re = '';
+            $tran1 = '';
+            $re1 = '';
+            $tr_do = '';
+            $tr_finish = '';
+            $tr_do1 = '';
+            $tr_finish1 = '';
+            $pre_formatter = '';
+            $post_formatter = '';
             if(!empty($code)){
                 foreach($code as $k1=>$v1){
+                    $temp1 = $v1['Translator'];
+                    $temp2 = $v1['Reviser'];
+                    $temp3 = $v1['Pre_Formatter'];
+                    $temp4 = $v1['Post_Formatter'];
                     //判断是否已经后排
-                    $yp = Db::table('ky_pj_daily_progress_dtp')
+                    $hp = Db::table('ky_pj_daily_progress_dtp')
                         ->where('Work_Content','Postformat')
                         ->where('delete_time', 0)
                         ->where('Work_Date', '<=',$firstTime)
                         ->where('Filing_Code',$v1['Filing_Code'])
                         ->find();
-                    if(!$yp){
-                        $tr = Db::table('ky_pj_daily_progress_tr_re')
+                    if(!$hp){
+                        $tr_re = Db::table('ky_pj_daily_progress_tr_re')
                             ->where('delete_time', 0)
                             ->where('Work_Date', '<=',$firstTime)
                             ->where('Filing_Code',$v1['Filing_Code'])
-                            ->find();
-                        if(!$tr){
+                            ->wherein('Work_Content', ['Translate','TR Finalize','TR Modify Other'])
+                            ->select();
+                        if(!$tr_re){
                             $wks += $v1['Pages'];
+                            if($temp1){
+                                $tr_do = $tr_do.','.$temp1;
+                            }
+                        }else{
+                            //判断翻译人员工作中还是已完成
+                            $name = array_column($tr_re,'Name_of_Translator_or_Reviser');
+                            $name = array_unique($name);
+                            foreach($name as $k2=>$v2){
+                                $com = Db::table('ky_pj_daily_progress_tr_re')
+                                    ->where('delete_time', 0)
+                                    ->where('Work_Date', '<=',$firstTime)
+                                    ->where('Filing_Code',$v1['Filing_Code'])
+                                    ->where('Name_of_Translator_or_Reviser',$v2)
+                                    ->where('Percentage_Completed',100)
+                                    ->wherein('Work_Content', ['Translate','TR Modify','TR Finalize','TR Modify Other'])
+                                    ->find();
+                                if($com){
+                                    $tr_finish = $tr_finish.','.$v2;
+                                }else{
+                                    $tr_do = $tr_do.','.$v2;
+                                }
+                            }
+
+                            //计算为开始页数
+                            $total = 0;
+                            foreach($tr_re as $v3){
+                                $total += $v3['Number_of_Pages_Completed'];
+                            }
+                            $cha = $v1['Pages'] - $total;
+                            $wks += $cha;
+
                         }
+                    }else{
+                        $tr_finish = $tr_finish.','.$temp1;
                     }
 
-                    /* $yfy = Db::table('ky_pj_daily_progress_tr_re')
-                         ->where('delete_time', 0)
-                         ->where('Work_Content','Translate')
-                         ->where('Percentage_Completed','100')
-                         ->where('Filing_Code',$v1['Filing_Code'])
-                         ->find();
-                     $fy_num += $yfy['Number_of_Pages_Completed'];*/
+
+                    $tr_time = strtotime($v1['Translation_Delivery_Time']);
+                    $tr_time = date('Ymd',$tr_time);
+                    $re_time = strtotime($v1['Revision_Delivery_Time']);
+                    $re_time = date('Ymd',$re_time);
+
+                    //如果交付时间在搜索时间之后才显示
+                    if($temp1){
+                       /* if($tr_time>$firstTime){
+                            $tran = $tran.','.$temp1;
+                        }*/
+                        $tran = $tran.','.$temp1;
+                    }
+                    if($temp2){
+                        /*if($re_time>$firstTime){
+                            $re = $re.','.$temp2;
+                        }*/
+                        $re = $re.','.$temp2;
+                    }
+                    if($temp3){
+                        $pre_formatter = $pre_formatter.','.$temp3;
+                    }
+                    if($temp4){
+                        $post_formatter = $post_formatter.','.$temp4;
+                    }
+
                 }
             }
 
+
+            //翻译正在做人员数据组装
+            $tr_arr = explode(',',$tr_do);
+            $tr_arr = array_unique($tr_arr);
+            $tran_do = implode(',',$tr_arr);
+            if($tran_do){
+                $tran_do =substr($tran_do,1);
+            }
+
+            //翻译已完成人员数据组装
+            $tr_arr2 = explode(',',$tr_finish);
+            $tr_arr2 = array_unique($tr_arr2);
+            $tran_finish = implode(',',$tr_arr2);
+            if($tran_finish){
+                $tran_finish =substr($tran_finish,1);
+            }
+
+            //翻译人员数据组装
+            $tr_arr3 = explode(',',$tran);
+            $tr_arr3 = array_unique($tr_arr3);
+            $tran = implode(',',$tr_arr3);
+            if($tran){
+                $tran =substr($tran,1);
+            }
+
+            //校对人员数据组装
+            $re_arr = explode(',',$re);
+            $re_arr = array_unique($re_arr);
+            $re = implode(',',$re_arr);
+            if($re){
+                $re =substr($re,1);
+            }
+            //预排版人员数据组装
+            $pre_arr = explode(',',$pre_formatter);
+            $pre_arr = array_unique($pre_arr);
+            $pre_formatter = implode(',',$pre_arr);
+            if($pre_formatter){
+                $pre_formatter =substr($pre_formatter,1);
+            }
+
+            //后排版人员数据组装
+            $post_arr = explode(',',$post_formatter);
+            $post_arr = array_unique($post_arr);
+            $post_formatter = implode(',',$post_arr);
+            if($post_formatter){
+                $post_formatter =substr($post_formatter,1);
+            }
+
             $all[$key]['wks'] = $wks;
-               $trjd = ($val['sumpage']-$wks)/$val['sumpage'];
+            $all[$key]['tr_do'] = $tran_do;
+            $all[$key]['tr_finish'] = $tran_finish;
+            $all[$key]['tran'] = $tran;
+            $all[$key]['re'] = $re;
+            $all[$key]['pre'] = $pre_formatter;
+            $all[$key]['post'] = $post_formatter;
+            //增加项目翻译进度
+            $trjd = ($val['sumpage']-$wks)/$val['sumpage'];
             $trjd = number_format($trjd,'2');
             $trjd = $trjd*100;
             $all[$key]['trjd'] = $trjd."%";
+
+            //合并公司名称中英文
+            $company_name = $val['Company_Name'];
+            $dict = Db::name('xt_dict')
+                ->where('cn_name',$company_name)
+                ->where('c_id','35')
+                ->find();
+            if($dict){
+                $en_name = $dict['en_name'];
+
+                $all[$key]['Company_Name'] = $company_name.$en_name;
+            }
+
             $t_wtj += $val['sumpage'];
             $t_wks += $wks;
 

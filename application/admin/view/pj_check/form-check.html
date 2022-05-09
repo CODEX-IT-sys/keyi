@@ -1,0 +1,523 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '质量抽查' : 'Project Management'}</a>
+                    <a class="on">{:session('language') == '中文'? '添加信息' : 'Project Profile'}</a>
+                </div>
+                <div class="global_btn">
+
+                    <button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' :
+                            'Back'}
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="mainCt mainSec formReset signLimit">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form" method="post" action="{:url('pj_check/save')}">
+
+                        <div class="layui-row layui-col-space10">
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '文件编号' : 'Filing_Code'}">
+                                        {:session('language') == '中文'? '文件编号' : 'Filing_Code'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Filing_Code" lay-verify="required" autocomplete="off"
+                                               placeholder="" value="{$info.Filing_Code}" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '文件名称' : 'Job Name'}">
+                                        {:session('language') == '中文'? '文件名称' : 'Job Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Job_Name" value="{$info.Job_Name}" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '页数' : 'Pages'}">
+                                        {:session('language') == '中文'? '页数' : 'Pages'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Pages" id="pages" value="{$info.Pages}" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="number">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '被QCR人员' : 'Job Name'}">
+                                        {:session('language') == '中文'? '被QCR人员' : 'Job Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Bcheck_Person" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? 'QCR类别' : 'Language Style'}">
+                                        {:session('language') == '中文'? 'QCR类别' : 'Language Style'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Check_Cate"  id="cate" lay-filter="VAT_Rate" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                                            <option value="翻译">{:session('language') == '中文'? '翻译' : Translation}</option>
+                                            <option value="排版">{:session('language') == '中文'? '排版' : Format}</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '抽样页面' : 'Job Name'}">
+                                        {:session('language') == '中文'? '抽样页面' : 'Job Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Check_Page" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '抽样页数' : 'Job Name'}">
+                                        {:session('language') == '中文'? '抽样页数' : 'Job Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Check_Pages" id="check_pages" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="number">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '抽样比率' : 'Job Name'}">
+                                        {:session('language') == '中文'? '抽样比率' : 'Job Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Sampling_Ratio" id="sampling_ratio" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                    <span class="signTip">%</span>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '修订字数/排版错误页数' : 'Source Text Word Count'}">
+                                        {:session('language') == '中文'? '修订字数/排版错误页数' : 'Source Text Word Count'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Word_Or_Pages"  id="word_or_page" lay-verify="required"
+                                               autocomplete="off" placeholder="" class="layui-input" type="number">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '抽样总字数' : 'Source Text Word Count'}">
+                                        {:session('language') == '中文'? '抽样总字数' : 'Source Text Word Count'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Check_Total_Words"  id="total_words" lay-verify="required"
+                                               autocomplete="off" placeholder="" class="layui-input" type="number">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '字数修订率' : 'Revision  Rate'}">
+                                        {:session('language') == '中文'? '字数修订率' : 'Revision Rate'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Revision_Rate" id="word_rate"  autocomplete="off"
+                                               placeholder="" class="layui-input">
+                                    </div>
+                                    <span class="signTip">%</span>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '排版错误率' : 'Revision  Rate'}">
+                                        {:session('language') == '中文'? '排版错误率' : 'Revision Rate'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Format_Error_Rate" id="format_rate"  autocomplete="off"
+                                               placeholder="" class="layui-input">
+                                    </div>
+                                    <span class="signTip">%</span>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item layui_ic">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '抽检日期' : 'Work Date'}">
+                                        {:session('language') == '中文'? '抽检日期' : 'Work Date'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input class="Date layui-input" name="Check_Date" id="Work_Date" type="text"
+                                               autocomplete="off">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '翻译质量等级' : 'Source Text Word Count'}">
+                                        {:session('language') == '中文'? '翻译质量等级' : 'Source Text Word Count'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Translation_QL"   lay-filter="VAT_Rate" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                                            <option value="A">{:session('language') == '中文'? 'A' : A}</option>
+                                            <option value="B">{:session('language') == '中文'? 'B' : B}</option>
+                                            <option value="C">{:session('language') == '中文'? 'C' : C}</option>
+                                            <option value="D">{:session('language') == '中文'? 'D' : D}</option>
+                                            <option value="E">{:session('language') == '中文'? 'E' : E}</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '排版质量等级' : 'Source Text Word Count'}">
+                                        {:session('language') == '中文'? '排版质量等级' : 'Source Text Word Count'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Format_QL"  id="format_ql" lay-verify="required"
+                                               autocomplete="off" placeholder="" class="layui-input" >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '建议' : 'Comment'}">
+                                        {:session('language') == '中文'? '建议' : 'Comment'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" name="Proposal"
+                                                  class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '备注' : 'Comment'}">
+                                        {:session('language') == '中文'? '备注' : 'Comment'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Comment" name="Remark"
+                                                  class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="id" value="{$info.id}">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+
+{js href="__JS__/xm-select.js"}
+
+<script>
+
+    layui.use(['form', 'laydate'], function () {
+        var form = layui.form, laydate = layui.laydate, layer = layui.layer;
+
+        //同时绑定多个,单个日期选择，显示在input里面
+        /* $('.showDate').click(function () {
+             laydate.render({
+                 elem: this
+                 , trigger: 'click'
+                 , theme: '#1B3382'
+                 , position: 'fixed'
+                 //,isInitValue: true
+                 //,value: new Date()
+                 , type: 'datetime'
+                 , format: 'yyyy-MM-dd'
+                 , ready: function (date) {
+                     this.dateTime.hours = 23;
+                     this.dateTime.minutes = 0;
+                     //this.dateTime.seconds=59;
+                 }
+             });
+         });*/
+        $('.Date').click(function () {
+            laydate.render({
+                elem: '#Work_Date'
+                , trigger: 'click'
+                , theme: '#1B3382'
+                , position: 'fixed'
+                //,isInitValue: true
+                //,value: new Date()
+                //,type:'datetime'
+                , format: 'yyyyMMdd'
+            });
+        });
+
+        //抽样页数变化 计算抽样比率
+        $('#check_pages').bind('input porpertychange', function () {
+
+            var zys = $.trim($('#pages').val());
+            var ck_pages = $.trim($('#check_pages').val());
+            var word_or_page = $.trim($('#word_or_page').val());
+            var cate = $('#cate').val();
+
+            zys ? zys : 0;
+            ck_pages ? ck_pages : 0;
+            word_or_page ? word_or_page : 0;
+            var ratio = (Number(ck_pages)/Number(zys))*100;
+            ratio = ratio.toFixed(2)
+
+            $('#sampling_ratio').val(ratio);
+
+            if(cate == '排版' && word_or_page != 0){
+                var format_rate = (Number(word_or_page)/Number(ck_pages))*100;
+                format_rate = format_rate.toFixed(2);
+                $('#format_rate').val(format_rate);
+
+                if(format_rate <= 1){
+                    $('#format_ql').val('质量卓越');
+                }else if(format_rate<=3){
+                    $('#format_ql').val('质量优秀');
+                }else if(format_rate<=5){
+                    $('#format_ql').val('质量良好');
+                }else if(format_rate<=10){
+                    $('#format_ql').val('质量可接受');
+                }else if(format_rate<=15){
+                    $('#format_ql').val('质量刚达标');
+                }else{
+                    $('#format_ql').val('质量不可接受');
+                }
+            }
+        });
+
+        //修订字数/排版错误页数变化
+        $('#word_or_page').bind('input porpertychange', function () {
+            var cate = $('#cate').val();
+            if(cate ==''){
+                alert('抽查分类不能为空');
+            }
+            var total_words = $.trim($('#total_words').val());
+            var word_or_page = $.trim($('#word_or_page').val());
+            var ck_pages = $.trim($('#check_pages').val());
+
+            total_words ? total_words : 0;
+            word_or_page ? word_or_page : 0;
+            ck_pages ? ck_pages : 0;
+
+            if(cate == '翻译' && total_words != 0){
+                var word_rate = (Number(word_or_page)/Number(total_words))*100;
+                word_rate = word_rate.toFixed(2);
+                $('#word_rate').val(word_rate);
+            }
+
+            if(cate == '排版' && ck_pages != 0){
+                var format_rate = (Number(word_or_page)/Number(ck_pages))*100;
+                format_rate = format_rate.toFixed(2);
+                $('#format_rate').val(format_rate);
+
+                if(format_rate <= 1){
+                    $('#format_ql').val('质量卓越');
+                }else if(format_rate<=3){
+                    $('#format_ql').val('质量优秀');
+                }else if(format_rate<=5){
+                    $('#format_ql').val('质量良好');
+                }else if(format_rate<=10){
+                    $('#format_ql').val('质量可接受');
+                }else if(format_rate<=15){
+                    $('#format_ql').val('质量刚达标');
+                }else{
+                    $('#format_ql').val('质量不可接受');
+                }
+            }
+
+        });
+
+        //抽样总字数变化
+        $('#total_words').bind('input porpertychange', function () {
+            var cate = $('#cate').val();
+            if(cate ==''){
+                alert('抽查分类不能为空');
+            }
+            var total_words = $.trim($('#total_words').val());
+            var word_or_page = $.trim($('#word_or_page').val());
+
+
+            total_words ? total_words : 0;
+            word_or_page ? word_or_page : 0;
+
+
+            if(cate == '翻译' && word_or_page != 0){
+                var word_rate = (Number(word_or_page)/Number(total_words))*100;
+                word_rate = word_rate.toFixed(2);
+                $('#word_rate').val(word_rate);
+
+
+            }
+
+
+
+        });
+
+        //抽样页数变化
+        $('#total_words').bind('input porpertychange', function () {
+            var cate = $('#cate').val();
+            if(cate ==''){
+                alert('抽查分类不能为空');
+            }
+            var ck_pages = $.trim($('#check_pages').val());
+            var word_or_page = $.trim($('#word_or_page').val());
+
+
+            ck_pages ? ck_pages : 0;
+            word_or_page ? word_or_page : 0;
+
+
+            if(cate == '排版' && word_or_page != 0){
+                var format_rate = (Number(word_or_page)/Number(ck_pages))*100;
+                format_rate = format_rate.toFixed(2);
+                $('#format_rate').val(format_rate);
+
+
+                if(format_rate <= 1){
+                    $('#format_ql').val('质量卓越');
+                }else if(format_rate<=3){
+                    $('#format_ql').val('质量优秀');
+                }else if(format_rate<=5){
+                    $('#format_ql').val('质量良好');
+                }else if(format_rate<=10){
+                    $('#format_ql').val('质量可接受');
+                }else if(format_rate<=15){
+                    $('#format_ql').val('质量刚达标');
+                }else{
+                    $('#format_ql').val('质量不可接受');
+                }
+
+
+            }
+
+
+
+        });
+        //排版错误率变化
+        $('#format_rate').bind('input porpertychange', function () {
+            var cate = $('#cate').val();
+            if(cate ==''){
+                alert('抽查分类不能为空');
+            }
+            var format_rate = $.trim($('#format_rate').val());
+
+            format_rate ? format_rate : 0;
+
+
+
+
+
+
+        });
+
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            // 必填项
+            validator.add('Job_Name', [{
+                rule: 'require',
+                msg: '文件名称不能为空'
+            }]);
+
+            validator.add('Filing_Code', [{
+                rule: 'require',
+                msg: '文件编号不能为空'
+            }]);
+
+
+            // 数值验证
+            validator.add('Pages', [{
+                rule: 'isNum',
+                msg: '页数只允许是数值数据'
+            }]);
+
+            return validator.start();
+        };
+
+
+
+        // 数据提交
+        $('#save').on('click', function () {
+
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+
+            // 表单提交
+            $('#form').submit();
+
+            // 关闭提示
+            layer.close(tip);
+        });
+    })
+</script>
+{/block}

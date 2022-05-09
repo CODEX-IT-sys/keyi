@@ -131,6 +131,9 @@ class PjProjectProfile extends Common
                 case 'other_remark':
                     $colsData[$k]['width'] = 180;
                     $colsData[$k]['sort'] = 'true';
+                case 'Spot_Check':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
                     break;
                 default:
                     $colsData[$k]['width']=80;
@@ -211,6 +214,10 @@ class PjProjectProfile extends Common
             [
                 'Field' => 'PA',
                 'Comment' => '项目组长'
+            ],
+            [
+                'Field' => 'Spot_Check',
+                'Comment' => '抽查状态'
             ],
         ];
 
@@ -344,24 +351,27 @@ class PjProjectProfile extends Common
                         break;
                     case 'trre_range':
                         $colsData[$k]['width'] = 150;
-                        $colsData[$k]['hide'] = 'true';
+
                         break;
                     case 'lang_style':
                         $colsData[$k]['width'] = 150;
-                        $colsData[$k]['hide'] = 'true';
+
                         break;
                     case 'format':
                         $colsData[$k]['width'] = 150;
-                        $colsData[$k]['hide'] = 'true';
+
                         break;
                     case 'deliverables':
                         $colsData[$k]['width'] = 180;
-                        $colsData[$k]['hide'] = 'true';
+
                         break;
                     case 'other_remark':
                         $colsData[$k]['width'] = 180;
-                        $colsData[$k]['hide'] = 'true';
+
                         break;
+                    case 'Spot_Check':
+                        $colsData[$k]['width'] = 120;
+                        $colsData[$k]['sort'] = 'true';
                     default:
                         $colsData[$k]['width']=80;
 
@@ -1175,5 +1185,125 @@ class PjProjectProfile extends Common
 
         return json(['code'=>$res]);
 
+    }
+
+    public function import()
+    {
+
+        try {
+            require '../extend/PHPExcel/PHPExcel.php';
+
+            $file = request()->file('file');
+
+            if ($file) {
+                $info = $file->validate(['size' => 10485760, 'ext' => 'xls,xlsx,'])->move('public/' . 'excel');
+                if (!$info) {
+                    $this->error('上传文件格式不正确');
+                } else {
+                    //获取上传到后台的文件名
+                    $fileName = $info->getSaveName();
+                    //获取文件路径
+                    $filePath = 'public/' . 'excel/' . $fileName;
+                    //获取文件后缀
+                    $suffix = $info->getExtension();
+                    // 判断哪种类型
+                    if ($suffix == "xlsx") {
+                        $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+                    } else {
+                        $reader = \PHPExcel_IOFactory::createReader('Excel5');
+                    }
+                }
+                $excel = $reader->load("$filePath", $encode = 'utf-8');
+
+                $sheet = $excel->getSheet(0);    // 读取第一个工作表(编号从 0 开始)
+
+                $highestRow = $sheet->getHighestRow();            // 取得总行数
+                $highestColumn = $sheet->getHighestColumn();    // 取得总列数
+                $arr = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+                // 一次读取一列
+                $res_arr = array();
+                $highestRow = round(($highestRow-18)/13);
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $a = ($row-1)*13+3+16;
+                    $d = ($row-1)*13+15+16;
+                    $f1 = ($row-1)*13+4+16;
+                    $f2 = ($row-1)*13+5+16;
+                    $f3 = ($row-1)*13+6+16;
+                    $f4 = ($row-1)*13+7+16;
+                    $f5 = ($row-1)*13+8+16;
+                    $res_arr[$row - 1]['name'] = trim($sheet->getCell("A" . $a)->getValue());
+                    $res_arr[$row - 1]['Source_Text_Word_Count'] = trim($sheet->getCell("D" . $d)->getValue());
+                    $f1 = trim($sheet->getCell("F" . $f1)->getValue());
+                    $f2 = trim($sheet->getCell("F" . $f2)->getValue());
+                    $f3 = trim($sheet->getCell("F" . $f3)->getValue());
+                    $f4 = trim($sheet->getCell("F" . $f4)->getValue());
+                    $f5 = trim($sheet->getCell("F" . $f5)->getValue());
+                    $res_arr[$row - 1]['One_Hundred_Percent_Repeated'] = floatval($f1)+floatval($f2)+floatval($f3)+floatval($f4);
+
+                    $res_arr[$row - 1]['Ninety_Five_to_Ninety_Nine_Percent_Repeated'] = $f5;
+                    $res_arr[$row - 1]['Total_Repetition_Rate'] = floatval($f1)+floatval($f2)+floatval($f3)+floatval($f4)+floatval($f5);
+                    $res_arr[$row - 1]['Actual_Source_Text_Count'] = round($res_arr[$row - 1]['Source_Text_Word_Count']*(1-$res_arr[$row - 1]['Total_Repetition_Rate']));
+
+                }
+
+                foreach($res_arr as $key=>$val){
+                    $up_data = [
+                        'Source_Text_Word_Count' => $val['Source_Text_Word_Count'],
+                        'One_Hundred_Percent_Repeated' => $val['One_Hundred_Percent_Repeated']*100,
+                        'Ninety_Five_to_Ninety_Nine_Percent_Repeated' => $val['Ninety_Five_to_Ninety_Nine_Percent_Repeated']*100,
+                        'Total_Repetition_Rate' => $val['Total_Repetition_Rate']*100,
+                        'Actual_Source_Text_Count' =>$val['Actual_Source_Text_Count'],
+                    ];
+                    Db::name('pj_project_profile')->where('Job_Name',$val['name'])->update($up_data);
+                }
+
+            }
+
+        } catch (\Exception $e) {
+            $this->error('执行错误', $e->getMessage());
+        }
+        return json(['code' => 1, 'msg' => '导入成功']);
+
+    }
+
+
+    public function spot_check(Request $request){
+
+        $job_id = session('administrator')['job_id'];
+        if(!in_array($job_id, [1,7])) {
+            return json(['msg' => '你没有权限操作！']);
+        }
+        // 获取提交的数据
+        $data = $request->post();
+
+        if($data['cate'] == '翻译'){
+            $cate = '待翻译QCR';
+        }else if($data['cate'] == '排版'){
+            $cate = '待排版QCR';
+        }else{
+            $cate = '待QCR';
+        }
+
+        $up_data = [
+            'Spot_Check' => $cate,
+        ];
+        $res = Db::name('pj_project_profile')->where('id',$data['c_id'])
+            ->update($up_data);
+        if($res){
+            return json(['msg' => '操作成功']);
+        }else{
+            return json(['msg' => '执行失败']);
+        }
+
+    }
+
+    public function split($c_id)
+    {
+        // 文件库
+        $text_list = Db::name('pj_project_profile_text')->field('id, Project_Name')
+            ->where('Filled_by', session('administrator')['name'])
+            ->where('delete_time', 0)->order('id desc')->select();
+        // 返回视图
+        return view('', ['c_id' => $c_id, 'text_list' => $text_list]);
     }
 }

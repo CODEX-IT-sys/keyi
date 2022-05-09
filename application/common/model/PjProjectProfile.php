@@ -47,31 +47,20 @@ class PjProjectProfile extends Model
 
         $where = [];
         $query = $this;
-        if($name=="程君"||$name=="张攀"){
-            //查询所有实习生
-            $sxs=Db::table("ky_admin")->where('trainee',1)->field("name")->select();
-            $a=[];
-            foreach ($sxs as $k=>$v)
-            {
-                $a[]=$v['name'];
-            }
-            $query = $this->where(function ($query) use($a) {
-                $query->where('Translator', 'in', $a)
-                    ->whereXor('Reviser', 'in', $a)
-                    ->whereXor('Pre_Formatter', 'in', $a)
-                     ->whereOr('Pre_Formatter', 'like', "程君%")
-                    ->whereOr('Pre_Formatter', 'like', "张攀%")
-                    ->whereOr('Post_Formatter', 'like', "张攀%")
-                ->whereOr('Reviser', 'like', "程君%")
-                    ->whereOr('Reviser', 'like', "张攀%")
-                ->whereOr('Translator', 'like', "程君%")
-                    ->whereOr('Translator', 'like', "张攀%");
+        if($name=="周美玲"){
+            //
+            $query = $this->where(function ($query) use($name) {
+                $query->where('PA', ['eq', 'PA01'], ['eq', 'PA06'], ['eq', 'PA12'],'or');
             });
 
+        }elseif($name=="李晓艺"){
+            $query = $this->where(function ($query) use($name) {
+                $query->where('PA', ['eq', 'PA04'], ['eq', 'PA05'],'or');
+            });
         }else{
 
             // 查询器对象 判断管理层
-            if(in_array($job_id, [1,8,9,16,20])) {
+            if(in_array($job_id, [1,8,9,16,20,22])) {
 
                 $query = $this;
 

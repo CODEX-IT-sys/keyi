@@ -32,14 +32,14 @@
                 <div class="layui-input-inline">
                     <select id="pa" name="pa" lay-filter="pa">
                         <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
-                        <option value="PA02" {$pa=='PA02'?'selected':''}>PA02 </option>
-                        <option value="PA03" {$pa=='PA03'?'selected':''}>PA03 </option>
+                       <!-- <option value="PA02" {$pa=='PA02'?'selected':''}>PA02 </option>
+                        <option value="PA03" {$pa=='PA03'?'selected':''}>PA03 </option>-->
                         <option value="PA04" {$pa=='PA04'?'selected':''}>PA04 </option>
                         <option value="PA05" {$pa=='PA05'?'selected':''}>PA05 </option>
                         <option value="PA06" {$pa=='PA06'?'selected':''}>PA06 </option>
-                        <option value="PA09" {$pa=='PA09'?'selected':''}>PA09 </option>
+                       <!-- <option value="PA09" {$pa=='PA09'?'selected':''}>PA09 </option>
                         <option value="PA10" {$pa=='PA10'?'selected':''}>PA10 </option>
-                        <option value="PA11" {$pa=='PA11'?'selected':''}>PA11 </option>
+                        <option value="PA11" {$pa=='PA11'?'selected':''}>PA11 </option>-->
                         <option value="PA12" {$pa=='PA12'?'selected':''}>PA12 </option>
                     </select>
                 </div>
@@ -104,12 +104,17 @@
 
             cols = [
                 {type: 'checkbox', fixed: 'left'}
-                ,{field: 'Company_Name', title: '公司名称', width: 100, align: 'center',totalRowText: '合计'}
+                ,{field: 'Company_Name', title: '公司名称', width: 150, align: 'center',totalRowText: '合计'}
                 ,{field: 'Date', title: '来稿日期', sort:true,width: 200, align: 'center'}
                 ,{field: 'Completed', title: '交付日期', sort:true,width: 200, align: 'center'}
                 , {field: 'sumpage', title: '未提交页数', minWidth: 100, align: 'center'}
                 , {field: 'wks', title: '翻译未开始页数', minWidth: 100, align: 'center'}
                 , {field: 'trjd', title: '项目翻译进度', minWidth: 100, align: 'center'}
+                , {field: 'tr_do', title: '翻译工作中人员', minWidth: 100, align: 'center'}
+                , {field: 'tr_finish', title: '翻译已完成人员', minWidth: 100, align: 'center'}
+                , {field: 're', title: '校对人员', minWidth: 100, align: 'center'}
+                , {field: 'pre', title: '预排版人员', minWidth: 100, align: 'center'}
+                , {field: 'post', title: '后排版人员', minWidth: 100, align: 'center'}
             ];
 
 
@@ -117,11 +122,17 @@
 
             cols = [
                 {type: 'checkbox', fixed: 'left'}
-                ,{field: 'Company_Name', title: '公司名称', width: 100, align: 'center',totalRowText: '合计'}
-                ,{field: 'Date', title: '来稿日期', sort:true,width: 200, align: 'center'}
-                ,{field: 'Completed', title: '交付日期', sort:true,width: 200, align: 'center'}
-                , {field: 'sumpage', title: '未提交页数', minWidth: 100, align: 'center'}
-                , {field: 'wks', title: '翻译未开始页数', minWidth: 100, align: 'center'}
+                ,{field: 'Company_Name', title: 'Company Name', width: 150, align: 'center',totalRowText: '合计'}
+                ,{field: 'Date', title: 'Date', sort:true,width: 200, align: 'center'}
+                ,{field: 'Completed', title: 'Completed', sort:true,width: 200, align: 'center'}
+                , {field: 'sumpage', title: 'Uncommitted Pages', minWidth: 100, align: 'center'}
+                , {field: 'wks', title: 'Translation Not Started pages', minWidth: 100, align: 'center'}
+                , {field: 'trjd', title: 'Project Translation Progress', minWidth: 100, align: 'center'}
+                , {field: 'tr_do', title: 'Translating', minWidth: 100, align: 'center'}
+                , {field: 'tr_finish', title: 'Translate Finish', minWidth: 100, align: 'center'}
+                , {field: 're', title: 'Revise', minWidth: 100, align: 'center'}
+                , {field: 'pre', title: 'Pre Formatter', minWidth: 100, align: 'center'}
+                , {field: 'post', title: 'Post Formatter', minWidth: 100, align: 'center'}
             ];
 
 
