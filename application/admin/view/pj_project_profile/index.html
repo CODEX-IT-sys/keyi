@@ -124,9 +124,16 @@ layui.use(['table','form'], function(){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
                     if(language === '中文'){
-						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
-							style: colsData[i].style
-						});
+                    	if(colsData[i].Field == 'Spot_Check'){
+							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
+								style: colsData[i].style,templet: '#titleTpl'
+							});
+						}else{
+							cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
+								style: colsData[i].style
+							});
+						}
+
                     }else{
                         cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
                     }
@@ -520,5 +527,23 @@ layui.use(['table','form'], function(){
 	});
 });
 </script>
+<script type="text/html" id="titleTpl">
 
+	{{#  if(d.Spot_Check == '待QCR'){ }}
+	<span style="color: red;">待QCR</span>
+	{{#  } else if(d.Spot_Check == '9'){ }}
+	<span style="color: red;">待翻译QCR</span>
+	{{#  } else if(d.Spot_Check == '8'){ }}
+	<span style="color: red;">待排版QCR</span>
+	{{#  } else if(d.Spot_Check == '7') { }}
+	<span style="color: dodgerblue;">翻译QCR</span>
+	{{#  } else if(d.Spot_Check == '6'){ }}
+	<span style="color: dodgerblue;">排版QCR</span>
+	{{#  } else if(d.Spot_Check == '5'){ }}
+	<span style="color: dodgerblue;">翻译QCR,排版QCR</span>
+
+	{{#  } else if(d.Spot_Check == '已QCR'){ }}
+	<span style="color: dodgerblue;">已QCR</span>
+	{{#  } }}
+</script>
 {/block}

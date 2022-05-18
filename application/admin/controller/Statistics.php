@@ -1241,12 +1241,22 @@ class Statistics extends Controller
     //每日提交页数统计
     public function dayup(){
         $data = request()->param('month');
-
-        $name = session('administrator')['name'];
-
-        if($name == '王畅' || $name='PMA02'){
+        $pa = request()->param('pa');
+        if($pa){
+            $name = $pa;
+        }else{
             $name = 'PA01';
+            $pa = 'PA01';
         }
+
+        $a = session('administrator')['name'];
+        // 用户id
+        $job_id = session('administrator')['job_id'];
+        if($job_id == 7){
+            $name = $a;
+            $pa = $a;
+        }
+
         if (isset($data)) {
             $time = strtotime($data);
             $firstTime = intval(date("Ymd", $time));
@@ -1306,7 +1316,21 @@ class Statistics extends Controller
                 ->select();
             $trzs_sum = 0;
             foreach($tr_zs as $k1=>$v1){
-                $trzs_sum += $v1['Actual_Source_Text_Count']*$v1['Percentage_Completed']/100;
+                $zx = Db::table('ky_pj_daily_progress_tr_re')
+                    ->where('Work_Date','<',$firstTime)
+                    ->where('delete_time', 0)
+                    ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                    ->wherein('Work_Content', ['Translate','TR Modify Other'])
+                    ->where('Filing_Code',$v1['Filing_Code'])
+                    ->where('Job_Name',$v1['Job_Name'])
+                    ->order('id','desc')
+                    ->find();
+                if($zx){
+                    $trzs_sum += $v1['Actual_Source_Text_Count']*($v1['Percentage_Completed']-$zx['Percentage_Completed'])/100;
+                }else{
+                    $trzs_sum += $v1['Actual_Source_Text_Count']*$v1['Percentage_Completed']/100;
+                }
+
             }
 
             $jd = Db::table('ky_pj_daily_progress_tr_re')
@@ -1324,7 +1348,21 @@ class Statistics extends Controller
                 ->select();
             $jdzs_sum = 0;
             foreach($jd_zs as $k2=>$v2){
-                $jdzs_sum += $v2['Actual_Source_Text_Count']*$v2['Percentage_Completed']/100;
+                $zx_jd = Db::table('ky_pj_daily_progress_tr_re')
+                    ->where('Work_Date','<',$firstTime)
+                    ->where('delete_time', 0)
+                    ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
+                    ->wherein('Work_Content', ['Revise'])
+                    ->where('Filing_Code',$v2['Filing_Code'])
+                    ->where('Job_Name',$v2['Job_Name'])
+                    ->order('id','desc')
+                    ->find();
+                if($zx_jd){
+                    $jdzs_sum += $v2['Actual_Source_Text_Count']*($v2['Percentage_Completed']-$zx_jd['Percentage_Completed'])/100;
+                }else{
+                    $jdzs_sum += $v2['Actual_Source_Text_Count']*$v2['Percentage_Completed']/100;
+                }
+
             }
 
 
@@ -1350,7 +1388,7 @@ class Statistics extends Controller
         // 非Ajax请求，直接返回视图
         if (!request()->isAjax()) {
 
-            $this->assign(['list'=>$list,'wtj'=>$wtj,'time'=>$time]);
+            $this->assign(['list'=>$list,'wtj'=>$wtj,'time'=>$time,'pa'=>$pa]);
 
             return $this->fetch();
         }
@@ -1454,7 +1492,7 @@ class Statistics extends Controller
                             ->where('delete_time', 0)
                             ->where('Work_Date', '<=',$firstTime)
                             ->where('Filing_Code',$v1['Filing_Code'])
-                            ->wherein('Work_Content', ['Translate','TR Finalize','TR Modify Other'])
+                            ->wherein('Work_Content', ['Translate'])
                             ->select();
                         if(!$tr_re){
                             $wks += $v1['Pages'];
@@ -1481,7 +1519,7 @@ class Statistics extends Controller
                                 }
                             }
 
-                            //计算为开始页数
+                            //计算未开始页数
                             $total = 0;
                             foreach($tr_re as $v3){
                                 $total += $v3['Number_of_Pages_Completed'];

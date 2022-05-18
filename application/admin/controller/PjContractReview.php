@@ -1150,7 +1150,9 @@ class PjContractReview extends Common
 
         //同步更新到来稿确认 反馈修订是否提交
         $feedback = [
-            'Feedback_Completed' => $data['Feedback_Completed']
+            'Feedback_Completed' => $data['Feedback_Completed'],
+            'Translation_Difficulty' => $data['Translation_Difficulty'],
+            'Format_Difficulty' => $data['Format_Difficulty']
         ];
 
         Db::name('mk_feseability')
@@ -1159,7 +1161,9 @@ class PjContractReview extends Common
 
         //同步更新是否交稿到结算管理
         $deliver = [
-            'Delivered_or_Not' => $data['Delivered_or_Not']
+            'Delivered_or_Not' => $data['Delivered_or_Not'],
+            'Translation_Difficulty' => $data['Translation_Difficulty'],
+            'Format_Difficulty' => $data['Format_Difficulty']
         ];
         Db::name('mk_invoicing')
             ->where('Filing_Code',$data['Filing_Code'])
@@ -1378,6 +1382,7 @@ class PjContractReview extends Common
 
             $arr1=$arr;
             $arr2=$arr;
+            $arr3=$arr;
             if(isset($arr['Completed'])){
                 $arr['Completed']=(int)$arr['Completed'];
             }
@@ -1437,7 +1442,7 @@ class PjContractReview extends Common
             }
 
             //同步更新是否交稿到结算管理
-            $deliver = ['Delivered_or_Not'];
+            $deliver = ['Delivered_or_Not','Translation_Difficulty','Format_Difficulty'];
             foreach ($field as $key=>$val){
                 if(!in_array($val, $deliver)) {
                     unset($arr2[$val]);
@@ -1447,6 +1452,19 @@ class PjContractReview extends Common
                 Db::name('mk_invoicing')
                     ->where('Filing_Code',$v['Filing_Code'])
                     ->update($arr2);
+            }
+
+            //同步更新翻译难度/排版难度到来稿确认表
+            $difficulty = ['Delivered_or_Not','Translation_Difficulty','Format_Difficulty'];
+            foreach ($field as $key=>$val){
+                if(!in_array($val, $difficulty)) {
+                    unset($arr3[$val]);
+                }
+            }
+            foreach ($Filing_Code as $k=>$v){
+                Db::name('mk_feseability')
+                    ->where('Filing_Code',$v['Filing_Code'])
+                    ->update($arr3);
             }
 
             // 提交事务

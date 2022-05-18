@@ -53,6 +53,45 @@
 
 {/volist}
 
+<script type="text/javascript" src="__STATIC__/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="__STATIC__/js/layer/3.1.1/layer.js"></script>
+<script>
+    var tq_status = {$tq_status};
+    var job_id = {$job_id};
+    var translate = {$translate};
+    var revise = {$revise};
+
+
+    //提示查看
+    if(tq_status == 1){
+        if(job_id == 10 || job_id == 11){
+            if(translate != 0){
+                var str = '您有'+translate+'个翻译问题FAQ未查看，请尽快查看';
+
+                layer.open({
+                    title: '消息'
+                    ,content: str
+                });
+                /*  var purl='/admin/faq/fanyi';
+                  window.open(purl);*/
+            }
+        }else if(job_id == 12 || job_id == 13){
+            if(revise != 0){
+                var str = '您有'+revise+'个排版问题FAQ未查看，请尽快查看';
+
+                layer.open({
+                    title: '消息'
+                    ,content: str
+                });
+                /* var purl='/admin/faq/paiban';
+                 window.open(purl);*/
+            }
+
+        }
+    }
+
+</script>
+
 {/block}
 
 {block name="iframe_url"}

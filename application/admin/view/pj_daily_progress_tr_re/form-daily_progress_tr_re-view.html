@@ -155,7 +155,17 @@
 							        </div>
 							    </div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '校对类型' : 'Revision Style'}">
+										{:session('language') == '中文'? '校对类型' : 'Revision Style'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Revise_Style" readonly  value="{$info.Revise_Style|default=''}" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '自检（是/否）' : 'Self Inspection Status'}">
@@ -460,7 +470,7 @@
 				$('#jdbl').val('N/A');
 				layer.msg('完成百分比为100才可填写');
 			}else{
-				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
+				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE Finalize' && work_content != 'TR Modify Other'){
 					$('#jdbl').val('N/A');
 					layer.msg('只有工作内容为校对相关才能填写');
 				}
@@ -481,7 +491,7 @@
 				$('#xdzs').val('0');
 				layer.msg('完成百分比为100才可填写');
 			}else{
-				if(work_content != 'Revise' && work_content != 'RE Modify' && work_content != 'RE (Sampling)' && work_content != 'RE (Highlight)' && work_content != 'RE (Sampling_Highlight)' && work_content != 'RE Finalize' ){
+				if(work_content != 'Revise' && work_content != 'RE Modify'  && work_content != 'RE Finalize'  && work_content != 'TR Modify Other'){
 					$('#xdzs').val('0');
 					layer.msg('只有工作内容为校对相关才能填写');
 				}else{

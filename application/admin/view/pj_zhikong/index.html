@@ -13,7 +13,9 @@
                 </div>
                 <div class="global_btn">
 
-                    <!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
+
+                    <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data
+                        Calculation'}</a>
                 </div>
             </div>
             <div class="mainCt">
@@ -104,7 +106,8 @@
         if(language === '中文'){
 
             cols = [
-                {field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
                 ,{field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center',sort:true}
                 ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
                 ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
@@ -142,7 +145,8 @@
         }else{
 
             cols = [
-                {field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
                 ,{field:'Filing_Code', title:'文件编号',minWidth: 100,align:'center',sort:true}
                 ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
                 ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
@@ -257,7 +261,22 @@
                 });
             });
         });
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var num = 0
+            var num2 = 0
 
+            for (v in checkStatus.data) {
+                num2 += 1;
+                num += parseInt(checkStatus.data[v]['Pages']) || 0;
+
+            }
+            var msg = "选中项数:"+num2+";页数:" + num ;
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        });
         //批量删除(多选操作)
         $('#del').click(function () {
             var checkStatus = table.checkStatus('test');
@@ -412,15 +431,15 @@
 
     {{#  if(d.Spot_Check == '待QCR'){ }}
     <span style="color: red;">待QCR</span>
-    {{#  } else if(d.Spot_Check == '待翻译QCR'){ }}
+    {{#  } else if(d.Spot_Check == '9'){ }}
     <span style="color: red;">待翻译QCR</span>
-    {{#  } else if(d.Spot_Check == '待排版QCR'){ }}
+    {{#  } else if(d.Spot_Check == '8'){ }}
     <span style="color: red;">待排版QCR</span>
-    {{#  } else if(d.Spot_Check == '翻译QCR') { }}
+    {{#  } else if(d.Spot_Check == '7') { }}
     <span style="color: dodgerblue;">翻译QCR</span>
-    {{#  } else if(d.Spot_Check == '排版QCR'){ }}
+    {{#  } else if(d.Spot_Check == '6'){ }}
     <span style="color: dodgerblue;">排版QCR</span>
-    {{#  } else if(d.Spot_Check == '翻译QCR,排版QCR'){ }}
+    {{#  } else if(d.Spot_Check == '5'){ }}
     <span style="color: dodgerblue;">翻译QCR,排版QCR</span>
 
     {{#  } else if(d.Spot_Check == '已QCR'){ }}

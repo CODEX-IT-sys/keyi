@@ -68,7 +68,7 @@ class PjDailyProgressTrRe extends Model
                     });
                 }
 
-            }elseif($name=='周美玲' || $name=='李晓艺'){
+            }elseif( $name=='李晓艺'){
                 //兼职新人组
                 $xid = Db::name('xt_dict_cate')->where('en_name','PA777')->field(['id'])->find();
                 $x_id = $xid['id'];
@@ -79,6 +79,8 @@ class PjDailyProgressTrRe extends Model
                     $query->where('Filled_by','in',$name_arr)
                         ->whereOr('Name_of_Translator_or_Reviser', 'in', $name_arr);
                 });
+
+            }elseif($name=='周美玲'){
 
             }else{
                 // 否则 就只显示自己录入的 或 项目助理数据

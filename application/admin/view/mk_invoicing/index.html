@@ -120,14 +120,36 @@ layui.use(['table','form'], function(){
                 if(colsData[i].Field !== 'id'){
 					if(colsData[i].Field !== 'payment_time') {
 						if (language === '中文') {
-							cols.push({
-								field: colsData[i].Field,
-								title: colsData[i].Comment,
-								sort: true,
-								minWidth: 120,
-								totalRow: true,
-								edit: true
-							});
+							if(colsData[i].Field == 'Translation_Difficulty' ){
+								cols.push({
+									field: colsData[i].Field,
+									title: colsData[i].Comment,
+									sort: true,
+									minWidth: 120,
+									totalRow: true,
+									edit: true,
+									templet: '#titleTpl'
+								});
+							}else if(colsData[i].Field == 'Format_Difficulty'){
+								cols.push({
+									field: colsData[i].Field,
+									title: colsData[i].Comment,
+									sort: true,
+									minWidth: 120,
+									totalRow: true,
+									edit: true,
+									templet: '#titleTpl2'
+								});
+							}else{
+								cols.push({
+									field: colsData[i].Field,
+									title: colsData[i].Comment,
+									sort: true,
+									minWidth: 120,
+									totalRow: true,
+									edit: true
+								});
+							}
 						} else {
 							cols.push({
 								field: colsData[i].Field,
@@ -586,5 +608,27 @@ layui.use(['table','form'], function(){
 
 
 </script>
+<script type="text/html" id="titleTpl">
+	{{#  if(d.Translation_Difficulty == '★'){ }}
+	<span style="">★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★'){ }}
+	<span style="">★★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★★'){ }}
+	<span style="color: red;">★★★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★★★★'){ }}
+	<span style="color: red;">★★★★★</span>
+	{{#  } }}
+</script>
 
+<script type="text/html" id="titleTpl2">
+	{{#  if(d.Format_Difficulty == '★'){ }}
+	<span style="">★</span>
+	{{#  } else if(d.Format_Difficulty == '★★'){ }}
+	<span style="">★★</span>
+	{{#  } else if(d.Format_Difficulty == '★★★'){ }}
+	<span style="color: red;">★★★</span>
+	{{#  } else if(d.Format_Difficulty == '★★★★'){ }}
+	<span style="color: red;">★★★★</span>
+	{{#  } }}
+</script>
 {/block}

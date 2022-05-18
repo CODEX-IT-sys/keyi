@@ -68,6 +68,40 @@ class Admin extends Controller
             $res = Db::table('ky_pj_contract_review')->where($where)->update($updata);
         }
     }
+
+    //同步字数修订率
+    public function pgxd(){
+        $check = Db::name('pj_check')->where('delete_time',0)->select();
+
+        foreach($check as $key=>$val){
+            if($val['Revision_Rate']){
+                $xmms = Db::name('pj_project_profile')
+                    ->where('Filing_Code',$val['Filing_Code'])
+                    ->where('Job_Name',$val['Job_Name'])
+                    ->find();
+                $fanyi = $xmms['Translator'];
+                $trans = explode(',',$fanyi);
+                //如果被抽查人是翻译
+                if(in_array($val['Bcheck_Person'],$trans)){
+                    if($xmms['Reviser'] == 'N/A'){
+                        $up_rate = [
+                            'Revision_Rate' => $val['Revision_Rate']
+                        ];
+                        $where = [
+                            'Filing_Code' => $val['Filing_Code'],
+                            'Job_Name' => $val['Job_Name'],
+                            'delete_time' => 0,
+                            'Percentage_Completed' => 100,
+                            'Name_of_Translator_or_Reviser' => $val['Bcheck_Person']
+                        ];
+                        $res = Db::name('pj_daily_progress_tr_re')->where($where)->update($up_rate);
+                    }
+                }
+            }
+        }
+        echo 'hello world';
+    }
+
     //修改实际源语数量
     public function xgActualNumber(){
 
@@ -87,6 +121,51 @@ class Admin extends Controller
             ];
 
             $res = Db::name('pj_daily_progress_tr_re')->where('id',$val['id'])->update($up_data);
+
+        }
+
+    }
+
+    //修改QCR状态
+    public function xgqcr(){
+        $where = [
+            'delete_time' => 0,
+
+        ];
+        $list = Db::name('pj_project_profile')
+            ->where('delete_time',0)
+            ->field(['id','Spot_Check'])
+            ->select();
+        foreach($list as $key=>$val){
+
+            if($val['Spot_Check'] == '待翻译QCR'){
+                $up_data = [
+                    'Spot_Check' => 9,
+                ];
+            }elseif($val['Spot_Check'] == '待排版QCR'){
+                $up_data = [
+                    'Spot_Check' => 8,
+                ];
+            }elseif($val['Spot_Check'] == '翻译QCR'){
+                $up_data = [
+                    'Spot_Check' => 7,
+                ];
+            }elseif($val['Spot_Check'] == '排版QCR'){
+                $up_data = [
+                    'Spot_Check' => 6,
+                ];
+            }elseif($val['Spot_Check'] == '翻译QCR,排版QCR'){
+                $up_data = [
+                    'Spot_Check' => 5,
+                ];
+            }else{
+                $up_data = [
+
+                ];
+            }
+
+
+            $res = Db::name('pj_project_profile')->where('id',$val['id'])->update($up_data);
 
         }
 

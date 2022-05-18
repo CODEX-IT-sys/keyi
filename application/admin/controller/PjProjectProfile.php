@@ -219,6 +219,10 @@ class PjProjectProfile extends Common
                 'Field' => 'Spot_Check',
                 'Comment' => '抽查状态'
             ],
+            [
+                'Field' => 'Revise_Style',
+                'Comment' => '校对类型'
+            ],
         ];
 
         if($request->has('search_type')){
@@ -863,6 +867,62 @@ class PjProjectProfile extends Common
 
         // 保存
         $save=  PjProjectProfileModel::create($data);
+
+        //同步校对类型到项目汇总和项目数据库
+        if($data['Revise_Style']){
+            //判断是否有同一个文件编号的记录存在
+            $where1 = [
+                'Filing_Code'=>$data['Filing_Code'],
+                'delete_time' => 0,
+            ];
+            $re = Db::name('pj_project_profile')->where($where1)->select();
+            $re_len = count($re);
+            if($re_len == 1){
+                $up_data = [
+                    'Revise_Style' => $data['Revise_Style']
+                ];
+
+            }else{
+                $ms = Db::name('pj_project_profile')->where($where1)->select();
+                $revise = [];
+                foreach($ms as $key=>$val){
+                    $revise[] = $val['Revise_Style'];
+                }
+
+                $revise = array_unique($revise);
+                $len = count($revise);
+                if($len == 1){
+                    $up_data = [
+                        'Revise_Style' => $data['Revise_Style']
+                    ];
+                }else{
+                    if(in_array('抽样标黄校对',$revise)){
+                        $up_data = [
+                            'Revise_Style' => '抽样标黄校对'
+                        ];
+                    }else{
+                        if(in_array('标黄校对',$revise)){
+                            $up_data = [
+                                'Revise_Style' => '标黄校对'
+                            ];
+                        }else{
+                            $up_data = [
+                                'Revise_Style' => '无校对'
+                            ];
+                        }
+                    }
+                }
+            }
+            $where = [
+                'Filing_Code' => $data['Filing_Code'],
+            ];
+            Db::name('pj_contract_review')->where($where)->update($up_data);
+            Db::name('pj_project_database')->where($where)->update($up_data);
+
+        }
+
+
+
 //        $save->schedule()->save(['status' => 'thinkphp']);
 //         项目任务分配 提醒消息 信息(Pre、Post format; TR、RE、PA)
         $pjm_data['cn_title'] = '您有新项目信息待处理！';
@@ -917,11 +977,62 @@ class PjProjectProfile extends Common
     {
         // 获取提交的数据
         $data = $request->post();
-//        dump($data);die;
+
         Db::name('pj_project_database')->where('Filing_Code',$data['Filing_Code'])->update(['Product_Involved'=>$data['Product_Involved']]);
         Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->update(['Product_Involved'=>$data['Product_Involved']]);
         PjProjectProfileModel::update($data);
+        //同步校对类型到项目汇总和项目数据库
+        if($data['Revise_Style']){
+            //判断是否有同一个文件编号的记录存在
+            $where1 = [
+                'Filing_Code'=>$data['Filing_Code'],
+                'delete_time' => 0,
+            ];
+            $re = Db::name('pj_project_profile')->where($where1)->select();
+            $re_len = count($re);
+            if($re_len == 1){
+                $up_data = [
+                    'Revise_Style' => $data['Revise_Style']
+                ];
 
+            }else{
+                $ms = Db::name('pj_project_profile')->where($where1)->select();
+                $revise = [];
+                foreach($ms as $key=>$val){
+                    $revise[] = $val['Revise_Style'];
+                }
+
+                $revise = array_unique($revise);
+                $len = count($revise);
+                if($len == 1){
+                    $up_data = [
+                        'Revise_Style' => $data['Revise_Style']
+                    ];
+                }else{
+                    if(in_array('抽样标黄校对',$revise)){
+                        $up_data = [
+                            'Revise_Style' => '抽样标黄校对'
+                        ];
+                    }else{
+                        if(in_array('标黄校对',$revise)){
+                            $up_data = [
+                                'Revise_Style' => '标黄校对'
+                            ];
+                        }else{
+                            $up_data = [
+                                'Revise_Style' => '无校对'
+                            ];
+                        }
+                    }
+                }
+            }
+            $where = [
+                'Filing_Code' => $data['Filing_Code'],
+            ];
+            Db::name('pj_contract_review')->where($where)->update($up_data);
+            Db::name('pj_project_database')->where($where)->update($up_data);
+
+        }
         echo "<script>history.go(-2);</script>";
 
         // 返回操作结果
@@ -1120,11 +1231,81 @@ class PjProjectProfile extends Common
                 {
                     if($k==$k1)
                     {
-                        $arr[$v]=$v1;
+                        if($v == 'Spot_Check'){
+                            if($v1 == '待翻译QCR'){
+                                $arr[$v]= 9;
+                            }elseif($v1 == '待排版QCR'){
+                                $arr[$v]= 8;
+                            }else{
+                                $arr[$v]= 1;
+                            }
+                        }else{
+                            $arr[$v]= $v1;
+                        }
+
                     }
                 }
             }
             $res = Db::name('pj_project_profile')->wherein('id',$data['arr'])->update($arr);
+
+            //如果涉及到校对类型 需要同步
+            if(in_array('Revise_Style',$field)){
+                foreach($data['arr'] as $k2=>$v2){
+                    $xm = Db::name('pj_project_profile')->where('id',$v2)->field('Filing_Code,Revise_Style')->find();
+                    //同步校对类型到项目汇总和项目数据库
+
+                    //判断有同一个文件编号的几条记录存在
+                    $where1 = [
+                        'Filing_Code'=>$xm['Filing_Code'],
+                        'delete_time' => 0,
+                    ];
+                    $re = Db::name('pj_project_profile')->where($where1)->select();
+                    $re_len = count($re);
+                    if($re_len == 1){
+                        $up_data = [
+                            'Revise_Style' => $xm['Revise_Style']
+                        ];
+
+                    }else{
+                        $ms = Db::name('pj_project_profile')->where($where1)->select();
+                        $revise = [];
+                        foreach($ms as $key=>$val){
+                            $revise[] = $val['Revise_Style'];
+                        }
+
+                        $revise = array_unique($revise);
+                        $len = count($revise);
+                        if($len == 1){
+                            $up_data = [
+                                'Revise_Style' => $xm['Revise_Style']
+                            ];
+                        }else{
+                            if(in_array('抽样标黄校对',$revise)){
+                                $up_data = [
+                                    'Revise_Style' => '抽样标黄校对'
+                                ];
+                            }else{
+                                if(in_array('标黄校对',$revise)){
+                                    $up_data = [
+                                        'Revise_Style' => '标黄校对'
+                                    ];
+                                }else{
+                                    $up_data = [
+                                        'Revise_Style' => '无校对'
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                    $where = [
+                        'Filing_Code' => $xm['Filing_Code'],
+                    ];
+                    Db::name('pj_contract_review')->where($where)->update($up_data);
+                    Db::name('pj_project_database')->where($where)->update($up_data);
+
+
+                }
+            }
         } catch (ValidateException $e) {
             // 这是进行验证异常捕获
             return json($e->getError());
@@ -1141,7 +1322,7 @@ class PjProjectProfile extends Common
     {
         try {
             $data=$request->param();
-            $res = Db::name('pj_project_profile')->wherein('Filing_Code',$data['Filing_Code'])->count();
+            $res = Db::name('pj_project_profile')->wherein('Filing_Code',$data['Filing_Code'])->where('delete_time',0)->count();
             if($res<1){
                 return json(['code'=>6666,]);
             }
@@ -1277,9 +1458,9 @@ class PjProjectProfile extends Common
         $data = $request->post();
 
         if($data['cate'] == '翻译'){
-            $cate = '待翻译QCR';
+            $cate = '9';
         }else if($data['cate'] == '排版'){
-            $cate = '待排版QCR';
+            $cate = '8';
         }else{
             $cate = '待QCR';
         }

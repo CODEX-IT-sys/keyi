@@ -44,23 +44,23 @@ class MkFeseability extends Common
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Pages':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Source_Text_Word_Count':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'File_Type':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Service':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Language':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Delivery_Date_Expected':
@@ -68,12 +68,20 @@ class MkFeseability extends Common
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Quality_Requirements':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=120;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Completed':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=120;
                     $colsData[$k]['sort']='true';
+                    break;
+                case 'Format_Difficulty':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Translation_Difficulty':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
                     break;
                 case 'trre_range':
                     $colsData[$k]['width'] = 180;
@@ -104,16 +112,16 @@ class MkFeseability extends Common
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Project_Requirements':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     $colsData[$k]['edit']='true';
                     break;
                 case 'Customer_Feedback':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Feedback_Completed':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Remarks':
@@ -121,17 +129,18 @@ class MkFeseability extends Common
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Filled_by':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Approval_Sales_Admin_Manager':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
                 case 'Approval_General_Manager':
-                    $colsData[$k]['width']=180;
+                    $colsData[$k]['width']=100;
                     $colsData[$k]['sort']='true';
                     break;
+
                 default:
                     $colsData[$k]['width']=80;
                     $colsData[$k]['hide']=true;

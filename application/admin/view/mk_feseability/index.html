@@ -120,9 +120,46 @@ layui.use(['table','form'], function(){
             if(colsData[i].Field !== 'delete_time'){
                 if(colsData[i].Field !== 'id'){
                     if(language === '中文'){
-						cols.push({field: colsData[i].Field ,title: colsData[i].Comment, totalRow:true,width:colsData[i].width,fixed:colsData[i].fixed,hide:colsData[i].hide,sort:colsData[i].sort,
-							style: colsData[i].style,edit: colsData[i].edit
-						});
+						if(colsData[i].Field == 'Translation_Difficulty' ){
+							cols.push({
+								field: colsData[i].Field,
+								title: colsData[i].Comment,
+								totalRow: true,
+								width: colsData[i].width,
+								fixed: colsData[i].fixed,
+								hide: colsData[i].hide,
+								sort: colsData[i].sort,
+								style: colsData[i].style,
+								edit: colsData[i].edit,
+								templet: '#titleTpl'
+							});
+						}else if(colsData[i].Field == 'Format_Difficulty'){
+							cols.push({
+								field: colsData[i].Field,
+								title: colsData[i].Comment,
+								totalRow: true,
+								width: colsData[i].width,
+								fixed: colsData[i].fixed,
+								hide: colsData[i].hide,
+								sort: colsData[i].sort,
+								style: colsData[i].style,
+								edit: colsData[i].edit,
+								templet: '#titleTpl2'
+							});
+						}else{
+							cols.push({
+								field: colsData[i].Field,
+								title: colsData[i].Comment,
+								totalRow: true,
+								width: colsData[i].width,
+								fixed: colsData[i].fixed,
+								hide: colsData[i].hide,
+								sort: colsData[i].sort,
+								style: colsData[i].style,
+								edit: colsData[i].edit
+							});
+						}
+
                     }else{
                         cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:180, totalRow:true});
                     }
@@ -613,5 +650,27 @@ layui.use(['table','form'], function(){
 
 });
 </script>
+<script type="text/html" id="titleTpl">
+	{{#  if(d.Translation_Difficulty == '★'){ }}
+	<span style="">★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★'){ }}
+	<span style="">★★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★★'){ }}
+	<span style="color: red;">★★★</span>
+	{{#  } else if(d.Translation_Difficulty == '★★★★★'){ }}
+	<span style="color: red;">★★★★★</span>
+	{{#  } }}
+</script>
 
+<script type="text/html" id="titleTpl2">
+	{{#  if(d.Format_Difficulty == '★'){ }}
+	<span style="">★</span>
+	{{#  } else if(d.Format_Difficulty == '★★'){ }}
+	<span style="">★★</span>
+	{{#  } else if(d.Format_Difficulty == '★★★'){ }}
+	<span style="color: red;">★★★</span>
+	{{#  } else if(d.Format_Difficulty == '★★★★'){ }}
+	<span style="color: red;">★★★★</span>
+	{{#  } }}
+</script>
 {/block}

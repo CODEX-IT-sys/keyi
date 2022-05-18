@@ -171,8 +171,7 @@ class PjDailyProgressTrRe extends Common
             '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky','客户译文'];
 
 
-        if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
-            || $data['Work_Content'] == 'RE (Sampling_Highlight)' || $data['Work_Content'] == 'RE Finalize'){
+        if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE Finalize'){
 
             //只有当完成百分比为100时才同步校对比率
             if($data['Percentage_Completed'] == 100){
@@ -194,52 +193,87 @@ class PjDailyProgressTrRe extends Common
                     'Percentage_Completed' => 100,
                     'delete_time' => 0,
                 ];
-                /*$record = Db('pj_daily_progress_tr_re')->where($where)
-                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();*/
-                $record = Db('pj_daily_progress_tr_re')->where($where)
-                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();
-               if($record == 1){
+
+                //判断是否有翻译修订他人记录
+                $xd_other = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', 'TR Modify Other')->find();
+                if($xd_other){
                     $upData = [
                         'Revision_Rate' => $data['Revision_Rate']
                     ];
-                    $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', 'TR Modify Other')
+                        ->update($upData);
+                }else{
+                    $record = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],'or')->count();
+                    if($record == 1){
+                        $upData = [
+                            'Revision_Rate' => $data['Revision_Rate']
+                        ];
+                        $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
 
-                    //生成翻译评估
-                    $tr_data = Db('pj_daily_progress_tr_re')
-                        ->where($where)
-                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], ['eq', 'TR Modify Other'], 'or')
-                        ->find();
-                    $name = session('administrator')['name'];
-                    if($tr_data){
-                        $pg_data = [
-                            'Filing_Code' => $data['Filing_Code'],
-                            'Job_Name' => $data['Job_Name'],
-                            'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
-                            'Company_Name' => $tr_data['Company_Name'],
-                            'Language' => $tr_data['Language'],
-                            'Translation_Difficulty' => $tr_data['Translation_Difficulty'],
-                            'Filled_by' => $name,
-                            'create_time' => time(),
-                        ];
-                        $where = [
-                            'Filing_Code' => $data['Filing_Code'],
-                            'Job_Name' => $data['Job_Name'],
-                            'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
-                            'delete_time' => 0,
-                        ];
-                        //如果评估记录不存在则添加
-                        $res =  Db('pj_translation_evaluation')->where($where)->find();
-                        if(!$res){
-                            Db('pj_translation_evaluation')->insert($pg_data);
+                        //生成翻译评估
+                        $tr_data = Db('pj_daily_progress_tr_re')
+                            ->where($where)
+                            ->where('Work_Content', ['eq', 'Translate'],  ['eq', 'TR Finalize'], ['eq', 'TR Modify Other'], 'or')
+                            ->find();
+                        $name = session('administrator')['name'];
+                        if($tr_data){
+                            $pg_data = [
+                                'Filing_Code' => $data['Filing_Code'],
+                                'Job_Name' => $data['Job_Name'],
+                                'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
+                                'Company_Name' => $tr_data['Company_Name'],
+                                'Language' => $tr_data['Language'],
+                                'Translation_Difficulty' => $tr_data['Translation_Difficulty'],
+                                'Filled_by' => $name,
+                                'create_time' => time(),
+                            ];
+                            $where = [
+                                'Filing_Code' => $data['Filing_Code'],
+                                'Job_Name' => $data['Job_Name'],
+                                'Translator' => $tr_data['Name_of_Translator_or_Reviser'],
+                                'delete_time' => 0,
+                            ];
+                            //如果评估记录不存在则添加
+                            $res =  Db('pj_translation_evaluation')->where($where)->find();
+                            if(!$res){
+                                Db('pj_translation_evaluation')->insert($pg_data);
+                            }
+
                         }
 
                     }
-
                 }
+
+
             }
 
 
+        }elseif($data['Work_Content'] == 'TR Modify Other'){
+            //只有当完成百分比为100时才同步校对比率
+            if ($data['Percentage_Completed'] == 100) {
+                //同步校对比率到翻译同事
+                $where = [
+                    'Filing_Code' => $data['Filing_Code'],
+                    'Job_Name' => $data['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'delete_time' => 0,
+                ];
+                $record = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')->count();
+                if($record == 1) {
+                    $upData = [
+                        'Revision_Rate' => $data['Revision_Rate']
+                    ];
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')
+                        ->update($upData);
 
+
+                }
+            }
         }
 
 
@@ -336,8 +370,7 @@ class PjDailyProgressTrRe extends Common
         $jz_arr = ['陈江波','乐阳','李显鹏','林巧','蒋雪婷','金岚艳','高睿','吕东霞','赵晨余','袁春蕾','吴奇芳','罗雅卓','李阳','薛佳楠','祝咏霖','张静','张莉',
             '胡颖','Paulo','Nathalie','Jesus','Domenico','AnnaBraithwaite','AnnaRosenqvist','Tim','Yesi','BorisPervozvansky','客户译文'];
 
-        if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
-            || $data['Work_Content'] == 'RE (Sampling_Highlight)' || $data['Work_Content'] == 'RE Finalize'){
+        if($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify'  || $data['Work_Content'] == 'RE Finalize'){
 
             //只有当完成百分比为100时才同步校对比率
             if($data['Percentage_Completed'] == 100){
@@ -348,22 +381,65 @@ class PjDailyProgressTrRe extends Common
                     'Percentage_Completed' => 100,
                     'delete_time' => 0,
                 ];
-                $record = Db('pj_daily_progress_tr_re')->where($where)
-                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],['eq', 'TR Modify Other'],'or')->count();
-                if($record > 1){
-                    return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
-                }elseif($record == 1){
+
+                //判断是否有翻译修订他人记录
+                $xd_other = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', 'TR Modify Other')->find();
+                if($xd_other){
                     $upData = [
                         'Revision_Rate' => $data['Revision_Rate']
                     ];
-                    $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', 'TR Modify Other')
+                        ->update($upData);
                 }else{
-                    if(!in_array($xmfy,$jz_arr)){
-                        return $this->error('翻译记录不存在，无法同步校对比率');
+
+
+                    $record = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],'or')->count();
+                    if($record > 1){
+                        return $this->error('翻译记录填写有问题，存在多个相同翻译记录，无法同步校对比率');
+                    }elseif($record == 1){
+                        $upData = [
+                            'Revision_Rate' => $data['Revision_Rate']
+                        ];
+                        $res = Db('pj_daily_progress_tr_re')->where($where)
+                            ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')
+                            ->update($upData);
+                    }else{
+                        if(!in_array($xmfy,$jz_arr)){
+                            return $this->error('翻译记录不存在，无法同步校对比率');
+                        }
                     }
+
                 }
+
+
             }
 
+        }elseif($data['Work_Content'] == 'TR Modify Other'){
+            //只有当完成百分比为100时才同步校对比率
+            if ($data['Percentage_Completed'] == 100) {
+                //同步校对比率到翻译同事
+                $where = [
+                    'Filing_Code' => $data['Filing_Code'],
+                    'Job_Name' => $data['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'delete_time' => 0,
+                ];
+                $record = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')->count();
+                if($record == 1) {
+                    $upData = [
+                        'Revision_Rate' => $data['Revision_Rate']
+                    ];
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')
+                        ->update($upData);
+
+
+                }
+            }
         }
 
         // 计算实际用时
@@ -445,6 +521,16 @@ class PjDailyProgressTrRe extends Common
     // 删除(防止大量重复数据、使用真实删除)
     public function delete($id)
     {
+        // 查询信息
+        $res = PjDailyProgressTrReModel::get($id);
+
+        $job_id = session('administrator')['job_id'];
+        $name = session('administrator')['name'];
+        if(!in_array($job_id, [1,8,9,20])) {
+            if ($res['Filled_by'] != $name) {
+                return $this->error('非本人不能删除');
+            }
+        }
         // 调用模型删除
         PjDailyProgressTrReModel::destroy($id, true);
 
@@ -469,7 +555,7 @@ class PjDailyProgressTrRe extends Common
 
 
         $info = PjProjectProfileModel::where('Filing_Code', $code)
-            ->field('Pages,Company_Name, Language, Translation_Difficulty, Total_Repetition_Rate, Excluding_Words,Actual_Source_Text_Count')
+            ->field('Pages,Company_Name, Language, Translation_Difficulty, Total_Repetition_Rate, Excluding_Words,Actual_Source_Text_Count,Revise_Style')
             ->where('Job_Name', $name)->find();
 
         // 返回值
@@ -524,8 +610,15 @@ class PjDailyProgressTrRe extends Common
             'delete_time' => 0,
             'Name_of_Translator_or_Reviser' => $data['trre_name'],
         ];
+        if($data['Work_Content'] == 'TR Modify Other'){
+            $re_num = Db('pj_daily_progress_tr_re')->where($where)->where('Work_Content','TR Modify Other')->find();
+        }else{
+            $re_num = Db('pj_daily_progress_tr_re')
+                ->where($where)
+                ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],  'or')
+                ->find();
+        }
 
-        $re_num = Db('pj_daily_progress_tr_re')->where($where)->find();
         if($re_num){
             return json(['code' => 1]);
         }else{
@@ -546,8 +639,7 @@ class PjDailyProgressTrRe extends Common
             '胡颖', 'Paulo', 'Nathalie', 'Jesus', 'Domenico', 'AnnaBraithwaite', 'AnnaRosenqvist', 'Tim', 'Yesi', 'BorisPervozvansky', '客户译文'];
 
 
-        if ($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE (Sampling)' || $data['Work_Content'] == 'RE (Highlight)'
-            || $data['Work_Content'] == 'RE (Sampling_Highlight)' || $data['Work_Content'] == 'RE Finalize') {
+        if ($data['Work_Content'] == 'Revise' || $data['Work_Content'] == 'RE Modify' || $data['Work_Content'] == 'RE Finalize') {
 
             //只有当完成百分比为100时才同步校对比率
             if ($data['Percentage_Completed'] == 100) {
@@ -577,7 +669,7 @@ class PjDailyProgressTrRe extends Common
                     'delete_time' => 0,
                 ];
                 $record = Db('pj_daily_progress_tr_re')->where($where)
-                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], ['eq', 'TR Modify Other'], 'or')->count();
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], 'or')->count();
                 if ($record > 1) {
                     $result = [
                         'code'=> 2,

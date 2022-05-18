@@ -17,6 +17,17 @@ class Index extends Controller
 
         // 默认为中文版
         //session('language',$language);
+        $name = session('administrator')['name'];
+        $job_id = session('administrator')['job_id'];
+
+        //不存在cookie记录 则是当天首次登录
+        if(!cookie($name)){
+            cookie($name, 'value', 86400);
+            $tq_status = 1;
+        }else{
+            $tq_status = 2;
+        }
+
 
         // 用户id
         $id = session('administrator')['id'];
@@ -117,7 +128,7 @@ class Index extends Controller
         }*/
 
         // 返回视图
-        return view('', ['menu'=>$top, 'msg_s'=>$msg_s, 'faq'=>$faq,'software'=>$software,'translate'=>$translate,'revise'=>$revise,'project'=>$project,'work'=>$work]);
+        return view('', ['menu'=>$top, 'msg_s'=>$msg_s, 'faq'=>$faq,'software'=>$software,'translate'=>$translate,'revise'=>$revise,'project'=>$project,'work'=>$work,'tq_status'=>$tq_status,'job_id'=>$job_id]);
     }
 
     // 欢迎页

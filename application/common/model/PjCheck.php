@@ -8,11 +8,11 @@ use think\Model;
 use think\Paginator;
 use think\model\concern\SoftDelete;
 
-// 项目描述 模型
+// 质量抽查 模型
 class PjCheck extends Model
 {
     // 软删除
-//    use SoftDelete;
+    use SoftDelete;
     protected $deleteTime = 'delete_time';
     protected $defaultSoftDelete = 0;
 

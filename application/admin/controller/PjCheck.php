@@ -171,35 +171,58 @@ class PjCheck extends Common
         // 保存
         $save = PjCheckModel::create($data);
 
+        //如果没有校对，字数修订率要同步到翻译人员每日进度百分比100的记录里
+        if($data['Revision_Rate']){
+            $xmms = Db::name('pj_project_profile')->where('id',$id)->find();
+            $fanyi = $xmms['Translator'];
+            $trans = explode(',',$fanyi);
+            //如果被抽查人是翻译
+            if(in_array($data['Bcheck_Person'],$trans)){
+                if($xmms['Reviser'] == 'N/A'){
+                    $up_rate = [
+                        'Revision_Rate' => $data['Revision_Rate']
+                    ];
+                    $where = [
+                        'Filing_Code' => $data['Filing_Code'],
+                        'Job_Name' => $data['Job_Name'],
+                        'delete_time' => 0,
+                        'Percentage_Completed' => 100,
+                        'Name_of_Translator_or_Reviser' => $data['Bcheck_Person']
+                    ];
+                    $res = Db::name('pj_daily_progress_tr_re')->where($where)->update($up_rate);
+                }
+            }
+        }
+
         //将描述表状态改为已抽查
         $xmms = Db::name('pj_project_profile')->where('id',$id)->find();
         $Spot_Check = $xmms['Spot_Check'];
         if($save){
             if($data['Check_Cate'] == '翻译'){
-                if($Spot_Check == '排版QCR'){
+                if($Spot_Check == '6'){
                     $up_data = [
-                        'Spot_Check' => '翻译QCR,排版QCR'
+                        'Spot_Check' => '5'
                     ];
                 }else{
                     $up_data = [
-                        'Spot_Check' => '翻译QCR'
+                        'Spot_Check' => '7'
                     ];
                 }
 
             }elseif($data['Check_Cate'] == '排版'){
-                if($Spot_Check == '翻译QCR'){
+                if($Spot_Check == '7'){
                     $up_data = [
-                        'Spot_Check' => '翻译QCR,排版QCR'
+                        'Spot_Check' => '5'
                     ];
                 }else{
                     $up_data = [
-                        'Spot_Check' => '排版QCR'
+                        'Spot_Check' => '6'
                     ];
                 }
 
             }else{
                 $up_data = [
-                    'Spot_Check' => '已抽查'
+                    'Spot_Check' => '已QCR'
                 ];
             }
             $res = Db::name('pj_project_profile')->where('id',$id)
@@ -220,6 +243,33 @@ class PjCheck extends Common
         $data = $request->post();
 //        dump($data);die;
         PjCheckModel::update($data);
+
+        //如果没有校对，字数修订率要同步到翻译人员每日进度百分比100的记录里
+        if($data['Revision_Rate']){
+            $xmms = Db::name('pj_project_profile')
+                ->where('Filing_Code',$data['Filing_Code'])
+                ->where('Job_Name',$data['Job_Name'])
+                ->find();
+            $fanyi = $xmms['Translator'];
+            $trans = explode(',',$fanyi);
+            //如果被抽查人是翻译
+            if(in_array($data['Bcheck_Person'],$trans)){
+                if($xmms['Reviser'] == 'N/A'){
+                    $up_rate = [
+                        'Revision_Rate' => $data['Revision_Rate']
+                    ];
+                    $where = [
+                        'Filing_Code' => $data['Filing_Code'],
+                        'Job_Name' => $data['Job_Name'],
+                        'delete_time' => 0,
+                        'Percentage_Completed' => 100,
+                        'Name_of_Translator_or_Reviser' => $data['Bcheck_Person']
+                    ];
+                    $res = Db::name('pj_daily_progress_tr_re')->where($where)->update($up_rate);
+                }
+            }
+        }
+
 
         echo "<script>history.go(-2);</script>";
 

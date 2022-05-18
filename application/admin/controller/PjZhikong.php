@@ -108,7 +108,7 @@ class PjZhikong extends Common
                     'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                     'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
                     'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
-                ->order('a.Filing_Code desc')
+                ->order('a.Spot_Check desc')
                 ->paginate($limit);
 
 
@@ -122,7 +122,7 @@ class PjZhikong extends Common
                         'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                         'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
                         'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
-                    ->order('a.Filing_Code desc')
+                    ->orderRaw('a.Spot_Check desc,a.Filing_Code desc')
                     ->paginate($limit);
             }else{
                 if($field != 'PA' && $field != 'Completed'){
@@ -136,7 +136,7 @@ class PjZhikong extends Common
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
                             'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
-                        ->order('a.Filing_Code desc')
+                        ->order('a.Spot_Check desc')
                         ->paginate($limit);
 
                 }else{
@@ -148,7 +148,7 @@ class PjZhikong extends Common
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
                             'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
-                        ->order('a.Filing_Code desc')
+                        ->order('a.Spot_Check desc')
                         ->paginate($limit);
                 }
 

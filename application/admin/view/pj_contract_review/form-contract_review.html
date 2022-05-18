@@ -245,7 +245,22 @@
 									</div>
 								</div>
 							</div>
-														
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '校对类型' : 'Revision Style'}">
+										{:session('language') == '中文'? '校对类型' : 'Revision Style'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Revise_Style" lay-filter="Revise_Style" lay-search>
+											<option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+											<option value="全校">全校</option>
+											<option value="抽样标黄校对">抽样标黄校对</option>
+											<option value="标黄校对">标黄校对</option>
+											<option value="无校对">无校对</option>
+										</select>
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '预排版人员' : 'Pre Formatter'}">
