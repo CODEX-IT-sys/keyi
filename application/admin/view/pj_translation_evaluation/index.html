@@ -135,16 +135,19 @@ layui.use(['table','form'], function(){
                 , {field: 'Filing_Code', title: '文件编号', rowspan: 2, minWidth: 200, sort: true, align: 'center'}
                 , {field: 'Company_Name', title: '公司名称', rowspan: 2, minWidth: 200, sort: true, align: 'center'}
                 , {field: 'Language', title: '语种', rowspan: 2, align: 'center', minWidth: 100}
+				, {field: 'File_Category', title: '文件分类', rowspan: 2, align: 'center', minWidth: 100}
                 , {field: 'Translation_Difficulty', title: '翻译难易程度', sort: true, rowspan: 2, minWidth: 130}
+				, {field: 'Overall_Evaluation', title: '整体评价', rowspan: 2, minWidth: 100}
+				, {field: 'Comment', title: '备注', rowspan: 2,align: 'center', minWidth: 100}
                 , {field: 'Translation', title: '译文', colspan: 4, align: 'center'}
                 , {field: 'Terminology', title: '术语', colspan: 3, align: 'center'}
                 , {field: 'Language_Quality', title: '语言品质', colspan: 4, align: 'center'}
                 , {field: 'Others', title: '其他', colspan: 2, align: 'center'}
-                , {field: 'Overall_Evaluation', title: '整体评价', rowspan: 2, minWidth: 100}
+
                 , {field: 'sign', title: '签名', rowspan: 2, minWidth: 100
                 	//,templet:function (d) {return '<img  src="'+d.sign+'"  alt="图片" class="layui-nav-img" />'}
         		}
-				, {field: 'Comment', title: '备注', rowspan: 2,align: 'center', minWidth: 100}
+
 				 ,{field:'create_time', title:'创建时间',rowspan: 2, align: 'center', sort:true, minWidth: 110}
                 , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 130, rowspan: 2, align: 'center'},
             ],
@@ -176,16 +179,19 @@ layui.use(['table','form'], function(){
                 ,{field:'Filing_Code', title:'Filing_Code', rowspan: 2, minWidth: 200, sort: true, align:'center'}
                 ,{field:'Company_Name', title:'Company_Name', rowspan: 2, minWidth: 200, sort: true, align:'center'}
                 ,{field:'Language', title:'Language', rowspan: 2, align:'center', minWidth: 150}
+				, {field: 'File_Category', title: 'File Category', rowspan: 2, align: 'center', minWidth: 100}
                 ,{field:'Translation_Difficulty', title:'Translation_Difficulty', sort: true, rowspan: 2, minWidth: 220}
+				,{field:'Overall_Evaluation', title:'Overall_Evaluation', rowspan: 2, minWidth: 180}
+				, {field: 'Comment', title: 'Comment', rowspan: 2, align: 'center', minWidth: 100}
                 ,{field:'Translation', title:'Translation', colspan: 4, align:'center'}
                 ,{field:'Terminology', title:'Terminology', colspan: 3, align:'center'}
                 ,{field:'Language_Quality', title:'Language_Quality', colspan: 4, align:'center'}
                 ,{field:'Others', title:'Others', colspan: 2, align:'center'}
-                ,{field:'Overall_Evaluation', title:'Overall_Evaluation', rowspan: 2, minWidth: 180}
+
                 ,{field:'sign', title:'sign', rowspan: 2, minWidth: 100
 					//,templet:function (d) {return '<img  src="'+d.sign+'"  alt="图片" class="layui-nav-img" />'}
 				}
-				, {field: 'Comment', title: 'Comment', rowspan: 2, align: 'center', minWidth: 100}
+
 				,{field:'create_time', title:'Create time', rowspan: 2, align: 'center',sort:true, minWidth: 110}
                 ,{fixed: 'right', title:'Action', toolbar: '#barDemo', width:130, rowspan: 2, align:'center'}
             ],

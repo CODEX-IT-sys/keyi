@@ -1443,6 +1443,7 @@ class PjContractReview extends Common
 
             //同步更新是否交稿到结算管理
             $deliver = ['Delivered_or_Not','Translation_Difficulty','Format_Difficulty'];
+            //$deliver = ['Delivered_or_Not'];
             foreach ($field as $key=>$val){
                 if(!in_array($val, $deliver)) {
                     unset($arr2[$val]);
@@ -1455,7 +1456,7 @@ class PjContractReview extends Common
             }
 
             //同步更新翻译难度/排版难度到来稿确认表
-            $difficulty = ['Delivered_or_Not','Translation_Difficulty','Format_Difficulty'];
+            $difficulty = ['Translation_Difficulty','Format_Difficulty'];
             foreach ($field as $key=>$val){
                 if(!in_array($val, $difficulty)) {
                     unset($arr3[$val]);

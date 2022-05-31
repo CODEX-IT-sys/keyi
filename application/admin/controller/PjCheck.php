@@ -14,7 +14,7 @@ use think\Controller;
 use think\Request;
 use think\Db;
 
-// 项目描述 控制器描述
+// 项目抽查 控制器描述
 class PjCheck extends Common
 {
 

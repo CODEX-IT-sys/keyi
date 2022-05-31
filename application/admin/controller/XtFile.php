@@ -66,7 +66,9 @@ class XtFile extends Controller
 
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
-            return view('');
+            return view('',[
+                'field' => $field, 'keyword' => $keyword,
+            ]);
         }
 
         // 返回数据

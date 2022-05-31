@@ -71,8 +71,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '被QCR人员' : 'Job Name'}">
-                                        {:session('language') == '中文'? '被QCR人员' : 'Job Name'}
+                                           title="{:session('language') == '中文'? '被QCR人员' : 'QCR personnel'}">
+                                        {:session('language') == '中文'? '被QCR人员' : 'QCR personnel'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Bcheck_Person" lay-verify="required" autocomplete="off" placeholder=""
@@ -83,14 +83,14 @@
 
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label" title="{:session('language') == '中文'? 'QCR类别' : 'Language Style'}">
-                                        {:session('language') == '中文'? 'QCR类别' : 'Language Style'}
+                                    <label class="layui-form-label" title="{:session('language') == '中文'? 'QCR类别' : 'QCR Category'}">
+                                        {:session('language') == '中文'? 'QCR类别' : 'QCR Category'}
                                     </label>
                                     <div class="layui-input-block">
                                         <select name="Check_Cate"  id="cate" lay-filter="VAT_Rate" lay-search>
                                             <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
-                                            <option value="翻译">{:session('language') == '中文'? '翻译' : Translation}</option>
-                                            <option value="排版">{:session('language') == '中文'? '排版' : Format}</option>
+                                            <option value="翻译">{:session('language') == '中文'? '翻译' : 'Translation'}</option>
+                                            <option value="排版">{:session('language') == '中文'? '排版' : 'Format'}</option>
                                         </select>
                                     </div>
 
@@ -99,8 +99,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '抽样页面' : 'Job Name'}">
-                                        {:session('language') == '中文'? '抽样页面' : 'Job Name'}
+                                           title="{:session('language') == '中文'? '抽样页面' : 'Sampling Page'}">
+                                        {:session('language') == '中文'? '抽样页面' : 'Sampling Page'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Check_Page" lay-verify="required" autocomplete="off" placeholder=""
@@ -111,8 +111,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '抽样页数' : 'Job Name'}">
-                                        {:session('language') == '中文'? '抽样页数' : 'Job Name'}
+                                           title="{:session('language') == '中文'? '抽样页数' : 'QA Pages'}">
+                                        {:session('language') == '中文'? '抽样页数' : 'QA Pages'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Check_Pages" id="check_pages" lay-verify="required" autocomplete="off" placeholder=""
@@ -124,8 +124,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '抽样比率' : 'Job Name'}">
-                                        {:session('language') == '中文'? '抽样比率' : 'Job Name'}
+                                           title="{:session('language') == '中文'? '抽样比率' : 'Sampling Ratio'}">
+                                        {:session('language') == '中文'? '抽样比率' : 'Sampling Ratio'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Sampling_Ratio" id="sampling_ratio" lay-verify="required" autocomplete="off" placeholder=""
@@ -137,8 +137,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '修订字数/排版错误页数' : 'Source Text Word Count'}">
-                                        {:session('language') == '中文'? '修订字数/排版错误页数' : 'Source Text Word Count'}
+                                           title="{:session('language') == '中文'? '修订字数/排版错误页数' : 'Word_Or_Pages'}">
+                                        {:session('language') == '中文'? '修订字数/排版错误页数' : 'Word_Or_Pages'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Word_Or_Pages"  id="word_or_page" lay-verify="required"
@@ -152,8 +152,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '抽样总字数' : 'Source Text Word Count'}">
-                                        {:session('language') == '中文'? '抽样总字数' : 'Source Text Word Count'}
+                                           title="{:session('language') == '中文'? '抽样总字数' : 'QA Total Words'}">
+                                        {:session('language') == '中文'? '抽样总字数' : 'QA Total Words'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Check_Total_Words"  id="total_words" lay-verify="required"
@@ -179,8 +179,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '排版错误率' : 'Revision  Rate'}">
-                                        {:session('language') == '中文'? '排版错误率' : 'Revision Rate'}
+                                           title="{:session('language') == '中文'? '排版错误率' : 'Format Error Rate'}">
+                                        {:session('language') == '中文'? '排版错误率' : 'Format Error Rate'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Format_Error_Rate" id="format_rate"  autocomplete="off"
@@ -193,8 +193,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item layui_ic">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '抽检日期' : 'Work Date'}">
-                                        {:session('language') == '中文'? '抽检日期' : 'Work Date'}
+                                           title="{:session('language') == '中文'? '抽检日期' : 'QA Date'}">
+                                        {:session('language') == '中文'? '抽检日期' : 'QA Date'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input class="Date layui-input" name="Check_Date" id="Work_Date" type="text"
@@ -206,17 +206,17 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '翻译质量等级' : 'Source Text Word Count'}">
-                                        {:session('language') == '中文'? '翻译质量等级' : 'Source Text Word Count'}
+                                           title="{:session('language') == '中文'? '翻译质量等级' : 'Translation QL'}">
+                                        {:session('language') == '中文'? '翻译质量等级' : 'Translation QL'}
                                     </label>
                                     <div class="layui-input-block">
                                         <select name="Translation_QL"   lay-filter="VAT_Rate" lay-search>
                                             <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
-                                            <option value="A">{:session('language') == '中文'? 'A' : A}</option>
-                                            <option value="B">{:session('language') == '中文'? 'B' : B}</option>
-                                            <option value="C">{:session('language') == '中文'? 'C' : C}</option>
-                                            <option value="D">{:session('language') == '中文'? 'D' : D}</option>
-                                            <option value="E">{:session('language') == '中文'? 'E' : E}</option>
+                                            <option value="A">{:session('language') == '中文'? 'A' : 'A'}</option>
+                                            <option value="B">{:session('language') == '中文'? 'B' : 'B'}</option>
+                                            <option value="C">{:session('language') == '中文'? 'C' : 'C'}</option>
+                                            <option value="D">{:session('language') == '中文'? 'D' : 'D'}</option>
+                                            <option value="E">{:session('language') == '中文'? 'E' : 'E'}</option>
                                         </select>
                                     </div>
 
@@ -225,8 +225,8 @@
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '排版质量等级' : 'Source Text Word Count'}">
-                                        {:session('language') == '中文'? '排版质量等级' : 'Source Text Word Count'}
+                                           title="{:session('language') == '中文'? '排版质量等级' : 'Format_QL'}">
+                                        {:session('language') == '中文'? '排版质量等级' : 'Format_QL'}
                                     </label>
                                     <div class="layui-input-block">
                                         <input name="Format_QL"  id="format_ql" lay-verify="required"
@@ -238,8 +238,8 @@
                             <div class="layui-col-xs12">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"
-                                           title="{:session('language') == '中文'? '建议' : 'Comment'}">
-                                        {:session('language') == '中文'? '建议' : 'Comment'}
+                                           title="{:session('language') == '中文'? '建议' : 'Proposal'}">
+                                        {:session('language') == '中文'? '建议' : 'Proposal'}
                                     </label>
                                     <div class="layui-input-block">
                                         <textarea placeholder="" name="Proposal"

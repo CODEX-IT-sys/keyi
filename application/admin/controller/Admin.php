@@ -69,6 +69,99 @@ class Admin extends Controller
         }
     }
 
+    //批量更新翻译评估的文件分类
+    public function fypg(){
+        $data = Db::name('pj_translation_evaluation')->where('delete_time',0)->field('id,Filing_Code,Job_Name,File_Category')->select();
+        foreach($data as $key=>$val){
+            if(!$val['File_Category']){
+                $cate = Db::name('pj_project_profile')->where('Filing_Code',$val['Filing_Code'])->where('Job_Name',$val['Job_Name'])->value('File_Category');
+                $up = [
+                    'File_Category' => $cate,
+                ];
+                $res = Db::name('pj_translation_evaluation')->where('id',$val['id'])->update($up);
+            }
+        }
+        echo 'success';
+    }
+
+    //同步项目汇总记录到项目放行
+    public function tb_xmfx(){
+        //查询2022年开始的项目汇总记录
+        $xmhz = Db::name('pj_contract_review')
+            ->where('delete_time',0)
+            ->where('Date','egt','20220101')
+            ->where('Delivered_or_Not','Yes')
+            ->field('Filing_Code,Job_Name,Translator,Reviser,Date,Service,PA')
+            ->select();
+
+        foreach($xmhz as $key=>$val){
+            if($val['Service'] == '翻译' || $val['Service'] == '校对'){
+                $tr = explode(',',$val['Translator']);
+                if($tr){
+                    $tran = $tr['0'];
+                }else{
+                    $tran = '';
+                }
+                //判断是否存在校对，是的话检查人则为校对，否则为翻译
+                $reviser = explode(',',$val['Reviser']);
+                if($reviser){
+                    $p = $reviser['0'];
+                    if($p == 'N/A'){
+                        $p = $tran;
+                    }
+                }else{
+                    $p = $tran;
+                }
+            }else{
+                $p = $val['PA'];
+            }
+
+            if($p == 'N/A' || $p == ''){
+                $p = $val['PA'];
+            }
+
+            $res = Db::name('pj_project_release')
+                ->where('Filing_Code',$val['Filing_Code'])
+                ->find();
+            if(!$res){
+                $add_data = [
+                    'Filing_Code' => $val['Filing_Code'],
+                    'Job_Name' => $val['Job_Name'],
+                    'Inspected_by' => $p,
+                    'Translation' => 'C',
+                    'Terminology' => 'C',
+                    'Language_Quality' => 'C',
+                    'Special_Noun' => 'C',
+                    'Measurement' => 'C',
+                    'Symbol' => 'C',
+                    'Drawing' => 'C',
+                    'Abbreviation' => 'C',
+                    'Layout_and_Format' => 'C',
+                    'Others' => 'C',
+                    'Existing_Issue' => 'C',
+                    'Correction_Result' => 'C',
+                    'Reviser' => 'Yes',
+                    'Filled_by' => $p,
+
+                ];
+                Db::name('pj_project_release')->insert($add_data);
+            }
+        }
+        echo 'success';
+    }
+    //同步项目放行中校对人员和项目经理的值为Yes
+    public function tb_yes(){
+        $xmfx = Db::name('pj_project_release')->where('delete_time',0)->select();
+        foreach($xmfx as $key=>$val){
+            $up_data = [
+                'Reviser' => 'Yes',
+                'Project_Manager' =>'Yes'
+            ];
+
+            $res = Db::name('pj_project_release')->where('id',$val['id'])->update($up_data);
+        }
+        echo '完成';
+    }
     //同步字数修订率
     public function pgxd(){
         $check = Db::name('pj_check')->where('delete_time',0)->select();

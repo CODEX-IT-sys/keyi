@@ -13,7 +13,7 @@
         </div>
         <form class="layui-form layui-inline" action="/admin/statistics/pa" id="sub">
             <div class="layui-form-item">
-                <label class="layui-form-label">选择月份</label>
+                <label class="layui-form-label">{:session('language') == '中文'? '月份选择' : 'Select Month'}</label>
                 <div class="layui-input-block">
                     <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off" class="layui-input">
                 </div>
@@ -23,10 +23,10 @@
             <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pa?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
                 <thead >
                 <tr>
-                    <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                    <th lay-data="{field:'sumpage',sort:true}">本月来稿文件总页数</th>
-                    <th lay-data="{field:'num',sort: true}">本月来稿文件总份数</th>
-                    <th lay-data="{field:'sumword',sort: true}">本月来稿文件总字数</th>
+                    <th lay-data="{field:'PA',sort: true}">{:session('language') == '中文'? '项目组长' : 'project leader'}</th>
+                    <th lay-data="{field:'sumpage',sort:true}">{:session('language') == '中文'? '本月来稿文件总页数' : 'Total pages of documents Contribute this month'}</th>
+                    <th lay-data="{field:'num',sort: true}">{:session('language') == '中文'? '本月来稿文件总份数' : 'Total number of documents Contribute this month'}</th>
+                    <th lay-data="{field:'sumword',sort: true}">{:session('language') == '中文'? '本月来稿文件总字数' : 'Total words of documents Contribute this month'}</th>
                 </tr>
                 </thead>
 
@@ -34,10 +34,10 @@
             <table class="layui-table" lay-filter="demo2" lay-data="{limit:30,toolbar: true,}">
                 <thead >
                 <tr>
-                    <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                    <th lay-data="{field:'sumpage2',sort:true}">本月已提交文件总页数</th>
-                    <th lay-data="{field:'num2',sort: true}">本月已提交文件总份数</th>
-                    <th lay-data="{field:'sumword2',sort: true}">本月已提交文件总字数</th>
+                    <th lay-data="{field:'PA',sort: true}">{:session('language') == '中文'? '项目组长' : 'project leader'}</th>
+                    <th lay-data="{field:'sumpage2',sort:true}">{:session('language') == '中文'? '本月已提交文件总页数' : 'Total pages of documents submitted this month'}</th>
+                    <th lay-data="{field:'num2',sort: true}">{:session('language') == '中文'? '本月已提交文件总份数' : 'Total number of documents submitted this month'}</th>
+                    <th lay-data="{field:'sumword2',sort: true}">{:session('language') == '中文'? '本月已提交文件总字数' : 'Total words of documents submitted this month'}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -54,10 +54,10 @@
             <table class="layui-table" lay-filter="demo1" lay-data="{limit:30,toolbar: true,}">
                 <thead >
              <tr>
-                <th lay-data="{field:'PA',sort: true}">项目助理</th>
-                <th lay-data="{field:'sumpage1',sort:true}">未提交文件总页数</th>
-                <th lay-data="{field:'num1',sort: true}">未提交文件总份数</th>
-                 <th lay-data="{field:'sumword1',sort: true}">未提交文件总字数</th>
+                <th lay-data="{field:'PA',sort: true}">{:session('language') == '中文'? '项目组长' : 'project leader'}</th>
+                <th lay-data="{field:'sumpage1',sort:true}">{:session('language') == '中文'? '未提交文件总页数' : 'Total pages of documents not submitted'}</th>
+                <th lay-data="{field:'num1',sort: true}">{:session('language') == '中文'? '未提交文件总份数' : 'Total number of documents not submitted'}</th>
+                 <th lay-data="{field:'sumword1',sort: true}">{:session('language') == '中文'? '未提交文件总字数' : 'Total words of documents not submitted'}</th>
             </tr> 
                 </thead>
                 <tbody>

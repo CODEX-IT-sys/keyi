@@ -34,15 +34,15 @@
                 <div class="layui-input-inline">
                     <select id="field" lay-verify="">
                         <option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
-                        <option value="Project_Name">{:session('language') == '中文'? '项目名称' : 'Project Name'}</option>
-                        <option value="Project_Responsible">{:session('language') == '中文'? '项目负责人' : 'Project Responsible'}</option>
+                        <option value="Project_Name" {$field=='Project_Name'?'selected':''}>{:session('language') == '中文'? '项目名称' : 'Project Name'}</option>
+                        <option value="Project_Responsible" {$field=='Project_Responsible'?'selected':''}>{:session('language') == '中文'? '项目负责人' : 'Project Responsible'}</option>
                     </select>
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">{:session('language') == '中文'? '查询内容' : 'Keyword'}</label>
                 <div class="layui-input-inline">
-                    <input type="text" id="keyword" placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}" autocomplete="off" class="layui-input">
+                    <input type="text" id="keyword" placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}" value="{$keyword}" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="searchBtn">
@@ -70,7 +70,8 @@
         var layer = top.layer;
         var table = layui.table;
 		var cols;
-		
+        var field = '{$field}';
+        var keyword = '{$keyword}';
 		// 切换语言
 		var language = "{:session('language') == '中文'? '中文' : 'english'}";
 		
@@ -94,6 +95,7 @@
         tableIns = table.render({
             elem: '#admin',
             toolbar: '#forwardBar',
+            where: {field: field, keyword: keyword},
             url: "{:url('xt_file/index')}",
             method: 'get',
             cols: cols,
@@ -116,13 +118,14 @@
                 layer.msg('搜索内容不能为空');
                 return false;
             }
-
+            // 页面 带参跳转 可以记住搜索参数
+            window.location.href = "{:url('index')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
             // 表格重载
-            table.reload('admin', {
+           /* table.reload('admin', {
                 url: "{:url('xt_file/index')}",
                 where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
                 page: 1
-            });
+            });*/
         });
 
         //监听工具条

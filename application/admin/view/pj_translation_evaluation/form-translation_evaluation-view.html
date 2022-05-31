@@ -81,7 +81,18 @@
 							        </div>
 							    </div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label"
+										   title="{:session('language') == '中文'? '文件分类' : 'File Category'}">
+										{:session('language') == '中文'? '文件分类' : 'File Category'}
+									</label>
+									<div class="layui-input-block">
+										<input name="File_Category" readonly lay-verify="required" value="{$info.File_Category|default=''}"
+											   autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs4">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '翻译难易程度' : 'Translation Difficulty'}">

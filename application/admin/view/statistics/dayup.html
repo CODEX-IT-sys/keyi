@@ -6,21 +6,21 @@
         <div class="top">
             <div class="position_lead">
                 <i class="iconfont icon-navigation"></i>
-                <a href="#">{:session('language') == '中文'? '数据统计' : 'Project Management'}</a>
+                <a href="#">{:session('language') == '中文'? '数据统计' : 'Data statistics'}</a>
                 <a class="on">{:session('language') == '中文'? '每日提交页数统计' : 'Day to Day follow up'}</a>
             </div>
 
         </div>
         <form class="layui-form layui-inline" action="/admin/statistics/dayup" id="sub">
             <div class="layui-form-item">
-                <label class="layui-form-label">选择日期</label>
+                <label class="layui-form-label">{:session('language') == '中文'? '选择日期' : 'Select Date'}</label>
                 <div class="layui-input-block">
                     <input type="date" name="month" placeholder="" value="{:input('month')}" autocomplete="off"
                            class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select Type'}</label>
+                <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select PL'}</label>
                 <div class="layui-input-inline">
                     <select id="pa" name="pa" lay-filter="pa">
                         <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
@@ -36,7 +36,7 @@
 
         <div class="forwardTable farTable">
             <table class="layui-hide" id="test" lay-filter="test">
-                <span style="color:red;margin-left:35px;font-size: 20px;">未提交页数：{$wtj}</span>
+                <span style="color:red;margin-left:35px;font-size: 20px;">{:session('language') == '中文'? '未提交页数' : 'Uncommitted pages'}：{$wtj}</span>
             </table>
         </div>
 
@@ -49,14 +49,14 @@
 {block name="js"}
 {js href="__JS__/jquery-3.3.1.min.js"}
 <!--库文件-->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<!--<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=iSyHvmega5x4qy23DSPlCxE09dLz5qTM"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>-->
 <script>
     var tableIns;  // 数据表格对象，用于重载
     layui.use(['table', 'form'], function () {
@@ -97,8 +97,8 @@
         } else {
 
             cols = [
-                {field: 'job', title: 'Job',sort:true, minWidth: 100, align: 'center',totalRowText: '合计'}
-                ,{field: 'name', title: 'Name', minWidth: 100, align: 'center', totalRowText: '合计'}
+                {field: 'job', title: 'Job',sort:true, minWidth: 100, align: 'center',totalRowText: 'Total'}
+                ,{field: 'name', title: 'Name', minWidth: 100, align: 'center'}
                 , {field: 'rz', title: 'Date on board', minWidth: 100, align: 'center'}
                 , {field: 'pb', title: 'Nb Page formated', minWidth: 100, align: 'center'}
                 , {field: 'tr', title: 'Nb page translated', minWidth: 180, align: 'center'}

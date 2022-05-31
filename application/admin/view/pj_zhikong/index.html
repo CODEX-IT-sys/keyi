@@ -9,7 +9,7 @@
                 <div class="position_lead">
                     <i class="iconfont icon-navigation"></i>
                     <a href="#">{:session('language') == '中文'? '项目管理' : 'Project Management'}</a>
-                    <a class="on">{:session('language') == '中文'? '质控信息' : 'Project Database'}</a>
+                    <a class="on">{:session('language') == '中文'? '质控信息' : 'QA Message'}</a>
                 </div>
                 <div class="global_btn">
 
@@ -89,7 +89,7 @@
 <script type="text/html" id="barDemo">
     <div class="table_btn">
         <a class="layui-btn layui-btn-xs com_btn" lay-event="view_project">{:session('language') == '中文'? '项目文件' : 'View Project'}</a>
-        <a class="layui-btn layui-btn-xs modify_btn" lay-event="check">{:session('language') == '中文'? 'QCR' : 'Check'}</a>
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="check">{:session('language') == '中文'? 'QCR' : 'QCR'}</a>
         <!--<a class="layui-btn layui-btn-xs com_btn" lay-event="look">{:session('language') == '中文'? '查看' : 'Look'}</a>-->
     </div>
 </script>
@@ -146,36 +146,36 @@
 
             cols = [
                 {type: 'checkbox', fixed: 'left'}
-                ,{field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
-                ,{field:'Filing_Code', title:'文件编号',minWidth: 100,align:'center',sort:true}
-                ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
-                ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
-                ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
-                ,{field:'Pages', title:'页数',style:'color: red;',minWidth: 180,align:'center'}
-                ,{field:'Source_Text_Word_Count', title:'源语数量', minWidth: 100,align:'center'}
-                ,{field:'Language', title:'语种',minWidth: 100,align:'center'}
-                ,{field:'Product_Involved', title:'涉及产品',minWidth: 100, align:'center'}
-                ,{field:'File_Usage_and_Linguistic_Specification', title:'文件用途和语言规范',minWidth: 100,align:'center'}
-                ,{field:'File_Type', title:'文件类型',minWidth: 100,align:'center'}
-                ,{field:'Format_Difficulty', title:'排版难度',minWidth: 100,align:'center',style:'color: red;'}
-                ,{field:'Translation_Difficulty', title:'翻译难度',minWidth: 120,align:'center'}
-                ,{field:'One_Hundred_Percent_Repeated', title:'100%重复率',minWidth: 100,align:'center'}
-                ,{field:'Ninety_Five_to_Ninety_Nine_Percent_Repeated', title:' 95-99%重复率', style:'color: red;', minWidth: 150, align:'center'}
-                ,{field:'Total_Repetition_Rate', title:'总重复率',minWidth: 100,align:'center'}
-                ,{field:'Actual_Source_Text_Count', title:'实际源语数量',minWidth: 100,align:'center',style:'color: red;'}
-                ,{field:'Pre_Formatter', title:'预排版人员',minWidth: 150,align:'center' }
-                ,{field:'Translator', title:'翻译人员', minWidth: 150,align:'center'}
-                ,{field:'Reviser', title:'校对人员',minWidth: 150,align:'center'}
-                ,{field:'Post_Formatter', title:'后排版人员',  minWidth: 150,align:'center'}
-                ,{field:'Delivery_Date_Expected', title:'客户期望提交日期',  minWidth: 150,align:'center'}
-                ,{field:'Completed', title:'交付日期',minWidth: 150,align:'center',sort:true,style:'color: red;'}
-                ,{field:'Delivered_or_Not', title:'是否交稿',minWidth: 150,align:'center',sort:true}
-                ,{field:'Attention', title:'客户联系人', minWidth: 150,align:'center'}
-                ,{field:'Customer_Requirements', title:'客户要求',minWidth: 150,align:'center'}
-                ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
-                ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center',sort:true}
+                ,{field: 'id', title: 'ID', minWidth: 200,hide:'true', align: 'center', sort: true}
+                ,{field:'Filing_Code', title:'Filing_Code',minWidth: 100,align:'center',sort:true}
+                ,{field:'Job_Name', title:'Job_Name',minWidth: 100,align:'center',sort:true}
+                ,{field:'Project_Name', title:'Project_Name',minWidth: 200,align:'center',sort:true,}
+                ,{field:'Company_Name', title:'Company_Name', minWidth: 180,align:'center' }
+                ,{field:'Pages', title:'Pages',style:'color: red;',minWidth: 180,align:'center'}
+                ,{field:'Source_Text_Word_Count', title:'Source_Text_Word_Count', minWidth: 100,align:'center'}
+                ,{field:'Language', title:'Language',minWidth: 100,align:'center'}
+                ,{field:'Product_Involved', title:'Product_Involved',minWidth: 100, align:'center'}
+                ,{field:'File_Usage_and_Linguistic_Specification', title:'File_Usage_and_Linguistic_Specification',minWidth: 100,align:'center'}
+                ,{field:'File_Type', title:'File_Type',minWidth: 100,align:'center'}
+                ,{field:'Format_Difficulty', title:'Format_Difficulty',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Translation_Difficulty', title:'Translation_Difficulty',minWidth: 120,align:'center'}
+                ,{field:'One_Hundred_Percent_Repeated', title:'One_Hundred_Percent_Repeated',minWidth: 100,align:'center'}
+                ,{field:'Ninety_Five_to_Ninety_Nine_Percent_Repeated', title:' Ninety_Five_to_Ninety_Nine_Percent_Repeated', style:'color: red;', minWidth: 150, align:'center'}
+                ,{field:'Total_Repetition_Rate', title:'Total_Repetition_Rate',minWidth: 100,align:'center'}
+                ,{field:'Actual_Source_Text_Count', title:'Actual_Source_Text_Count',minWidth: 100,align:'center',style:'color: red;'}
+                ,{field:'Pre_Formatter', title:'Pre_Formatter',minWidth: 150,align:'center' }
+                ,{field:'Translator', title:'Translator', minWidth: 150,align:'center'}
+                ,{field:'Reviser', title:'Reviser',minWidth: 150,align:'center'}
+                ,{field:'Post_Formatter', title:'Post_Formatter',  minWidth: 150,align:'center'}
+                ,{field:'Delivery_Date_Expected', title:'Delivery_Date_Expected',  minWidth: 150,align:'center'}
+                ,{field:'Completed', title:'Completed',minWidth: 150,align:'center',sort:true,style:'color: red;'}
+                ,{field:'Delivered_or_Not', title:'Delivered_or_Not',minWidth: 150,align:'center',sort:true}
+                ,{field:'Attention', title:'Attention', minWidth: 150,align:'center'}
+                ,{field:'Customer_Requirements', title:'Customer_Requirements',minWidth: 150,align:'center'}
+                ,{field:'External_Reference_File', title:'External_Reference_File',  minWidth: 150,align:'center'}
+                ,{field:'First_Cooperation', title:'First_Cooperation',minWidth: 150,align:'center',sort:true}
                 ,{field:'PA', title:'PA',minWidth: 150,align:'center',sort:true}
-                ,{field: 'Spot_Check', title: 'QCR状态', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{field: 'Spot_Check', title: 'QCR Status', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
                 ,{fixed: 'right', title: 'Operation', align: 'center', toolbar: '#barDemo', width: 180}
 
             ];

@@ -321,6 +321,9 @@ class PjDailyProgressTrRe extends Common
         // 写入填表人
         $data['Filled_by'] = session('administrator')['name'];
 
+        if($data['Category'] == 'TR'){
+            $data['Revision_Rate'] = 'N/A';
+        }
         // 保存
         PjDailyProgressTrReModel::create($data);
 
@@ -347,6 +350,7 @@ class PjDailyProgressTrRe extends Common
         //计算改文件的页数和
         $ysh   =Db::name('pj_daily_progress_tr_re')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->where('Filled_by',$admin['name'])
             ->where('Work_Content',$data['Work_Content'])->sum('Number_of_Pages_Completed');
+
 
         if($ysh+$data['Number_of_Pages_Completed']-$page>$xmms){
             return $this->error('该文件完成页数和和超过项目描述页数,总页数：'.$xmms);
@@ -477,7 +481,7 @@ class PjDailyProgressTrRe extends Common
                         ->where('Name_of_Translator_or_Reviser', $data['Name_of_Translator_or_Reviser'])
                         ->where('Job_Name', $data['Job_Name'])
                         ->where('Category', 'TR')
-                        ->where('Work_Content', 'Translate')
+                        ->where('Work_Content', $data['Work_Content'])
                         ->sum('Actual_Work_Time');
                 }
                 if($data['Category'] == 'RE'){
@@ -486,7 +490,7 @@ class PjDailyProgressTrRe extends Common
                         ->where('Name_of_Translator_or_Reviser', $data['Name_of_Translator_or_Reviser'])
                         ->where('Job_Name', $data['Job_Name'])
                         ->where('Category', 'RE')
-                        ->where('Work_Content', 'Revise')
+                        ->where('Work_Content', $data['Work_Content'])
                         ->sum('Actual_Work_Time');
                 }
 
@@ -509,7 +513,9 @@ class PjDailyProgressTrRe extends Common
             $data['Productivity'] = 0;
         }
 
-//        die;
+        if($data['Category'] == 'TR'){
+            $data['Revision_Rate'] = 'N/A';
+        }
         PjDailyProgressTrReModel::update($data);
 
         echo "<script>history.go(-2);</script>";

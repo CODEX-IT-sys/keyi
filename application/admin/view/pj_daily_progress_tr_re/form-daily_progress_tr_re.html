@@ -645,10 +645,12 @@
 			if(bfb!=100){
 				$('#yzs').val(0);
 				$('#zzs').val(0);
+				$('#kczs').val(0);
 				layer.msg('完成百分比为100才可填写');
 			}
 			var yzs = $.trim($('#yzs').val());
 			var zcfz = $.trim($('#zcfz').val());
+
 			var kczs = $.trim($('#kczs').val());
 
 			var xdzs = $.trim($('#xdzs').val());
@@ -770,6 +772,10 @@
 					})
 				}
 
+			}else{
+				//清除扣除字数
+				$('#kczs').val('0');
+				$('#zzs').val(0);
 			}
 		})
 

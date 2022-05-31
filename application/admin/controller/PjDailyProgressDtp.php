@@ -132,10 +132,11 @@ class PjDailyProgressDtp extends Common
 
         //计算项目描述表中的文件编号的页数
         $xmms=Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])->value('Pages');
-        if($ysh+$data['Number_of_Pages_Completed']>$xmms){
-            return $this->error('该文件完成页数和和超过项目描述页数');
+        if($data['Work_Content'] != 'Merge') {
+            if ($ysh + $data['Number_of_Pages_Completed'] > $xmms) {
+                return $this->error('该文件完成页数和和超过项目描述页数');
+            }
         }
-
         //判断是否自动生成预排评估
         if($data['Work_Content']=='Postformat' && $data['Percentage_Completed'] == 100){
 
@@ -236,11 +237,11 @@ class PjDailyProgressDtp extends Common
 
         //去除正在修改的页数
         $page=Db::name('pj_daily_progress_dtp')->where('id',$data['id'])->value('Number_of_Pages_Completed');
-
-        if($ysh+$data['Number_of_Pages_Completed']-$page>$xmms){
-            return $this->error('该文件完成页数和和超过项目描述页数');
+        if($data['Work_Content'] != 'Merge') {
+            if ($ysh + $data['Number_of_Pages_Completed'] - $page > $xmms) {
+                return $this->error('该文件完成页数和和超过项目描述页数');
+            }
         }
-
         /*if($data['Work_Content']=='Postformat'){
             //获取y排版人员
             $ypb=Db::name('pj_daily_progress_dtp')->where('Filing_Code',$data['Filing_Code'])->where('Job_Name',$data['Job_Name'])

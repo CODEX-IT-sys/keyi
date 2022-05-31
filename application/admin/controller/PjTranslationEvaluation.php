@@ -249,7 +249,7 @@ class PjTranslationEvaluation extends Common
     {
 
         $info = PjProjectProfileModel::where('Filing_Code', $code)
-            ->field('Translator, Company_Name, Language, Translation_Difficulty')
+            ->field('Translator, Company_Name, Language, Translation_Difficulty,File_Category')
             ->where('Job_Name', $name)->find();
 
         // 返回值

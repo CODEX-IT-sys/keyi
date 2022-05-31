@@ -1298,7 +1298,7 @@ class Statistics extends Controller
                 ->where('Work_Date',$firstTime)
                 ->where('delete_time', 0)
                 ->where('Name_of_Formatter',$val['cn_name'])
-                ->wherein('Work_Content', ['Preformat', 'Postformat'])
+                ->wherein('Work_Content', ['Preformat', 'Postformat','Compare','Entry'])
                 ->sum('Number_of_Pages_Completed');
 
             $tr = Db::table('ky_pj_daily_progress_tr_re')
@@ -1452,7 +1452,7 @@ class Statistics extends Controller
 
         $t_wtj = 0;
         $t_wks = 0;
-
+        $th_wks = 0;
         foreach($all as $key=>$val){
             $code = Db::table('ky_pj_contract_review')
                 ->where('delete_time', 0)
@@ -1463,6 +1463,7 @@ class Statistics extends Controller
                 ->field('Filing_Code,Pages,Translator,Reviser,Pre_Formatter,Post_Formatter,Translation_Delivery_Time,Revision_Delivery_Time')
                 ->select();
             $wks = 0;
+            $hp_wks = 0;
             $fy_num = 0;
             $tran = '';
             $re = '';
@@ -1486,8 +1487,11 @@ class Statistics extends Controller
                         ->where('delete_time', 0)
                         ->where('Work_Date', '<=',$firstTime)
                         ->where('Filing_Code',$v1['Filing_Code'])
-                        ->find();
+                        ->select();
                     if(!$hp){
+                        $hp_wks += $v1['Pages'];
+
+
                         $tr_re = Db::table('ky_pj_daily_progress_tr_re')
                             ->where('delete_time', 0)
                             ->where('Work_Date', '<=',$firstTime)
@@ -1529,6 +1533,13 @@ class Statistics extends Controller
 
                         }
                     }else{
+                        $hp_total = 0;
+                        foreach($hp as $v4){
+                            $hp_total += $v4['Number_of_Pages_Completed'];
+                        }
+                        $hp_cha = $v1['Pages'] - $hp_total;
+                        $hp_wks += $hp_cha;
+
                         $tr_finish = $tr_finish.','.$temp1;
                     }
 
@@ -1610,6 +1621,7 @@ class Statistics extends Controller
             }
 
             $all[$key]['wks'] = $wks;
+            $all[$key]['hp_wks'] = $hp_wks;
             $all[$key]['tr_do'] = $tran_do;
             $all[$key]['tr_finish'] = $tran_finish;
             $all[$key]['tran'] = $tran;
@@ -1617,10 +1629,21 @@ class Statistics extends Controller
             $all[$key]['pre'] = $pre_formatter;
             $all[$key]['post'] = $post_formatter;
             //增加项目翻译进度
-            $trjd = ($val['sumpage']-$wks)/$val['sumpage'];
-            $trjd = number_format($trjd,'2');
-            $trjd = $trjd*100;
-            $all[$key]['trjd'] = $trjd."%";
+            if($val['sumpage'] == 0){
+                $all[$key]['trjd'] = "100%";
+                $all[$key]['hpjd'] = "100%";
+            }else{
+                $trjd = ($val['sumpage']-$wks)/$val['sumpage'];
+                $trjd = number_format($trjd,'2');
+                $trjd = $trjd*100;
+                $all[$key]['trjd'] = $trjd."%";
+
+                $hpjd = ($val['sumpage']-$hp_wks)/$val['sumpage'];
+                $hpjd = number_format($hpjd,'2');
+                $hpjd = $hpjd*100;
+                $all[$key]['hpjd'] = $hpjd."%";
+            }
+
 
             //合并公司名称中英文
             $company_name = $val['Company_Name'];
@@ -1636,11 +1659,13 @@ class Statistics extends Controller
 
             $t_wtj += $val['sumpage'];
             $t_wks += $wks;
+            $th_wks += $hp_wks;
 
         }
 
         $totalRow['sumpage'] = $t_wtj;
         $totalRow['wks'] = $t_wks;
+        $totalRow['hp_wks'] = $th_wks;
         // 非Ajax请求，直接返回视图
         if (!request()->isAjax()) {
 
@@ -1655,6 +1680,280 @@ class Statistics extends Controller
             'data'  =>$all,
             'totalRow' => $totalRow,
         ];
+
+
+    }
+
+    //各组排版页数信息
+    public function pb_page()
+    {
+        $data = request()->param('month');
+        $pa = request()->param('pa');
+        if($pa){
+            $name = $pa;
+        }else{
+            $name = 'PA01';
+            $pa = 'PA01';
+        }
+
+        $a = session('administrator')['name'];
+        // 用户id
+        $job_id = session('administrator')['job_id'];
+        if($job_id == 7){
+            $name = $a;
+            $pa = $a;
+        }
+
+        if (isset($data)) {
+            $time = strtotime($data);
+            $year = date("Y", $time);
+            $month = date("m", $time);
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t', $firstTime);
+            $lastTime = $firstTime + 86400 * $day - 1; //结束时间戳
+            $firstTime = intval(date("Ymd", $firstTime));
+            $lastTime = intval(date("Ymd", $lastTime));
+            if ($data == '') {
+                $firstTime = 19701201;
+                $lastTime = 20351201;
+                $time = time();
+                $year = date("Y", $time);
+
+                $month = date("m", $time);
+
+                $day = date("d", $time);
+                // 本月一共有几天
+                $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+                $day = date('t', $firstTime);
+                $lastTime = $firstTime + 86400 * $day - 1; //结束时间戳
+                $firstTime = intval(date("Ymd", $firstTime));
+                $lastTime = intval(date("Ymd", $lastTime));
+            }
+        } else {
+            $time = time();
+            $year = date("Y", $time);
+
+            $month = date("m", $time);
+
+            $day = date("d", $time);
+            // 本月一共有几天
+            $firstTime = mktime(0, 0, 0, $month, 1, $year);     // 创建本月开始时间
+            $day = date('t', $firstTime);
+            $lastTime = $firstTime + 86400 * $day - 1; //结束时间戳
+            $firstTime = intval(date("Ymd", $firstTime));
+            $lastTime = intval(date("Ymd", $lastTime));
+
+        }
+
+        $cid = Db::table('ky_xt_dict_cate')->where('en_name',$name)->find();
+        $group = Db::table('ky_xt_dict')->where('c_id',$cid['id'])->field('id,cn_name')->select();
+        $group = array_column($group,'cn_name');
+        //halt($group);
+        //来稿页数
+        $mt = Db::table('ky_pj_contract_review')->whereBetweenTime('Date', $firstTime, $lastTime)->where('delete_time', 0)->where('PA',$pa)->field('Date,sum(Pages) as sumpage')
+            ->where('Delivered_or_Not', '<>', 'CXL')->group('Date')->select();
+        //提交页数
+        $tj = Db::table('ky_pj_contract_review')->whereBetweenTime('Completed', $firstTime, $lastTime)->where('delete_time', 0)->where('PA',$pa)->field('Completed,sum(Pages) as tjpage')
+            ->where('Delivered_or_Not', '<>', 'CXL')->group('Completed')->select();
+
+        //预排页数
+        $yp = Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date', $firstTime, $lastTime)
+            ->where('Name_of_Formatter','in',$group)
+            ->where('delete_time', 0)->where('Work_Content', 'Preformat')->field('Work_Date,sum(Number_of_Pages_Completed) as yppage')
+            ->group('Work_Date')->select();
+        //后排页数
+        $hp = Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date', $firstTime, $lastTime)
+            ->where('Name_of_Formatter','in',$group)
+            ->where('delete_time', 0)->where('Work_Content', 'Postformat')->field('Work_Date,sum(Number_of_Pages_Completed) as hppage')
+            ->group('Work_Date')->select();
+        //对y比页数
+        $db = Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date', $firstTime, $lastTime)
+            ->where('Name_of_Formatter','in',$group)
+            ->where('delete_time', 0)->where('Work_Content', 'Compare')->field('Work_Date,sum(Number_of_Pages_Completed) as dbpage')
+            ->group('Work_Date')->select();
+
+        foreach ($mt as $k => $v) {
+            $mt[$k]['Work_Date'] = $v['Date'];
+            unset($mt[$k]['Date']);
+        }
+        foreach ($tj as $k => $v) {
+            $tj[$k]['Work_Date'] = $v['Completed'];
+            unset($tj[$k]['Completed']);
+        }
+        $hb = [];
+        $c = array_merge($hp, $mt,$tj,$yp,$db);
+
+
+        foreach ($c as $k1 => $v1) {
+            if (isset($v1['tjpage'])) {
+                $hb[$v1['Work_Date']]['tjpage'] = intval($v1['tjpage']);
+            }
+            if (isset($v1['hppage'])) {
+                $hb[$v1['Work_Date']]['hppage'] = intval($v1['hppage']);
+            }
+            if (isset($v1['sumpage'])) {
+                $hb[$v1['Work_Date']]['sumpage'] = intval($v1['sumpage']);
+            }
+            if (isset($v1['yppage'])) {
+                $hb[$v1['Work_Date']]['yppage'] = intval($v1['yppage']);
+            }
+            if (isset($v1['dbpage'])) {
+                $hb[$v1['Work_Date']]['dbpage'] = intval($v1['dbpage']);
+            }
+        }
+
+        $list = [];
+        foreach ($hb as $k2 => $v) {
+            $hb[$k2]['date'] = $k2;
+            $list[] = $hb[$k2];
+        }
+
+        if (!isset($list)) {
+            return '无数据';
+        }
+
+        $id = [];
+        foreach ($list as $key => $row) {
+            $id[$key] = $row['date'];
+        }
+        array_multisort($id, SORT_DESC, $list);
+
+        $mon = [];
+        foreach ($list as $k => $v) {
+            $mon[] = $v['date'];
+        }
+
+        $char = [];
+        foreach ($list as $k => $v) {
+            unset($v['hppage']);
+            unset($v['yppage']);
+            unset($v['trpage']);
+            unset($v['xdpage']);
+            unset($v['date']);
+            if (!isset($v['sumpage'])) {
+                $v['sumpage'] = 0;
+            } else {
+                $v['sumpage'] = intval($v['sumpage']);
+            }
+            $char['name'] = '页数';
+            $char['type'] = 'bar';
+            $char['data'][] = $v['sumpage'];
+        }
+        if (!request()->isAjax()) {
+            $this->assign(['list' => $list, 'pa'=>$pa,'mon' => json_encode($mon), 'char' => json_encode($char)]);
+            return $this->fetch();
+        }
+        return [
+            'code' => 0,
+            'msg' => '',
+            'count' => 0,
+            'data' => $list,
+        ];
+
+    }
+
+    //校对比率平均值统计
+    public function xdtj(){
+        $data = request()->param('year');
+        $y = $data;
+        if(!$data){
+            $y = 2022;
+        }
+        // 预定义 月份数组
+        $m = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+
+        $n = [];
+        // 时间为条件
+        $s = intval($y. '01' . '01');
+        $d = intval($y. '12' . '31');
+
+        $list = Db::name('pj_daily_progress_tr_re')
+            ->where('delete_time',0)
+            ->where('Percentage_Completed',100)
+            ->whereBetweenTime('Work_Date',$s,$d)
+            ->field('Name_of_Translator_or_Reviser,avg(Revision_Rate) as rate')
+            ->group('Name_of_Translator_or_Reviser')
+            ->select();
+
+        //查询小组
+        $pa01 = Db::name('xt_dict_cate')->where('en_name','PA01')->value('id');
+        $pa01_arr = Db::name('xt_dict')->where('c_id',$pa01)->select();
+        $pa01_arr = array_column($pa01_arr, 'cn_name');
+
+        $pa04= Db::name('xt_dict_cate')->where('en_name','PA04')->value('id');
+        $pa04_arr = Db::name('xt_dict')->where('c_id',$pa04)->select();
+        $pa04_arr = array_column($pa04_arr, 'cn_name');
+
+        $pa05 = Db::name('xt_dict_cate')->where('en_name','PA05')->value('id');
+        $pa05_arr = Db::name('xt_dict')->where('c_id',$pa05)->select();
+        $pa05_arr = array_column($pa05_arr, 'cn_name');
+
+        $pa06 = Db::name('xt_dict_cate')->where('en_name','PA06')->value('id');
+        $pa06_arr = Db::name('xt_dict')->where('c_id',$pa06)->select();
+        $pa06_arr = array_column($pa06_arr, 'cn_name');
+
+        $pa12 = Db::name('xt_dict_cate')->where('en_name','PA12')->value('id');
+        $pa12_arr = Db::name('xt_dict')->where('c_id',$pa12)->select();
+        $pa12_arr = array_column($pa12_arr, 'cn_name');
+
+        foreach($list as $key=>$val){
+            //查询岗位
+            $gw = Db::name('admin')->where('name',$val['Name_of_Translator_or_Reviser'])->where('delete_time',0)->field('job_id')->find();
+            $job_name = Db::table('ky_xt_job')->where('id',$gw['job_id'])->value('cn_name');
+            $list[$key]['job'] = $job_name;
+            //判断小组
+            if(in_array($val['Name_of_Translator_or_Reviser'],$pa01_arr)){
+                $list[$key]['team'] = 'PA01';
+            }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa04_arr)){
+                $list[$key]['team'] = 'PA04';
+            }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa05_arr)){
+                $list[$key]['team'] = 'PA05';
+            }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa06_arr)){
+                $list[$key]['team'] = 'PA06';
+            }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa12_arr)){
+                $list[$key]['team'] = 'PA12';
+            }else{
+                $list[$key]['team'] = '';
+            }
+
+            //遍历 查询 每个月
+            for ($i = 0; $i < 12; $i++) {
+
+                // 时间为条件
+                $s = intval($y. $m[$i] . '01');
+                $d = intval($y. $m[$i] . '31');
+
+                //查询每月校对比率平均值
+
+                $avg = Db::name('pj_daily_progress_tr_re')
+                    ->where('delete_time',0)
+                    ->where('Percentage_Completed',100)
+                    ->where('Name_of_Translator_or_Reviser',$val['Name_of_Translator_or_Reviser'])
+                    ->whereBetweenTime('Work_Date',$s,$d)
+                    ->avg('Revision_Rate');
+                $date = 'date'.$i;
+                $list[$key][$date] = round($avg,2);
+
+            }
+        }
+        // 非Ajax请求，直接返回视图
+        if (!request()->isAjax()) {
+
+            $this->assign(['list'=>$list,'pa'=>'PA01','y'=>$y]);
+
+            return $this->fetch();
+        }
+
+        return [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => 0,
+            'data'  =>$list,
+
+        ];
+
 
 
     }

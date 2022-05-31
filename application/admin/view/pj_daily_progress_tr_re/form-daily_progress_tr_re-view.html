@@ -233,7 +233,7 @@
 										{:session('language') == '中文'? '扣除字数' : 'Excluding Words'}
 									</label>
 									<div class="layui-input-block">
-										<input name="Excluding Words" value="{$info.Excluding_Words|default=''}" readonly autocomplete="off" placeholder="" class="layui-input" type="number">
+										<input name="Excluding Words" id="kczs" value="{$info.Excluding_Words|default=''}" readonly autocomplete="off" placeholder="" class="layui-input" type="number">
 									</div>
 								</div>
 							</div>
@@ -427,11 +427,16 @@
 			if(bfb!=100){
 				$('#yzs').val(0);
 				$('#zzs').val(0);
+				$('#kczs').val(0);
+				var kczs = 0;
 				layer.msg('完成百分比为100才可填写');
+			}else{
+				var kczs = $.trim($('#kczs').val());
 			}
 			var yzs = $.trim($('#yzs').val());
 			var zcfz = $.trim($('#zcfz').val());
-			var kczs = $.trim($('#kczs').val());
+
+
 
 			var xdzs = $.trim($('#xdzs').val());
 

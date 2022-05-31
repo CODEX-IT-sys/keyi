@@ -64,7 +64,7 @@ class PjZhikong extends Common
         ];
         $colsData[10] = [
             'Field' => 'Spot_Check',
-            'Comment' => '抽查状态',
+            'Comment' => 'QCR状态',
         ];
 
         // 非Ajax请求，直接返回视图
@@ -73,6 +73,18 @@ class PjZhikong extends Common
                 'field'=>$field, 'keyword'=>$keyword,'select_field'=>$colsData, 'colsData' => json_encode($colsData),
                 'search_type'=>$search_type
             ]);
+        }
+
+        if($keyword == '待翻译QCR'){
+            $keyword = 9;
+        }elseif($keyword == '待排版QCR'){
+            $keyword = 8;
+        }elseif($keyword == '翻译QCR'){
+            $keyword = 7;
+        }elseif($keyword == '排版QCR'){
+            $keyword = 6;
+        }elseif($keyword == '翻译QCR,排版QCR'){
+            $keyword = 5;
         }
 
 

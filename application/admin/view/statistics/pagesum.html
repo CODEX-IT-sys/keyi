@@ -13,26 +13,26 @@
         </div>
             <form class="layui-form layui-inline" action="/admin/statistics/pagesum" id="sub">
                 <div class="layui-form-item">
-                    <label class="layui-form-label">选择月份</label>
+                    <label class="layui-form-label">{:session('language') == '中文'? '月份选择' : 'Select Month'}</label>
                     <div class="layui-input-block">
                         <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off" class="layui-input">
                     </div>
                 </div>
             </form>
         <div class="global_btn">
-            <a class="layui-btn com_btn" id="sjth">数据计算</a>
+            <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
         </div>
         <div class="layui-form">
             <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pagesum?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
                 <thead >
                 <tr>
                     <th lay-data="{checkbox:true}"></th>
-                    <th lay-data="{field:'date',sort: true}">日期</th>
-                    <th lay-data="{field:'sumpage',sort:true}">当天需提交页数</th>
-                    <th lay-data="{field:'yppage',sort: true}">预排完成页数</th>
-                    <th lay-data="{field:'trpage',sort: true}">翻译完成页数</th>
-                    <th lay-data="{field:'xdpage',sort: true}">校对完成页数</th>
-                    <th lay-data="{field:'hppage',sort: true}">后排完成页数</th>
+                    <th lay-data="{field:'date',sort: true}">{:session('language') == '中文'? '日期' : 'Date'}</th>
+                    <th lay-data="{field:'sumpage',sort:true}">{:session('language') == '中文'? '当天需提交页数' : 'Number of pages to be submitted on the same day'}</th>
+                    <th lay-data="{field:'yppage',sort: true}">{:session('language') == '中文'? '预排完成页数' : 'Pre scheduled pages'}</th>
+                    <th lay-data="{field:'trpage',sort: true}">{:session('language') == '中文'? '翻译完成页数' : 'Translation completed pages'}</th>
+                    <th lay-data="{field:'xdpage',sort: true}">{:session('language') == '中文'? '校对完成页数' : 'Proofreading completed pages'}</th>
+                    <th lay-data="{field:'hppage',sort: true}">{:session('language') == '中文'? '后排完成页数' : 'Post scheduled pages'} </th>
                 </tr>
                 </thead>
                 <!--<tbody>-->
@@ -58,14 +58,15 @@
 {block name="js"}
 {js href="__JS__/jquery-3.3.1.min.js"}
 <!--库文件-->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<!--<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=iSyHvmega5x4qy23DSPlCxE09dLz5qTM"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>-->
+<script type="text/javascript" src="__STATIC__/js/echarts.min.js"></script>
 <script>
     layui.use('table', function() {
         var table = layui.table;

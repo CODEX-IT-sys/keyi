@@ -6,33 +6,27 @@
         <div class="top">
             <div class="position_lead">
                 <i class="iconfont icon-navigation"></i>
-                <a href="#">{:session('language') == '中文'? '数据统计' : 'Data statistics'}</a>
-                <a class="on">{:session('language') == '中文'? '每日项目节点统计' : 'Daily project node statistics'}</a>
+                <a href="#">{:session('language') == '中文'? '数据统计' : 'Data Statistics'}</a>
+                <a class="on">{:session('language') == '中文'? '各组排版页数统计' : 'Statistics of layout pages of each group'}</a>
             </div>
             <div class="global_btn">
-
-
                 <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
 
             </div>
         </div>
-
-        <form class="layui-form layui-inline" action="/admin/statistics/gs" id="sub">
+        <form class="layui-form layui-inline" action="/admin/statistics/pb_page" id="sub">
             <div class="layui-form-item">
-                <label class="layui-form-label">{:session('language') == '中文'? '选择日期' : 'Select Date'}</label>
+                <label class="layui-form-label">{:session('language') == '中文'? '选择月份' : 'Select Month'}</label>
                 <div class="layui-input-block">
-                    <input type="date" name="month" placeholder="" value="{:input('month')}" autocomplete="off"
+                    <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off"
                            class="layui-input">
                 </div>
-
             </div>
-
             <div class="layui-form-item">
                 <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select PL'}</label>
                 <div class="layui-input-inline">
                     <select id="pa" name="pa" lay-filter="pa">
                         <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
-
                         <option value="PA04" {$pa=='PA04'?'selected':''}>PA04 </option>
                         <option value="PA05" {$pa=='PA05'?'selected':''}>PA05 </option>
                         <option value="PA06" {$pa=='PA06'?'selected':''}>PA06 </option>
@@ -40,22 +34,13 @@
                     </select>
                 </div>
             </div>
-
         </form>
-
 
         <div class="forwardTable farTable">
             <table class="layui-hide" id="test" lay-filter="test">
 
             </table>
-            <div class="explain">
-                <h5 class="explainTitle">
-                    <span id="jisuan"  style="background: #0ba4da;float: right;"></span>
-                </h5>
-
-            </div>
         </div>
-
     </div>
 </div>
 
@@ -89,50 +74,38 @@
         var myMonth = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
         var myToday = myDate.getDate(); //获取当前日(1-31)
         var time1 = myYear+'-'+myMonth+'-'+myToday;
-
+        console.log(time1);
         if(!time){
             time = time1;
         }
 
-        var url = "{:url('statistics/gs')}" +  '?month=' + time+'&pa='+pa;
+        var url = "{:url('statistics/pb_page')}" +  '?month=' + time+'&pa='+pa;
         var cols;
         if (language === '中文') {
 
             cols = [
-                {type: 'checkbox', fixed: 'left'}
-                ,{field: 'Company_Name', title: '公司名称', width: 150, align: 'center',totalRowText: '合计'}
-                ,{field: 'Date', title: '来稿日期', sort:true,width: 150, align: 'center'}
-                ,{field: 'Completed', title: '交付日期', sort:true,width: 150, align: 'center'}
-                , {field: 'sumpage', title: '未提交页数', minWidth: 100, align: 'center'}
-                , {field: 'wks', title: '翻译未开始页数', minWidth: 100, align: 'center'}
-                , {field: 'trjd', title: '项目翻译进度', minWidth: 100, align: 'center'}
-                , {field: 'hp_wks', title: '后排未开始页数', minWidth: 100, align: 'center'}
-                , {field: 'hpjd', title: '项目后排进度', minWidth: 100, align: 'center'}
-                , {field: 'tr_do', title: '翻译工作中人员', minWidth: 100, align: 'center'}
-                , {field: 'tr_finish', title: '翻译已完成人员', minWidth: 100, align: 'center'}
-                , {field: 're', title: '校对人员', minWidth: 100, align: 'center'}
-                , {field: 'pre', title: '预排版人员', minWidth: 100, align: 'center'}
-                , {field: 'post', title: '后排版人员', minWidth: 100, align: 'center'}
+                /* {field: 'Company_Name', title: '公司名称',sort:true, width: 100, align: 'center',totalRowText: '合计'}*/
+                {checkbox:true}
+                ,{field: 'date', title: '日期', width: 200, align: 'center'}
+                ,{field: 'sumpage', title: '来稿页数', width: 200, align: 'center'}
+                , {field: 'tjpage', title: '提交页数', minWidth: 100, align: 'center'}
+                , {field: 'yppage', title: '预排页数', minWidth: 100, align: 'center'}
+                , {field: 'hppage', title: '后排页数', minWidth: 100, align: 'center'}
+                , {field: 'dbpage', title: '对比页数', minWidth: 100, align: 'center'}
+
             ];
 
 
         } else {
 
             cols = [
-                {type: 'checkbox', fixed: 'left'}
-                ,{field: 'Company_Name', title: 'Company Name', width: 150, align: 'center',totalRowText: 'Total'}
-                ,{field: 'Date', title: 'Date', sort:true,width: 200, align: 'center'}
-                ,{field: 'Completed', title: 'Completed', sort:true,width: 200, align: 'center'}
-                , {field: 'sumpage', title: 'Uncommitted Pages', minWidth: 100, align: 'center'}
-                , {field: 'wks', title: 'Translation Not Started pages', minWidth: 100, align: 'center'}
-                , {field: 'trjd', title: 'Project Translation Progress', minWidth: 100, align: 'center'}
-                , {field: 'hp_wks', title: 'Post Formatter Not Started pages', minWidth: 100, align: 'center'}
-                , {field: 'hpjd', title: 'Project Formatter Progress', minWidth: 100, align: 'center'}
-                , {field: 'tr_do', title: 'Translating', minWidth: 100, align: 'center'}
-                , {field: 'tr_finish', title: 'Translate Finish', minWidth: 100, align: 'center'}
-                , {field: 're', title: 'Revise', minWidth: 100, align: 'center'}
-                , {field: 'pre', title: 'Pre Formatter', minWidth: 100, align: 'center'}
-                , {field: 'post', title: 'Post Formatter', minWidth: 100, align: 'center'}
+                {checkbox:true}
+                ,{field: 'date', title: 'Date', width: 200, align: 'center'}
+                ,{field: 'sumpage', title: 'Pages of contribution', width: 200, align: 'center'}
+                , {field: 'tjpage', title: 'Submitted pages', minWidth: 100, align: 'center'}
+                , {field: 'yppage', title: 'Number of pre arranged pages', minWidth: 100, align: 'center'}
+                , {field: 'hppage', title: 'Number of PostFormat pages', minWidth: 100, align: 'center'}
+                , {field: 'dbpage', title: 'Number of comparison pages', minWidth: 100, align: 'center'}
             ];
 
 
@@ -150,7 +123,7 @@
             , where: {}
             , toolbar: '#forwardBar'
             , defaultToolbar: ['filter', 'exports', 'print']
-            , title: '每日项目节点统计'
+            , title: '排版页数统计'
             , totalRow: true
             , cols: cols
             , limit: 100, height: 'full-200',
@@ -160,7 +133,52 @@
                 hash: 'fenye',
                 limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
             },
+            //给单元格标注颜色
+            done: function (res, page, count) {
+                var that = this.elem.next();
+                res.data.forEach(function (item, index) {
+                    if (item.Completed > 0){
+
+                        //更具自己需要加颜色或角标
+                        var td = that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Completed']").css("background-color", "#a6d792");//给单元格添加颜色
+                        //var td = that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='deadline']").css("background", "url('../../images/timg.png') no-repeat");//给单元格添加背景图片
+                    }
+                })
+            }
         });
+
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var len = checkStatus.data.length;
+            var sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0, sum5 = 0;
+            for (v in checkStatus.data) {
+
+                if (checkStatus.data[v]['sumpage']) {
+                    sum1 += checkStatus.data[v]['sumpage'];
+                }
+                if (checkStatus.data[v]['tjpage']) {
+                    sum2 += checkStatus.data[v]['tjpage'];
+                }
+                if (checkStatus.data[v]['yppage']) {
+                    sum3 += checkStatus.data[v]['yppage'];
+                }
+                if (checkStatus.data[v]['hppage']) {
+                    sum4 += checkStatus.data[v]['hppage'];
+                }
+                if (checkStatus.data[v]['dbpage']) {
+                    sum5 += checkStatus.data[v]['dbpage'];
+                }
+
+            }
+
+            var msg = "来稿总和:" + sum1 + ';平均数:' + (sum1 / len).toFixed(1) + "<br>提交总和:" + sum2 + ';平均数:' + (sum2 / len).toFixed(1)
+                + "<br>预排总和:" + sum3 + ';平均数:' + (sum3 / len).toFixed(1) + "<br>后排总和:" + sum4 + ';平均数:' + (sum4 / len).toFixed(1)
+                + "<br>对比总和:" + sum5 + ';平均数:' + (sum5 / len).toFixed(1);
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        })
 
         // 表格类型切换时
         form.on('select(pa)', function (data) {
@@ -168,38 +186,15 @@
             $('#sub').submit();
 
         });
-
-        $('#sjth').click(function () {
-            var checkStatus = table.checkStatus('test');
-            var num = 0
-            var num2 = 0
-
-            for (v in checkStatus.data) {
-
-                num += parseInt(checkStatus.data[v]['sumpage'])||0;
-                num2 += parseInt(checkStatus.data[v]['wks'])||0;
-
-            }
-            var msg = "未提交页数:" + num + ';未开始页数:' + num2;
-
-            $('#jisuan').html(msg)
-            layer.alert(msg);
-            // console.log(num);
-        });
-
     });
 </script>
 
 
 <script>
-
     $("input[name='month']").change(function () {
-
+        console.log($("input[name='month']").val())
         $('#sub').submit();
     })
-
-
 </script>
-
 
 {/block}

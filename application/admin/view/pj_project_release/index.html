@@ -13,7 +13,7 @@
 					</div>
 					<div class="global_btn">
 						<a class="layui-btn com_btn" id="jdpl">{:session('language') == '中文'? '校对人员确认' : 'Reviser'}</a>
-						<a class="layui-btn com_btn" id="xmjlpl">{:session('language') == '中文'? '项目经理确认' : 'Project Manager'}</a>
+						<a class="layui-btn com_btn" id="xmjlpl">{:session('language') == '中文'? '质量经理确认' : 'Quality Manager'}</a>
 
 						<a href="{:url('pj_project_release/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 						<!--<a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
@@ -116,7 +116,12 @@ layui.use(['table','form'], function(){
                     if(language === '中文'){
                         cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
                     }else{
-                        cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+                    	if(colsData[i].Field == 'Project_Manager'){
+							cols.push({field: colsData[i].Field ,title: 'Quality Manager', sort:true, minWidth:200, totalRow:true});
+						}else{
+							cols.push({field: colsData[i].Field ,title: colsData[i].Field, sort:true, minWidth:200, totalRow:true});
+						}
+
                     }
                 }
             }

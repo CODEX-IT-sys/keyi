@@ -1,0 +1,191 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <div class="top">
+            <div class="position_lead">
+                <i class="iconfont icon-navigation"></i>
+                <a href="#">{:session('language') == '中文'? '数据统计' : 'Data Statistics'}</a>
+                <a class="on">{:session('language') == '中文'? '翻译人员的修订率统计' : 'Revision Rate of Translator'}</a>
+            </div>
+
+        </div>
+        <form class="layui-form layui-inline" action="/admin/statistics/xdtj" id="sub">
+            <div class="layui-form-item label_auto">
+                <label class="layui-form-label">{:session('language') == '中文'? '年份' : 'Year'}</label>
+                <div class="layui-input-inline">
+                    <select name="year"  id="year" lay-verify="" lay-filter="year">
+                        <option value="2020" {$y==2020?'selected':''}>2020</option>
+                        <option value="2021" {$y==2021?'selected':''}>2021</option>
+                        <option value="2022" {$y==2022?'selected':''}>2022</option>
+                    </select>
+                </div>
+            </div>
+
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select Type'}</label>
+                <div class="layui-input-inline">
+                    <select id="pa" name="pa" lay-filter="pa">
+                        <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
+                        <option value="PA02" {$pa=='PA02'?'selected':''}>PA02 </option>
+                        <option value="PA03" {$pa=='PA03'?'selected':''}>PA03 </option>
+                        <option value="PA04" {$pa=='PA04'?'selected':''}>PA04 </option>
+                        <option value="PA05" {$pa=='PA05'?'selected':''}>PA05 </option>
+                        <option value="PA06" {$pa=='PA06'?'selected':''}>PA06 </option>
+                        <option value="PA09" {$pa=='PA09'?'selected':''}>PA09 </option>
+                        <option value="PA10" {$pa=='PA10'?'selected':''}>PA10 </option>
+                        <option value="PA11" {$pa=='PA11'?'selected':''}>PA11 </option>
+                        <option value="PA12" {$pa=='PA12'?'selected':''}>PA12 </option>
+                    </select>
+                </div>
+            </div>-->
+
+        </form>
+
+
+        <div class="forwardTable farTable">
+            <table class="layui-hide" id="test" lay-filter="test">
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div id="main" style="height:400px;"></div>
+{/block}
+
+{block name="js"}
+{js href="__JS__/jquery-3.3.1.min.js"}
+<!--库文件-->
+<!--<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=iSyHvmega5x4qy23DSPlCxE09dLz5qTM"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>-->
+<script>
+    var tableIns;  // 数据表格对象，用于重载
+    layui.use(['table', 'form'], function () {
+        var table = layui.table, form = layui.form;
+
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+        // 数据表格字段
+        var time =  $("#year").find("option:selected").val();
+        var pa =  $("#pa").find("option:selected").val();
+
+        var myDate = new Date();
+        var myYear = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+        var myMonth = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        var myToday = myDate.getDate(); //获取当前日(1-31)
+        var time1 = myYear+'-'+myMonth+'-'+myToday;
+
+        if(!time){
+            time = 2022;
+        }
+        console.log(time);
+        var url = "{:url('statistics/xdtj')}" +  '?year=' + time+'&pa='+pa;
+        var cols;
+        if (language === '中文') {
+
+            cols = [
+                {field: 'Name_of_Translator_or_Reviser', title: '姓名', width: 100, align: 'center',sort:true}
+                ,{field: 'job', title: '岗位', minWidth: 50, align: 'center',sort:true}
+                ,{field: 'team', title: '小组', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date0', title: '1月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date1', title: '2月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date2', title: '3月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date3', title: '4月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date4', title: '5月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date5', title: '6月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date6', title: '7月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date7', title: '8月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date8', title: '9月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date9', title: '10月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date10', title: '11月', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date11', title: '12月', minWidth: 50, align: 'center',sort:true}
+
+
+            ];
+
+
+        } else {
+
+            cols = [
+                {field: 'Name_of_Translator_or_Reviser', title: 'Name', width: 100, align: 'center',sort:true}
+                ,{field: 'job', title: 'Job', minWidth: 50, align: 'center',sort:true}
+                ,{field: 'team', title: 'Team', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date0', title: 'January', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date1', title: 'February', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date2', title: 'March', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date3', title: 'April', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date4', title: 'May', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date5', title: 'June', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date6', title: 'July', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date7', title: 'August', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date8', title: 'September', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date9', title: 'October', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date10', title: 'November', minWidth: 50, align: 'center',sort:true}
+                , {field: 'date11', title: 'December', minWidth: 50, align: 'center',sort:true}
+
+
+            ];
+
+
+        }
+        //console.log(cols);
+
+
+        cols = [cols];
+
+
+        // 生成表格
+        tableIns = table.render({
+            elem: '#test'
+            , url: url
+            , where: {}
+            , toolbar: '#forwardBar'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , title: '校对比率统计'
+            , totalRow: true
+            , cols: cols
+            , id:'tableId'
+            , limit: 100, height: 'full-200',
+            even: false,
+            page: {
+                curr: location.hash.replace('#!fenye=', ''),
+                hash: 'fenye',
+                limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            },
+            //给单元格标注颜色
+            done: function (res, page, count) {
+
+                var that = this.elem.next();
+
+
+            }
+        });
+
+
+        // 表格类型切换时
+        form.on('select(year)', function (data) {
+
+            $('#sub').submit();
+
+        });
+    });
+</script>
+
+
+<script>
+
+
+
+</script>
+
+
+{/block}
