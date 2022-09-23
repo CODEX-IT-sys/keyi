@@ -187,6 +187,10 @@ class PjContractReview extends Common
                 'Comment'=>'文件分类'
             ],
             [
+            'Field'=>'Service',
+            'Comment'=>'服务'
+            ],
+            [
                 'Field'=>'Format_Difficulty',
                 'Comment'=>'排版难易程度'
             ],
@@ -229,6 +233,10 @@ class PjContractReview extends Common
             [
                 'Field'=>'Revision_Delivery_Time',
                 'Comment'=>'校对交付时间'
+            ],
+            [
+                'Field'=>'Revise_Style',
+                'Comment'=>'校对类型'
             ],
             [
                 'Field'=>'Post_Formatter',
@@ -1636,6 +1644,27 @@ class PjContractReview extends Common
                 ];
                 Db::name('pj_project_profile')->insert($in_data);
             }
+
+            //同步项目名称到术语数据记录表
+            $where3 = [
+                'Project_Name' => $data['Project_Name'],
+                'delete_time' => 0,
+            ];
+            $name = session('administrator')['name'];
+            $updata3 = [
+                'Project_Name' => $data['Project_Name'],
+                'Filled_by' => $name
+            ];
+            //截取项目名称日期
+            $date = substr($data['Project_Name'],0,9);
+
+            if($date >= 20220901){
+                $pj = Db::name('pj_term_record')->where($where3)->find();
+                if(!$pj){
+                    Db::name('pj_term_record')->insert($updata3);
+                }
+            }
+
 
             // 返回操作结果
             return json(['msg'=>'拆分成功']);

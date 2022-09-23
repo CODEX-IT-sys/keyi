@@ -621,11 +621,13 @@ layui.use(['table','form'], function(){
         var checkStatus = table.checkStatus('test');
         var num = 0
         var num2 = 0
+		var num3 = 0
         for (v in checkStatus.data) {
             num += checkStatus.data[v]['Pages'];
             num2 += checkStatus.data[v]['Source_Text_Word_Count'];
+            num3 += 1;
         }
-        var msg = "选中页数:" + num + ';源语数量:' + num2;
+        var msg = "选中项数:" + num3 +";选中页数:" + num + ';源语数量:' + num2;
 
         $('#jisuan').html(msg)
         layer.alert(msg);

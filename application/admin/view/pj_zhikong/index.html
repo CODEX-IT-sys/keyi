@@ -29,12 +29,12 @@
                         <h5 class="explainTitle">
                             <i class="iconfont icon-tishi"></i>
                             <span>说明</span>
-                            <span id="jisuan"  style="background: #0ba4da;float: right;">
+                            <span id="jisuan"  style="float: right;">
 
                             </span>
                         </h5>
                         <div class="explainCt">
-
+                            {$intro|raw}
                         </div>
                     </div>
                 </div>
@@ -108,13 +108,15 @@
             cols = [
                 {type: 'checkbox', fixed: 'left'}
                 ,{field: 'id', title: '主键序号', minWidth: 200,hide:'true', align: 'center', sort: true}
-                ,{field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center',sort:true}
-                ,{field:'Job_Name', title:'文件名称',minWidth: 100,align:'center',sort:true}
+                ,{field:'Filing_Code', title:'文件编号',minWidth: 200,align:'center',fixed:'left',sort:true}
+                ,{field:'Job_Name', title:'文件名称',minWidth:250,align:'center',fixed:'left',sort:true}
                 ,{field:'Project_Name', title:'项目名称',minWidth: 200,align:'center',sort:true,}
-                ,{field:'Company_Name', title:'公司名称', minWidth: 180,align:'center' }
-                ,{field:'Pages', title:'页数',style:'color: red;',minWidth: 180,align:'center'}
+                ,{field:'Company_Name', title:'公司名称', minWidth: 100,align:'center' }
+                ,{field:'Pages', title:'页数',style:'color: red;',minWidth: 100,align:'center'}
                 ,{field:'Source_Text_Word_Count', title:'源语数量', minWidth: 100,align:'center'}
                 ,{field:'Language', title:'语种',minWidth: 100,align:'center'}
+                ,{field: 'Spot_Check', title: 'QCR状态', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{field:'QCR_Feedback', title:'QCR反馈',minWidth: 120,align:'center',sort:true}
                 ,{field:'Product_Involved', title:'涉及产品',minWidth: 100, align:'center'}
                 ,{field:'File_Usage_and_Linguistic_Specification', title:'文件用途和语言规范',minWidth: 100,align:'center'}
                 ,{field:'File_Type', title:'文件类型',minWidth: 100,align:'center'}
@@ -124,19 +126,18 @@
                 ,{field:'Ninety_Five_to_Ninety_Nine_Percent_Repeated', title:' 95-99%重复率', style:'color: red;', minWidth: 150, align:'center'}
                 ,{field:'Total_Repetition_Rate', title:'总重复率',minWidth: 100,align:'center'}
                 ,{field:'Actual_Source_Text_Count', title:'实际源语数量',minWidth: 100,align:'center',style:'color: red;'}
-                ,{field:'Pre_Formatter', title:'预排版人员',minWidth: 150,align:'center' }
-                ,{field:'Translator', title:'翻译人员', minWidth: 150,align:'center'}
-                ,{field:'Reviser', title:'校对人员',minWidth: 150,align:'center'}
-                ,{field:'Post_Formatter', title:'后排版人员',  minWidth: 150,align:'center'}
+                ,{field:'Pre_Formatter', title:'预排版人员',minWidth: 100,align:'center' }
+                ,{field:'Translator', title:'翻译人员', minWidth: 100,align:'center'}
+                ,{field:'Reviser', title:'校对人员',minWidth: 100,align:'center'}
+                ,{field:'Post_Formatter', title:'后排版人员',  minWidth: 100,align:'center'}
                 ,{field:'Delivery_Date_Expected', title:'客户期望提交日期',  minWidth: 150,align:'center'}
                 ,{field:'Completed', title:'交付日期',minWidth: 150,align:'center',sort:true,style:'color: red;'}
-                ,{field:'Delivered_or_Not', title:'是否交稿',minWidth: 150,align:'center',sort:true}
+                ,{field:'Delivered_or_Not', title:'是否交稿',minWidth: 100,align:'center',sort:true}
                 ,{field:'Attention', title:'客户联系人', minWidth: 150,align:'center'}
                 ,{field:'Customer_Requirements', title:'客户要求',minWidth: 150,align:'center'}
                 ,{field:'External_Reference_File', title:'客户参考文件',  minWidth: 150,align:'center'}
-                ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 150,align:'center',sort:true}
-                ,{field:'PA', title:'项目组长',minWidth: 150,align:'center',sort:true}
-                , {field: 'Spot_Check', title: 'QCR状态', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{field:'First_Cooperation', title:'是否首次合作',minWidth: 100,align:'center',sort:true}
+                ,{field:'PA', title:'项目组长',minWidth: 100,align:'center',sort:true}
                 ,{fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 180}
             ];
 
@@ -147,13 +148,15 @@
             cols = [
                 {type: 'checkbox', fixed: 'left'}
                 ,{field: 'id', title: 'ID', minWidth: 200,hide:'true', align: 'center', sort: true}
-                ,{field:'Filing_Code', title:'Filing_Code',minWidth: 100,align:'center',sort:true}
-                ,{field:'Job_Name', title:'Job_Name',minWidth: 100,align:'center',sort:true}
+                ,{field:'Filing_Code', title:'Filing_Code',minWidth: 100,align:'center',fixed:'left',sort:true}
+                ,{field:'Job_Name', title:'Job_Name',minWidth: 100,align:'center',fixed:'left',sort:true}
                 ,{field:'Project_Name', title:'Project_Name',minWidth: 200,align:'center',sort:true,}
                 ,{field:'Company_Name', title:'Company_Name', minWidth: 180,align:'center' }
-                ,{field:'Pages', title:'Pages',style:'color: red;',minWidth: 180,align:'center'}
+                ,{field:'Pages', title:'Pages',style:'color: red;',minWidth: 100,align:'center'}
                 ,{field:'Source_Text_Word_Count', title:'Source_Text_Word_Count', minWidth: 100,align:'center'}
                 ,{field:'Language', title:'Language',minWidth: 100,align:'center'}
+                ,{field: 'Spot_Check', title: 'QCR Status', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
+                ,{field:'QCR_Feedback', title:'QCR Feedback',minWidth: 150,align:'center',sort:true}
                 ,{field:'Product_Involved', title:'Product_Involved',minWidth: 100, align:'center'}
                 ,{field:'File_Usage_and_Linguistic_Specification', title:'File_Usage_and_Linguistic_Specification',minWidth: 100,align:'center'}
                 ,{field:'File_Type', title:'File_Type',minWidth: 100,align:'center'}
@@ -175,7 +178,6 @@
                 ,{field:'External_Reference_File', title:'External_Reference_File',  minWidth: 150,align:'center'}
                 ,{field:'First_Cooperation', title:'First_Cooperation',minWidth: 150,align:'center',sort:true}
                 ,{field:'PA', title:'PA',minWidth: 150,align:'center',sort:true}
-                ,{field: 'Spot_Check', title: 'QCR Status', style: 'color: red;',minWidth: 150, align: 'center', sort: true,templet: '#titleTpl'}
                 ,{fixed: 'right', title: 'Operation', align: 'center', toolbar: '#barDemo', width: 180}
 
             ];
@@ -195,11 +197,12 @@
             ,defaultToolbar: ['filter', 'exports', 'print']
             ,title: '质控信息'
             ,cols : cols
-            ,limit:50, 			height: 'full-200',
+            ,limit:100, 			height: 'full-200',
             even: true,
             page: {
                 curr:location.hash.replace('#!fenye=', ''),
-                hash:'fenye'
+                hash:'fenye',
+                limits:[10,20,30,40,50,60,70,80,90,100,500,10000]
             },
         });
 
@@ -245,7 +248,7 @@
                     maxmin: true,
                     shadeClose: true, //点击遮罩关闭层
                     area : ['700px' , '560px'],
-                    content: "{:url('pj_project_profile/condition_zk')}",
+                    content: "{:url('pj_zhikong/condition_zk')}",
                     end: function () {
                         var search_type = localStorage.getItem('search_type');
                         var s = localStorage.getItem('field');

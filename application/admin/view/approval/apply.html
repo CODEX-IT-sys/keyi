@@ -1,0 +1,192 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="secWrap">
+    <div class="layui-container">
+        <form class="layui-form centerBox" id="form">
+
+
+
+            <div class="layui-col-xs10">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="{:session('language') == '中文'? '申请人' : 'Applicant'}">
+                        {:session('language') == '中文'? '申请人' : 'Applicant'}
+                    </label>
+                    <div class="layui-input-block">
+                        <select name="name"  lay-filter="" lay-search>
+                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                            <option value="PA01">PA01</option>
+                            <option value="PA05">PA05</option>
+                            <option value="PA06">PA06</option>
+                            <option value="PA12">PA12</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs10">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{:session('language') == '中文'? '客户公司' : 'Customer Company'}</label>
+                    <div class="layui-input-block">
+                        <select name="company"  lay-filter="" lay-search>
+                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                            {volist name="$company" id="v"}
+                            <option value="{$v}">{$v}</option>
+                            {/volist}
+
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="layui-col-xs10">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{:session('language') == '中文'? '来稿人' : 'Attention'}</label>
+                    <div class="layui-input-block">
+                        <select name="attention"  lay-filter="" lay-search>
+                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                            {volist name="$attention" id="v2"}
+                            <option value="{$v2}">{$v2}</option>
+                            {/volist}
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs10">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{:session('language') == '中文'? '审批人' : 'Approver'}</label>
+                    <div class="layui-input-block">
+                        <select name="approver"  lay-filter="" lay-search>
+                            <option value="PM02">PM02</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="layui-layer-btn layui-layer-btn- bottm_control">
+        <a class="layui-layer-btn0" id="submit">{:session('language') == '中文'? '确认' : 'OK'}</a>
+        <a class="layui-layer-btn1" id="cancel">{:session('language') == '中文'? '取消' : 'Cancel'}</a>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+<!--脚本-->
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            validator.add('name', [{
+                rule: 'require',
+                msg: '申请人不能为空'
+            }]);
+
+            validator.add('company', [{
+                rule: 'require',
+                msg: '客户公司不能为空'
+            }]);
+            validator.add('attention', [{
+                rule: 'require',
+                msg: '来稿人不能为空'
+            }]);
+
+            return validator.start();
+        };
+
+        // 字段 重名验证
+        /*$('#english_name').blur(function () {
+
+            var table = $('#table').val();
+
+            var name = $('#english_name').val();
+
+            // 获取数据 提交数据
+            $.ajax({
+                url: "{:url('score/check_name')}",
+                type: 'post',
+                dataType: 'json',
+                data: {table:table, name:name},
+                success: function (res) {
+
+                    if(res.code === 0){
+                        layer.alert(res.msg, {title: '提示'},
+                            function (index) {
+                            // 关闭alert
+                            layer.close(index);});
+
+                        $('#english_name').val('');
+
+                        return false;
+                    }
+                }
+            })
+
+        });*/
+
+
+        // 获取要提交的数据
+        var getSubmitData = function () {
+            // 字段节点公共的字段
+            var data = $('#form').find('[name=name], [name=company], [name=attention], [name=approver]').serialize();
+
+            return data;
+        };
+
+        // 表单提交
+        $('#submit').on('click', function () {
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+            console.log(getSubmitData());
+
+            // 获取数据 提交数据
+            $.ajax({
+                url: "{:url('approval/add_apply')}",
+                type: 'post',
+                dataType: 'json',
+                data: getSubmitData()
+            }).done(function (res) {
+                layer.alert(res.msg, {title: '提示'}, function (index) {
+
+                    // 关闭alert
+                    layer.close(index);
+
+                    // 关闭表单弹窗
+                    var formIndex = top.layer.getFrameIndex(window.name);
+                    top.layer.close(formIndex);
+
+                });
+            }).fail(function (jqXHR) {
+                if (jqXHR.status === 422) {
+                    layer.alert(jqXHR.responseText, {title: '提示'});
+                }
+            });
+        });
+
+        // 取消
+        function qx() {
+            var index = top.layer.getFrameIndex(window.name);
+            top.layer.close(index);
+        }
+
+        $('#cancel').on('click', function () {
+            qx();
+        });
+    });
+</script>
+{/block}

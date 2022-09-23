@@ -853,6 +853,28 @@ class Statistics extends Controller
     public function pagesum()
     {
         $data=request()->param('month');
+        $pa = request()->param('pa');
+        if($pa){
+            if($pa == 'all'){
+                $where = [];
+                $user = Db::name('admin')->where('delete_time',0)->field('id,name')->select();
+                $name_arr = array_column($user, 'name');
+            }else{
+                $where = [
+                    'PA' => $pa
+                ];
+                $cid = Db::name('xt_dict_cate')->where('en_name', $pa)->field(['id'])->find();
+                $c_id = $cid['id'];
+                $name_arr = Db::name('xt_dict')->where('c_id', $c_id)->select();
+                $name_arr = array_column($name_arr, 'cn_name');
+
+            }
+        }else{
+            $where = [];
+            $user = Db::name('admin')->where('delete_time',0)->field('id,name')->select();
+            $name_arr = array_column($user, 'name');
+            $pa = 'all';
+        }
 
         if(isset($data)){
             $time= strtotime($data);
@@ -901,20 +923,20 @@ class Statistics extends Controller
 //        dump($lastTime);
 //        die;
         //每天要完成多少页
-        $mt=  Db::table('ky_pj_contract_review')->whereBetweenTime('Completed',$firstTime,$lastTime)->where('delete_time',0)->field('Completed,sum(Pages) as sumpage')
-            ->where('Delivered_or_Not','<>','CXL')->group('Completed')->select();
-      //预排页数Work_Content
-        $yp=Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date',$firstTime,$lastTime)->where('delete_time',0)->where('Work_Content','Preformat')->field('Work_Date,sum(Number_of_Pages_Completed) as yppage')
+        $mt = Db::table('ky_pj_contract_review')->whereBetweenTime('Completed', $firstTime, $lastTime)->where('delete_time', 0)->field('Completed,sum(Pages) as sumpage')
+            ->where('Delivered_or_Not', '<>', 'CXL')->where($where)->group('Completed')->select();
+        //预排页数Work_Content
+        $yp = Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date', $firstTime, $lastTime)->where('delete_time', 0)->where('Work_Content', 'Preformat')->where('Name_of_Formatter','in',$name_arr)->field('Work_Date,sum(Number_of_Pages_Completed) as yppage')
             ->group('Work_Date')->select();
         //后排页数Work_Content
-        $hp=Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date',$firstTime,$lastTime)->where('delete_time',0)->where('Work_Content','Postformat')->field('Work_Date,sum(Number_of_Pages_Completed) as hppage')
+        $hp = Db::table('ky_pj_daily_progress_dtp')->whereBetweenTime('Work_Date', $firstTime, $lastTime)->where('delete_time', 0)->where('Work_Content', 'Postformat')->where('Name_of_Formatter','in',$name_arr)->field('Work_Date,sum(Number_of_Pages_Completed) as hppage')
             ->group('Work_Date')->select();
         //翻译页数Work_Content
-        $tr=Db::table('ky_pj_daily_progress_tr_re')->whereBetweenTime('Work_Date',$firstTime,$lastTime)->where('delete_time',0)->wherein('Work_Content',['Translate','TR Modify','TR Finalize'])->where('Category','TR')
+        $tr = Db::table('ky_pj_daily_progress_tr_re')->whereBetweenTime('Work_Date', $firstTime, $lastTime)->where('delete_time', 0)->wherein('Work_Content', ['Translate', 'TR Modify', 'TR Finalize'])->where('Category', 'TR')->where('Name_of_Translator_or_Reviser','in',$name_arr)
             ->field('Work_Date,sum(Number_of_Pages_Completed) as trpage')
             ->group('Work_Date')->select();
         //校对页数Work_Content
-        $xd=Db::table('ky_pj_daily_progress_tr_re')->whereBetweenTime('Work_Date',$firstTime,$lastTime)->where('delete_time',0)->wherein('Work_Content',['Revise','RE Modify','RE (Sampling)','RE (Highlight)','RE (Sampling_Highlight)','RE Finalize'])->where('Category','RE')
+        $xd = Db::table('ky_pj_daily_progress_tr_re')->whereBetweenTime('Work_Date', $firstTime, $lastTime)->where('delete_time', 0)->wherein('Work_Content', ['Revise', 'RE Modify', 'RE Finalize'])->where('Category', 'RE')->where('Name_of_Translator_or_Reviser','in',$name_arr)
             ->field('Work_Date,sum(Number_of_Pages_Completed) as xdpage')
             ->group('Work_Date')->select();
         foreach($mt as $k=>$v){
@@ -983,8 +1005,10 @@ class Statistics extends Controller
             $char['type']= 'bar';
             $char['data'][]=$v['sumpage'];
         }
+
+        $wtj = Db::name('pj_contract_review')->where('Delivered_or_Not', 'No')->where('delete_time', 0)->sum('pages');
         if (!request()->isAjax()) {
-            $this->assign(['list'=>$list,'mon'=>json_encode($mon),'char'=>json_encode($char)]);
+            $this->assign(['list' => $list, 'mon' => json_encode($mon), 'char' => json_encode($char),'pa'=>$pa,'wtj'=>$wtj]);
             return $this->fetch();
         }
         return [
@@ -1298,7 +1322,7 @@ class Statistics extends Controller
                 ->where('Work_Date',$firstTime)
                 ->where('delete_time', 0)
                 ->where('Name_of_Formatter',$val['cn_name'])
-                ->wherein('Work_Content', ['Preformat', 'Postformat','Compare','Entry'])
+                ->wherein('Work_Content', ['Preformat', 'Postformat','Compare','Entry','Term Extraction'])
                 ->sum('Number_of_Pages_Completed');
 
             $tr = Db::table('ky_pj_daily_progress_tr_re')
@@ -1316,17 +1340,24 @@ class Statistics extends Controller
                 ->select();
             $trzs_sum = 0;
             foreach($tr_zs as $k1=>$v1){
+                //判断之前是否填过该文件编号的记录，如果有的话已完成百分比需要减去之前的
                 $zx = Db::table('ky_pj_daily_progress_tr_re')
                     ->where('Work_Date','<',$firstTime)
                     ->where('delete_time', 0)
                     ->where('Name_of_Translator_or_Reviser',$val['cn_name'])
-                    ->wherein('Work_Content', ['Translate','TR Modify Other'])
+                    ->wherein('Work_Content', $v1['Work_Content'])
                     ->where('Filing_Code',$v1['Filing_Code'])
                     ->where('Job_Name',$v1['Job_Name'])
                     ->order('id','desc')
-                    ->find();
+                    ->select();
+
                 if($zx){
-                    $trzs_sum += $v1['Actual_Source_Text_Count']*($v1['Percentage_Completed']-$zx['Percentage_Completed'])/100;
+                    if($v1['Percentage_Completed'] != 0){
+                        $arr = array_column($zx,'Percentage_Completed');
+                        $max = max($arr);
+                        $trzs_sum += $v1['Actual_Source_Text_Count']*($v1['Percentage_Completed']-$max)/100;
+                    }
+
                 }else{
                     $trzs_sum += $v1['Actual_Source_Text_Count']*$v1['Percentage_Completed']/100;
                 }
@@ -1872,6 +1903,8 @@ class Statistics extends Controller
         $list = Db::name('pj_daily_progress_tr_re')
             ->where('delete_time',0)
             ->where('Percentage_Completed',100)
+            ->where('Work_Content','Translate')
+
             ->whereBetweenTime('Work_Date',$s,$d)
             ->field('Name_of_Translator_or_Reviser,avg(Revision_Rate) as rate')
             ->group('Name_of_Translator_or_Reviser')
@@ -1882,9 +1915,9 @@ class Statistics extends Controller
         $pa01_arr = Db::name('xt_dict')->where('c_id',$pa01)->select();
         $pa01_arr = array_column($pa01_arr, 'cn_name');
 
-        $pa04= Db::name('xt_dict_cate')->where('en_name','PA04')->value('id');
+       /* $pa04= Db::name('xt_dict_cate')->where('en_name','PA04')->value('id');
         $pa04_arr = Db::name('xt_dict')->where('c_id',$pa04)->select();
-        $pa04_arr = array_column($pa04_arr, 'cn_name');
+        $pa04_arr = array_column($pa04_arr, 'cn_name');*/
 
         $pa05 = Db::name('xt_dict_cate')->where('en_name','PA05')->value('id');
         $pa05_arr = Db::name('xt_dict')->where('c_id',$pa05)->select();
@@ -1906,8 +1939,6 @@ class Statistics extends Controller
             //判断小组
             if(in_array($val['Name_of_Translator_or_Reviser'],$pa01_arr)){
                 $list[$key]['team'] = 'PA01';
-            }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa04_arr)){
-                $list[$key]['team'] = 'PA04';
             }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa05_arr)){
                 $list[$key]['team'] = 'PA05';
             }elseif(in_array($val['Name_of_Translator_or_Reviser'],$pa06_arr)){
@@ -1931,6 +1962,7 @@ class Statistics extends Controller
                     ->where('delete_time',0)
                     ->where('Percentage_Completed',100)
                     ->where('Name_of_Translator_or_Reviser',$val['Name_of_Translator_or_Reviser'])
+                    ->where('Work_Content','Translate')
                     ->whereBetweenTime('Work_Date',$s,$d)
                     ->avg('Revision_Rate');
                 $date = 'date'.$i;
@@ -1938,6 +1970,13 @@ class Statistics extends Controller
 
             }
         }
+
+       /* foreach($list as $k2=>$v2){
+            if($v2['team'] == ''){
+                unset($list[$k2]);
+            }
+        }
+        */
         // 非Ajax请求，直接返回视图
         if (!request()->isAjax()) {
 

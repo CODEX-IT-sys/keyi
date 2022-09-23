@@ -213,35 +213,40 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="layui-col-xs4">
-							    <div class="layui-form-item">
-							        <label class="layui-form-label" title="{:session('language') == '中文'? '是否更新公司主库' : 'Update Company TM'}">
-							            {:session('language') == '中文'? '是否更新公司主库' : 'Update Company TM'}
-							        </label>
-							        <div class="layui-input-block">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '是否更新公司主库' : 'Update Company TM'}">
+										{:session('language') == '中文'? '是否更新公司主库' : 'Update Company TM'}
+									</label>
+									<div class="layui-input-block">
 										<select name="Update_Company_TM" lay-filter="Update_Company_TM" lay-search>
 											<option value="No">No</option>
-											<option value="Yes">Yes</option>
-											<option value="N/A">N/A</option>
+											<option value="Yes A级">Yes A级</option>
+											<option value="Yes B级">Yes B级</option>
+											<option value="Yes 旧主记忆库">Yes 旧主记忆库</option>
+											<option value="Yes 特殊项目公司主记忆库">Yes 特殊项目公司主记忆库</option>
+											<option value="N/A 不更库项目">N/A 不更库项目</option>
+											<option value="N/A 已更特殊类型库">N/A 已更特殊类型库</option>
 										</select>
 									</div>
-							    </div>
+								</div>
 							</div>
-							
+
 							<div class="layui-col-xs4">
-							    <div class="layui-form-item">
-							        <label class="layui-form-label" title="{:session('language') == '中文'? '是否更新文件主库' : 'Update File TM'}">
-							            {:session('language') == '中文'? '是否更新文件主库' : 'Update File TM'}
-							        </label>
-							        <div class="layui-input-block">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '是否更新类型主库' : 'Update File TM'}">
+										{:session('language') == '中文'? '是否更新类型主库' : 'Update File TM'}
+									</label>
+									<div class="layui-input-block">
 										<select name="Update_File_TM" lay-filter="Update_File_TM" lay-search>
-											<option value="No">No</option>
-											<option value="Yes">Yes</option>
-											<option value="N/A">N/A</option>
+											{foreach $typearr as $key=>$v}
+											<option value="{$v.name}">{$v.name}</option>
+											{/foreach}
+
 										</select>
 									</div>
-							    </div>
+								</div>
 							</div>
 							
 							<div class="layui-col-xs4">
@@ -274,6 +279,34 @@
 										</select>
 							        </div>
 							    </div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '不符合项' : 'Non_Conformance'}">
+										{:session('language') == '中文'? '不符合项' : 'Non_Conformance'}
+									</label>
+									<div class="layui-input-block">
+										<div id="ncr" class="xm-select-demo"></div>
+										<input name="Non_Conformance" id="Non_Conformance" type="hidden" value="" autocomplete="off" placeholder="" class="layui-input">
+
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '不符合项是否已纠正' : 'Whether_Non_Conformance_Corrected'}">
+										{:session('language') == '中文'? '不符合项是否已纠正' : 'Whether_Non_Conformance_Corrected'}
+									</label>
+									<div class="layui-input-block">
+										<select name="Whether_Non_Conformance_Corrected" lay-filter="Update_Company_TM" lay-search>
+											<option value="是">是</option>
+											<option value="否">否</option>
+											<option value="N/A">N/A</option>
+										</select>
+									</div>
+								</div>
 							</div>
 
 							<div class="layui-col-xs4">
@@ -467,7 +500,23 @@
             },
             data: hpData
         });
-
+		var ncr = '{$ncr|raw}';
+		var ncrData = JSON.parse(ncr);
+		var ncrz = xmSelect.render({
+			el: '#ncr',
+			toolbar: {
+				show: true,
+				list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+			},
+			paging: true,
+			pageSize: 10,
+			filterable: true,
+			pageEmptyShow: false,
+			theme: {
+				color: '#0073FF'
+			},
+			data: ncrData
+		});
 		// 下拉选择器值发生变化
 		form.on('select(Filing_Code)', function (data) {
 			var code = data.value;
@@ -569,7 +618,21 @@
                         },
                         data: JSON.parse(res.hp)
                     });
-
+					xmSelect.render({
+						el: '#ncr',
+						toolbar: {
+							show: true,
+							list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+						},
+						paging: true,
+						pageSize: 10,
+						filterable: true,
+						pageEmptyShow: false,
+						theme: {
+							color: '#0073FF'
+						},
+						data: JSON.parse(res.ncr)
+					});
 					// 文本框写入默认值
 					$.each(info, function (name, value) {
                         // input
@@ -703,6 +766,16 @@
             hpnamestr = hpnamestr.substring(0, hpnamestr.length - 1);
             $('#Post_Formatter').val(hpnamestr);
 
+			var ncrArr = ncrz.getValue();
+			var ncrLength = ncrArr.length;
+			var ncrnamestr = '';
+			for(var i=0; i< ncrLength; i++ )
+			{
+				ncrnamestr += ncrArr[i].name + ',';
+			}
+			// 去除多余符号
+			ncrnamestr = ncrnamestr.substring(0, ncrnamestr.length - 1);
+			$('#Non_Conformance').val(ncrnamestr);
 			// 表单提交
 			$('#form').submit();
 		});

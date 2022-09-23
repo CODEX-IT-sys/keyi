@@ -157,24 +157,28 @@ class Workbench extends Controller
                 ->paginate($limit);
 
             // 项目部 (10翻译人员  11校对人员  12、13预、后排版人员)
-        } else if(in_array($job_id, [4,5,6,10,11,12,13,15,19])){
+        } else if(in_array($job_id, [4,5,10,11,12,13,15,19])){
 
             // 针对不同人员 查询字段不同
-            if($job_id == 10 or $job_id == 19){
+            if ($job_id == 10 or $job_id == 19) {
                 $where_time = 'Translation_Delivery_Time';
                 $where_name = 'Translator';
+                $where_name2 = 'a.Translator';
             }
-            if(in_array($job_id, [4,6,11,15])){
+            if (in_array($job_id, [4,  11, 15])) {
                 $where_time = 'Revision_Delivery_Time';
                 $where_name = 'Reviser';
+                $where_name2 = 'a.Reviser';
             }
-            if($job_id == 12){
+            if ($job_id == 12) {
                 $where_time = 'Pre_Format_Delivery_Time';
                 $where_name = 'Pre_Formatter';
+                $where_name2 = 'a.Pre_Formatter';
             }
-            if($job_id == 13 or $job_id == 5){
+            if ($job_id == 13 or $job_id == 5) {
                 $where_time = 'Post_Format_Delivery_Time';
                 $where_name = 'Post_Formatter';
+                $where_name2 = 'a.Post_Formatter';
             }
 
             // 待安排项目
@@ -213,6 +217,37 @@ class Workbench extends Controller
                 ->order('id desc')
                 ->select();
 
+
+            //QCR提醒
+            $tod = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
+            $begintime = $tod-15*86400;
+            $endtime = $tod+16*86400;
+            $qcr =  Db::table('ky_pj_project_profile')
+                ->alias('a')
+                ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                ->where('a.delete_time',0)
+                ->where($where_name2,'like',$name)
+                ->where('a.Spot_Check','in',['5','6','7','8','9'])
+                ->where('b.Completed', '>',$begintime)
+                ->where('b.Completed','<',$endtime)
+                ->where('b.Delivered_or_Not','No')
+                ->field('a.id,a.Filing_Code,a.Job_Name,a.Spot_Check,a.Format_QL,a.Translation_QL,a.Proposal')
+                ->order('a.Spot_Check desc')
+                ->paginate($limit)->each(function($item, $key){
+                    if($item['Spot_Check'] == 5){
+                        $item['Spot_Check'] = '翻译QCR,排版QCR';
+                    }elseif($item['Spot_Check'] == 6){
+                        $item['Spot_Check'] = '排版QCR';
+                    }elseif($item['Spot_Check'] == 7){
+                        $item['Spot_Check'] = '翻译QCR';
+                    }elseif($item['Spot_Check'] == 8){
+                        $item['Spot_Check'] = '待排版QCR';
+                    }elseif($item['Spot_Check'] == 9){
+                        $item['Spot_Check'] = '待翻译QCR';
+                    }
+
+                    return $item;
+                });
             // 进度异常
             /*$exception =  Db::name('pj_contract_review')
                 ->field('id, Filing_Code, Job_Name')
@@ -230,16 +265,27 @@ class Workbench extends Controller
             // 将职位置0 表示非管理层
             $job_id = 0;
 
-        } else if(in_array($job_id,[7,8,9])) {
-            // 项目管理人员(7项目组长、8项目经理、9总经理)
-            if($job_id == 7){
+        } else if(in_array($job_id,[6,7,8,9,23])) {
+            // 项目管理人员(6质控主管、7项目组长、8项目经理、9总经理)
+            if ($job_id == 7) {
                 $where_name = 'PA';
+                $where_name2 ='a.PA';
             }
-            if($job_id == 8){
-                $where_name = 'PM';
-            }
-            if($job_id == 9){
+
+            if ($job_id == 8) {
                 $where_name = '';
+                $where_name2 ='';
+            }
+            if ($job_id == 9 || $job_id == 6) {
+                $where_name = '';
+                $where_name2 ='';
+            }
+
+            if($job_id == 23){
+                $where_name = '';
+                $where_name2 ='';
+                /*$where_name = 'PM';
+                $name = 'PM02';*/
             }
 
             // 待安排项目   项目助理为空的
@@ -306,6 +352,38 @@ class Workbench extends Controller
                 ->order('id desc')
                 ->paginate($limit);
 
+            //QCR提醒
+            $tod = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
+            $begintime = $tod-16*86400;
+            $begintime = date('Ymd',$begintime);
+            $endtime = $tod+17*86400;
+            $endtime = date('Ymd',$endtime);
+            $qcr = Db::table('ky_pj_project_profile')
+                ->alias('a')
+                ->leftjoin('ky_pj_contract_review b','a.Filing_code = b.Filing_code')
+                ->where('a.delete_time',0)
+                ->where($where_name2,'like',$name)
+                ->where('a.Spot_Check','in',['5','6','7','8','9'])
+                ->where('b.Completed', '>',$begintime)
+                ->where('b.Completed','<',$endtime)
+                ->where('b.Delivered_or_Not','No')
+                ->field('a.id,a.Filing_Code,a.Job_Name,a.Spot_Check,a.Format_QL,a.Translation_QL,a.Proposal')
+                ->order('a.Spot_Check desc')
+                ->paginate($limit)->each(function($item, $key){
+                    if($item['Spot_Check'] == 5){
+                        $item['Spot_Check'] = '翻译QCR,排版QCR';
+                    }elseif($item['Spot_Check'] == 6){
+                        $item['Spot_Check'] = '排版QCR';
+                    }elseif($item['Spot_Check'] == 7){
+                        $item['Spot_Check'] = '翻译QCR';
+                    }elseif($item['Spot_Check'] == 8){
+                        $item['Spot_Check'] = '待排版QCR';
+                    }elseif($item['Spot_Check'] == 9){
+                        $item['Spot_Check'] = '待翻译QCR';
+                    }
+
+                    return $item;
+                });
 
             if($job_id == 8){
                 $where_name = '';
@@ -416,6 +494,17 @@ class Workbench extends Controller
         }
         $t['f'] = $f_data['count'];
 
+        if (empty($qcr)) {
+            $q_data = [
+                'code' => 0,
+                'msg' => '',
+                'count' => 0,
+                'data' => [],
+            ];
+        } else {
+            $q_data = generate_layui_table_data($qcr);
+        }
+        $t['q'] = $q_data['count'];
 
         // 判断 type 参数 赋值列表
         switch ($type) {
@@ -444,6 +533,9 @@ class Workbench extends Controller
                 break;
             case 6:
                 $data = $f_data;
+                break;
+            case 7:
+                $data = $q_data;
                 break;
         }
 

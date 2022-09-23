@@ -126,7 +126,26 @@
         {:session('language') == '中文'? '翻译QCR完毕' : 'Translated QCR'}
     </span>
     {{#  } }}
-
+    {{#  if(d.type == 11){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? 'QA自检报告' : 'QA Report'}
+    </span>
+    {{#  } }}
+    {{#  if(d.type == 12){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? '术语（校定）' : 'Term'}
+    </span>
+    {{#  } }}
+    {{#  if(d.type == 13){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? 'N/A' : 'N/A'}
+    </span>
+    {{#  } }}
+    {{#  if(d.type == 14){ }}
+    <span class="layui-badge layui-bg-orange">
+        {:session('language') == '中文'? '修订完毕' : 'Revised'}
+    </span>
+    {{#  } }}
 </script>
 
 <!--脚本-->
@@ -151,6 +170,7 @@
                 {field: 'file_dir', title: '文件夹', sort:true, minWidth: 200},
                 {field: 'creator', title: '创建者', sort:true, minWidth: 100},
                 {field: 'create_time', title: '创建时间', sort:true, minWidth: 130},
+                {field: 'update_time', title: '修改时间', sort:true, minWidth: 100},
                 {width: 240, title: '操作', align: 'center', toolbar: '#barDemo'}
 			]]
 		}else{
@@ -161,6 +181,7 @@
                 {field: 'file_dir', title: 'Folder', sort:true, minWidth: 200},
                 {field: 'creator', title: 'Creator', sort:true, minWidth: 100},
                 {field: 'create_time', title: 'Create_time', sort:true, minWidth: 130},
+                {field: 'update_time', title: 'Update_time', sort:true, minWidth: 100},
 			    {width: 240, title: 'Action', align: 'center', toolbar: '#barDemo'}
 			]]
 		}

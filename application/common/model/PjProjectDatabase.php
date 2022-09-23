@@ -33,7 +33,7 @@ class PjProjectDatabase extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(!in_array($job_id,[1,8,9,20])){
+        if(!in_array($job_id,[1,6,8,9,16,20,23]) && $name != '周美玲' && $name !='李晓艺'){
 
             // 否则 就只显示自己录入的 或 项目助理数据
             /*$query = $this->where('Filled_by','in', [session('administrator')['name'],NULL])
@@ -76,7 +76,7 @@ class PjProjectDatabase extends Model
         }
 
         // 返回分页对象
-        return $query->order('id desc')->paginate($limit);
+        return $query->where('Delivered_or_Not','neq','CXL')->order('id desc')->paginate($limit);
     }
 
     public function getAll()

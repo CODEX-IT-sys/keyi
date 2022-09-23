@@ -30,7 +30,7 @@ class XtFile extends Controller
         $job_id = session('administrator')['job_id'];
 
         // 查询器对象 判断管理层
-        if(in_array($job_id, [1,8,9,20]) || $name == '张攀' || $name == '闻心宇') {
+        if(in_array($job_id, [1,6,8,9,20,23]) || $name == '张攀' || $name == '闻心宇' || $name == '周美玲' || $name == '李晓艺' ) {
 
             // 可见所有项目
             $list = Db::name('pj_project_profile_text')
@@ -100,8 +100,8 @@ class XtFile extends Controller
     // 显示新建的表单页
     public function create($Project_Name)
     {
-
-        return view('', ['Project_Name'=>$Project_Name]);
+        $file_name =  Db::name('xt_dict')->where('c_id',36)->order('sort','asc')->select();
+        return view('', ['Project_Name'=>$Project_Name,'file_name'=>$file_name]);
     }
 
     // 显示编辑的表单页
@@ -135,6 +135,42 @@ class XtFile extends Controller
         }
 
         return json(['code'=>0, 'msg'=>'success']);
+    }
+
+    //通过文件类型获取文件夹名称
+    public function getName(){
+        $type = input('fileType');
+
+        //文件名称数据组装
+        $cszl = ['翻译文件（部分已排版）','翻译文件（全部已排版）','参考文件_客户参考','参考文件_内部参考','客户要求'];
+        $fywc = ['翻译修订完毕-需后排','资料收集-翻译','翻译完毕-需后排'];
+        $jdwc = ['校对完毕-需后排','资料收集-校对'];
+        $QA = ['QA自检报告-翻译','QA自检报告-校对'];
+        $hpwc = ['后排完毕','后排完毕-需QCR'];
+        $dgwj = ['定稿完毕','更库项目文件'];
+        $fyQCR = ['翻译QCR完毕'];
+        $pbQCR = ['排版QCR完毕'];
+        $sy = ['术语'];
+        $xd = ['修订完毕-需后排'];
+        $arr = [];
+        $arr['1'] = $cszl;
+        $arr['4'] = $fywc;
+        $arr['5'] = $jdwc;
+        $arr['11'] = $QA;
+        $arr['6'] = $hpwc;
+        $arr['7'] = $dgwj;
+        $arr['9'] = $pbQCR;
+        $arr['10'] = $fyQCR;
+        $arr['12'] = $sy;
+        $arr['13'] = $sy;
+        $arr['14'] = $xd;
+        $data = $arr[$type];
+        $list = [
+            'code' => 1,
+            'msg' => 'success',
+            'data' => $data,
+        ];
+        return $list;
     }
 
     // 文件上传 （保留原文件名）

@@ -14,7 +14,7 @@ use think\Controller;
 use think\Request;
 use think\Db;
 
-// 项目抽查 控制器描述
+// 质量抽查
 class PjCheck extends Common
 {
 
@@ -29,25 +29,34 @@ class PjCheck extends Common
 
         foreach ($colsData as $k => $v) {
             switch ($v['Field']) {
-                case 'title':
+                case 'Filing_Code':
+                    $colsData[$k]['width'] = 150;
+                    $colsData[$k]['fixed'] = 'left';
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Job_Name':
                     $colsData[$k]['width'] = 300;
                     $colsData[$k]['fixed'] = 'left';
                     $colsData[$k]['sort'] = 'true';
                     break;
-                case 'content':
-                    $colsData[$k]['hide'] = 'true';
+                case 'Pages':
+                    $colsData[$k]['width'] = 100;
+                    $colsData[$k]['sort'] = 'true';
                     break;
-                case 'update_time':
-                    $colsData[$k]['hide'] = 'true';
+                case 'Bcheck_Person':
+                    $colsData[$k]['width'] = 100;
                     break;
-                case 'create_time':
-                    $colsData[$k]['hide'] = 'true';
+                case 'Check_Cate':
+                    $colsData[$k]['width'] = 100;
+                    break;
+                case 'Sampling_Ratio':
+                    $colsData[$k]['width'] = 100;
                     break;
                 case 'Filled_by':
                     $colsData[$k]['hide'] = 'true';
                     break;
-                case 'status':
-                    $colsData[$k]['hide'] = 'true';
+                case 'Check_Pages':
+                    $colsData[$k]['width'] = 100;
                     break;
                 default:
                     ;
@@ -200,31 +209,30 @@ class PjCheck extends Common
         if($save){
             if($data['Check_Cate'] == '翻译'){
                 if($Spot_Check == '6'){
-                    $up_data = [
-                        'Spot_Check' => '5'
-                    ];
+                    $spot_check = '5';
                 }else{
-                    $up_data = [
-                        'Spot_Check' => '7'
-                    ];
+                    $spot_check = '7';
+
                 }
 
             }elseif($data['Check_Cate'] == '排版'){
                 if($Spot_Check == '7'){
-                    $up_data = [
-                        'Spot_Check' => '5'
-                    ];
+                    $spot_check = '5';
                 }else{
-                    $up_data = [
-                        'Spot_Check' => '6'
-                    ];
+                    $spot_check = '6';
                 }
 
             }else{
-                $up_data = [
-                    'Spot_Check' => '已QCR'
-                ];
+                $spot_check = '已抽查';
             }
+            $up_data = [
+                'Format_QL' => $data['Format_QL'],
+                'Translation_QL' => $data['Translation_QL'],
+                'Proposal' => $data['Proposal'],
+                'Spot_Check' => $spot_check
+            ];
+
+
             $res = Db::name('pj_project_profile')->where('id',$id)
                 ->update($up_data);
         }
@@ -270,6 +278,20 @@ class PjCheck extends Common
             }
         }
 
+        //同步等级和建议到项目描述表
+        $where2 = [
+            'Filing_Code' => $data['Filing_Code'],
+            'Job_Name' => $data['Job_Name'],
+            'delete_time' => 0,
+        ];
+        $up_data = [
+            'Format_QL' => $data['Format_QL'],
+            'Translation_QL' => $data['Translation_QL'],
+            'Proposal' => $data['Proposal'],
+
+        ];
+        $res = Db::name('pj_project_profile')->where($where2)
+            ->update($up_data);
 
         echo "<script>history.go(-2);</script>";
 

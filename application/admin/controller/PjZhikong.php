@@ -67,11 +67,23 @@ class PjZhikong extends Common
             'Comment' => 'QCR状态',
         ];
 
+        $colsData[11] = [
+            'Field' => 'QCR_Feedback',
+            'Comment' => 'QCR反馈',
+        ];
+
+        $colsData[12] = [
+            'Field' => 'Delivered_or_Not',
+            'Comment' => '是否交稿',
+        ];
+
+        // 查询文本说明信息
+        $intro = Db::name('xt_table_text')->where('id',18)->value('intro');
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
             return view('', [
                 'field'=>$field, 'keyword'=>$keyword,'select_field'=>$colsData, 'colsData' => json_encode($colsData),
-                'search_type'=>$search_type
+                'search_type'=>$search_type,'intro'=>$intro
             ]);
         }
 
@@ -101,7 +113,7 @@ class PjZhikong extends Common
             foreach ($field_arr as $k => $v){
                 foreach ($keyword_arr as $key => $val){
                     if($k == $key){
-                        if($v != 'PA' && $v != 'Completed'){
+                        if($v != 'PA' && $v != 'Completed' && $v != 'Delivered_or_Not'){
                             $map[] = ['a.'.$v,'LIKE',"%".$val."%"];
 
                         }else{
@@ -119,7 +131,7 @@ class PjZhikong extends Common
                 ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                     'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                     'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                    'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                    'a.Reviser','a.Post_Formatter','a.Spot_Check','a.QCR_Feedback','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                 ->order('a.Spot_Check desc')
                 ->paginate($limit);
 
@@ -133,11 +145,11 @@ class PjZhikong extends Common
                     ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                         'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                         'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                        'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                        'a.Reviser','a.Post_Formatter','a.Spot_Check','a.QCR_Feedback','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                     ->orderRaw('a.Spot_Check desc,a.Filing_Code desc')
                     ->paginate($limit);
             }else{
-                if($field != 'PA' && $field != 'Completed'){
+                if($field != 'PA' && $field != 'Completed' && $field != 'Delivered_or_Not'){
 
                     $list = Db::table('ky_pj_project_profile')
                         ->alias('a')
@@ -147,7 +159,7 @@ class PjZhikong extends Common
                         ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                            'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                            'a.Reviser','a.Post_Formatter','a.Spot_Check','a.QCR_Feedback','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                         ->order('a.Spot_Check desc')
                         ->paginate($limit);
 
@@ -159,7 +171,7 @@ class PjZhikong extends Common
                         ->field(['a.id','a.Filing_Code','a.Job_Name','Project_Name','a.Company_Name','a.Pages','a.Source_Text_Word_Count','a.Language','a.Product_Involved',
                             'a.File_Usage_and_Linguistic_Specification','a.File_Type','a.Format_Difficulty','a.Translation_Difficulty','a.One_Hundred_Percent_Repeated',
                             'a.Ninety_Five_to_Ninety_Nine_Percent_Repeated','a.Total_Repetition_Rate','a.Actual_Source_Text_Count','a.Pre_Formatter','a.Translator',
-                            'a.Reviser','a.Post_Formatter','a.Spot_Check','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
+                            'a.Reviser','a.Post_Formatter','a.Spot_Check','a.QCR_Feedback','b.Delivery_Date_Expected','b.Completed','b.Delivered_or_Not','b.Attention','b.Customer_Requirements','b.External_Reference_File','b.First_Cooperation','b.PA'])
                         ->order('a.Spot_Check desc')
                         ->paginate($limit);
                 }
@@ -383,6 +395,19 @@ class PjZhikong extends Common
         $colsData[8] = [
             'Field' => 'PA',
             'Comment' => '项目组长',
+        ];
+        $colsData[9] = [
+            'Field' => 'Spot_Check',
+            'Comment' => 'QCR状态',
+        ];
+
+        $colsData[10] = [
+            'Field' => 'QCR_Feedback',
+            'Comment' => 'QCR反馈',
+        ];
+        $colsData[11] = [
+            'Field' => 'Delivered_or_Not',
+            'Comment' => '是否交稿',
         ];
         // 直接返回视图
         return view('', ['select_field'=>$colsData]);

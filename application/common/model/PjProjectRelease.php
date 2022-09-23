@@ -35,7 +35,7 @@ class PjProjectRelease extends Model
 
         // 查询器对象 判断管理层
         //if(!in_array($job_id,[1,4,6,8,9,10,11,15,20])) {
-        if(!in_array($job_id,[1,8,9])) {
+        if(!in_array($job_id,[1,6,8,9])) {
             // 否则 就只显示自己录入的数据
             $where['Filled_by'] = $name;
         }

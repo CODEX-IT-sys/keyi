@@ -52,22 +52,8 @@ class PjProjectDatabase extends Common
                 case 'Filled_by':
                     $colsData[$k]['hide']=true;
                     break;
-                case 'PA':
-                    $colsData[$k]['hide']=true;
-                    break;
-                case 'CODEX_Team':
-//                    $colsData[$k]['width']=100;
-                    $colsData[$k]['hide']=true;
-                    break;
-                case 'Sub_Contracted':
-                    $colsData[$k]['hide']=true;
-                    break;
-
                 case 'Pre_Format_Delivery_Time':
                     $colsData[$k]['width']=150;
-                    break;
-                case 'PA':
-                    $colsData[$k]['hide']=true;
                     break;
                 case 'Post_Formatter':
                     $colsData[$k]['hide']=true;
@@ -75,12 +61,26 @@ class PjProjectDatabase extends Common
                 case 'Pre_Formatter':
                     $colsData[$k]['hide']=true;
                     break;
-                case 'File_Type':
+                case 'Attention':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Product_Involved':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Product_Parts':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Brand_and_Model':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Industry_Field':
+                    $colsData[$k]['hide']=true;
+                    break;
+                case 'Date':
                     $colsData[$k]['hide']=true;
                     break;
                 case 'Completed':
                     $colsData[$k]['width']=100;
-                    $colsData[$k]['hide']=true;
                     break;
                 case 'Translator':
                     $colsData[$k]['sort']='true';
@@ -222,10 +222,92 @@ class PjProjectDatabase extends Common
         // 项目助理
         $pa = Admin::field('name')->where('job_id', 7)->where('status', 0)->select();
 
+        //不符合项
+        $ncr = [
+            ['value'=>0, 'name'=>'无'],
+            ['value'=>1, 'name'=>'TM01'],
+            ['value'=>2, 'name'=>'TM02'],
+            ['value'=>3, 'name'=>'TM03'],
+            ['value'=>4, 'name'=>'TM04'],
+            ['value'=>5, 'name'=>'TM05'],
+            ['value'=>6, 'name'=>'TM06'],
+            ['value'=>7, 'name'=>'TM07'],
+            ['value'=>8, 'name'=>'TM08'],
+            ['value'=>9, 'name'=>'TM09'],
+            ['value'=>10, 'name'=>'TM10'],
+            ['value'=>11, 'name'=>'TM11'],
+            ['value'=>12, 'name'=>'TM12'],
+            ['value'=>12, 'name'=>'TM13'],
+        ];
+
+        $typearr = [
+            ['value'=>0, 'name'=>'No'],
+            ['value'=>1, 'name'=>'No 文件未达更类型库标准'],
+            ['value'=>2, 'name'=>'Yes MD/IVD综述资料'],
+            ['value'=>3, 'name'=>'Yes MD/IVD证书声明'],
+            ['value'=>4, 'name'=>'Yes MD/IVD上市后资料'],
+            ['value'=>5, 'name'=>'Yes MD/IVD风险管理'],
+            ['value'=>6, 'name'=>'Yes MD/IVD安全有效基本要求清单'],
+            ['value'=>7, 'name'=>'Yes MD/IVD产品技术要求'],
+            ['value'=>8, 'name'=>'Yes MD/IVD产品注册检验报告'],
+            ['value'=>9, 'name'=>'Yes MD/IVD物理测试'],
+            ['value'=>10, 'name'=>'Yes MD/IVD化学测试'],
+            ['value'=>11, 'name'=>'Yes MD/IVD IEC电气测试'],
+            ['value'=>12, 'name'=>'Yes MD/IVD辐射测试'],
+            ['value'=>13, 'name'=>'Yes MD/IVD软件'],
+            ['value'=>14, 'name'=>'Yes MD/IVD生物学评价'],
+            ['value'=>15, 'name'=>'Yes MD/IVD灭菌测试'],
+            ['value'=>16, 'name'=>'Yes MD/IVD非临床研究资料'],
+            ['value'=>17, 'name'=>'Yes MD/IVD临床研究资料'],
+            ['value'=>18, 'name'=>'Yes MD/IVD说明书、标签'],
+            ['value'=>19, 'name'=>'Yes MD/IVD质量管理'],
+            ['value'=>20, 'name'=>'Yes MD/IVD单据'],
+            ['value'=>21, 'name'=>'Yes CTD-质量'],
+            ['value'=>22, 'name'=>'Yes 药理学'],
+            ['value'=>23, 'name'=>'Yes 药代动力学'],
+            ['value'=>24, 'name'=>'Yes 毒理学'],
+            ['value'=>25, 'name'=>'Yes CTD-非临床'],
+            ['value'=>26, 'name'=>'Yes CTD-临床'],
+            ['value'=>27, 'name'=>'Yes 上市后报告'],
+            ['value'=>28, 'name'=>'Yes PBRER、PSUR、DSUR'],
+            ['value'=>29, 'name'=>'Yes RMP'],
+            ['value'=>30, 'name'=>'Yes SUSAR'],
+            ['value'=>31, 'name'=>'Yes 检验报告COA'],
+            ['value'=>32, 'name'=>'Yes 药品符合性声明'],
+            ['value'=>33, 'name'=>'Yes SMF'],
+            ['value'=>34, 'name'=>'Yes DMF'],
+            ['value'=>35, 'name'=>'Yes 药品说明书'],
+            ['value'=>36, 'name'=>'Yes 肿瘤基因检测报告（NGS）'],
+            ['value'=>37, 'name'=>'Yes 境外生产药品注册-补充申请表'],
+            ['value'=>38, 'name'=>'Yes 财报'],
+            ['value'=>39, 'name'=>'Yes 研究者手册'],
+            ['value'=>40, 'name'=>'Yes 注册标准'],
+            ['value'=>41, 'name'=>'Yes EIR'],
+            ['value'=>42, 'name'=>'Yes 证书声明'],
+            ['value'=>43, 'name'=>'Yes 软件'],
+            ['value'=>44, 'name'=>'Yes 标准A级'],
+            ['value'=>45, 'name'=>'Yes 标准B级'],
+            ['value'=>46, 'name'=>'Yes 法规A级'],
+            ['value'=>47, 'name'=>'Yes 法规B级'],
+            ['value'=>48, 'name'=>'Yes 合同协议/法律文件A级'],
+            ['value'=>49, 'name'=>'Yes 合同协议/法律文件B级'],
+            ['value'=>50, 'name'=>'Yes 专利A级'],
+            ['value'=>51, 'name'=>'Yes 专利B级'],
+            ['value'=>52, 'name'=>'Yes 医学文献/论文A级'],
+            ['value'=>53, 'name'=>'Yes 医学文献/论文B级'],
+            ['value'=>54, 'name'=>'Yes 化学品分析A级'],
+            ['value'=>55, 'name'=>'Yes 化学品分析B级'],
+            ['value'=>56, 'name'=>'Yes 发补/补正通知'],
+
+            ['value'=>58, 'name'=>'Yes 小语种A级'],
+            ['value'=>59, 'name'=>'Yes 小语种B级'],
+            ['value'=>60, 'name'=>'Yes 个人A级'],
+            ['value'=>61, 'name'=>'Yes 个人B级'],
+        ];
         // 直接返回视图
         return view('form-project_database', [
             'file_code'=>$file_code,'File_Type'=>$File_Type,'document_type'=>json_encode($document_type),'up'=>$up, 'yy'=>$yy,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,'typearr'=>$typearr,'ncr'=>json_encode($ncr),
         ]);
     }
 
@@ -327,16 +409,110 @@ class PjProjectDatabase extends Common
         $re_arr = explode(',', $res['Reviser']);
         $yp_arr = explode(',', $res['Pre_Formatter']);
         $hp_arr = explode(',', $res['Post_Formatter']);
+        $ncr_arr = explode(',',$res['Non_Conformance']);
             //更新项目描述的涉及产品Product_Involved
         Db::name('pj_project_profile')->where('Filing_Code',$res['Filing_Code'])->update(['Product_Involved'=>$res['Product_Involved']]);
         // N/A 选项
         $na = [['value'=>0, 'name'=>'N/A']];
 
+        //不符合项
+        $ncr = [
+            ['value'=>0, 'name'=>'无'],
+            ['value'=>1, 'name'=>'TM01'],
+            ['value'=>2, 'name'=>'TM02'],
+            ['value'=>3, 'name'=>'TM03'],
+            ['value'=>4, 'name'=>'TM04'],
+            ['value'=>5, 'name'=>'TM05'],
+            ['value'=>6, 'name'=>'TM06'],
+            ['value'=>7, 'name'=>'TM07'],
+            ['value'=>8, 'name'=>'TM08'],
+            ['value'=>9, 'name'=>'TM09'],
+            ['value'=>10, 'name'=>'TM10'],
+            ['value'=>11, 'name'=>'TM11'],
+            ['value'=>12, 'name'=>'TM12'],
+            ['value'=>12, 'name'=>'TM13'],
+        ];
+        foreach ($ncr as $k => $v){
+            if(in_array($v['name'],$ncr_arr)){
+                $ncr[$k]['selected'] = true;
+            }
+        }
 
         $newarr=[
-            ['value'=>0, 'name'=>'N/A'],
-            ['value'=>1, 'name'=>'Yes'],
-            ['value'=>2, 'name'=>'No']
+            ['value'=>0, 'name'=>'No'],
+            ['value'=>1, 'name'=>'Yes A级'],
+            ['value'=>2, 'name'=>'Yes B级'],
+            ['value'=>3, 'name'=>'Yes 旧主记忆库'],
+            ['value'=>4, 'name'=>'Yes 特殊项目公司主记忆库'],
+            ['value'=>5, 'name'=>'N/A 不更库项目'],
+            ['value'=>6, 'name'=>'N/A 已更特殊类型库'],
+
+        ];
+
+        $typearr = [
+            ['value'=>0, 'name'=>'No'],
+            ['value'=>1, 'name'=>'No 文件未达更类型库标准'],
+            ['value'=>2, 'name'=>'Yes MD/IVD综述资料'],
+            ['value'=>3, 'name'=>'Yes MD/IVD证书声明'],
+            ['value'=>4, 'name'=>'Yes MD/IVD上市后资料'],
+            ['value'=>5, 'name'=>'Yes MD/IVD风险管理'],
+            ['value'=>6, 'name'=>'Yes MD/IVD安全有效基本要求清单'],
+            ['value'=>7, 'name'=>'Yes MD/IVD产品技术要求'],
+            ['value'=>8, 'name'=>'Yes MD/IVD产品注册检验报告'],
+            ['value'=>9, 'name'=>'Yes MD/IVD物理测试'],
+            ['value'=>10, 'name'=>'Yes MD/IVD化学测试'],
+            ['value'=>11, 'name'=>'Yes MD/IVD IEC电气测试'],
+            ['value'=>12, 'name'=>'Yes MD/IVD辐射测试'],
+            ['value'=>13, 'name'=>'Yes MD/IVD软件'],
+            ['value'=>14, 'name'=>'Yes MD/IVD生物学评价'],
+            ['value'=>15, 'name'=>'Yes MD/IVD灭菌测试'],
+            ['value'=>16, 'name'=>'Yes MD/IVD非临床研究资料'],
+            ['value'=>17, 'name'=>'Yes MD/IVD临床研究资料'],
+            ['value'=>18, 'name'=>'Yes MD/IVD说明书、标签'],
+            ['value'=>19, 'name'=>'Yes MD/IVD质量管理'],
+            ['value'=>20, 'name'=>'Yes MD/IVD单据'],
+            ['value'=>21, 'name'=>'Yes CTD-质量'],
+            ['value'=>22, 'name'=>'Yes 药理学'],
+            ['value'=>23, 'name'=>'Yes 药代动力学'],
+            ['value'=>24, 'name'=>'Yes 毒理学'],
+            ['value'=>25, 'name'=>'Yes CTD-非临床'],
+            ['value'=>26, 'name'=>'Yes CTD-临床'],
+            ['value'=>27, 'name'=>'Yes 上市后报告'],
+            ['value'=>28, 'name'=>'Yes PBRER、PSUR、DSUR'],
+            ['value'=>29, 'name'=>'Yes RMP'],
+            ['value'=>30, 'name'=>'Yes SUSAR'],
+            ['value'=>31, 'name'=>'Yes 检验报告COA'],
+            ['value'=>32, 'name'=>'Yes 药品符合性声明'],
+            ['value'=>33, 'name'=>'Yes SMF'],
+            ['value'=>34, 'name'=>'Yes DMF'],
+            ['value'=>35, 'name'=>'Yes 药品说明书'],
+            ['value'=>36, 'name'=>'Yes 肿瘤基因检测报告（NGS）'],
+            ['value'=>37, 'name'=>'Yes 境外生产药品注册-补充申请表'],
+            ['value'=>38, 'name'=>'Yes 财报'],
+            ['value'=>39, 'name'=>'Yes 研究者手册'],
+            ['value'=>40, 'name'=>'Yes 注册标准'],
+            ['value'=>41, 'name'=>'Yes EIR'],
+            ['value'=>42, 'name'=>'Yes 证书声明'],
+            ['value'=>43, 'name'=>'Yes 软件'],
+            ['value'=>44, 'name'=>'Yes 标准A级'],
+            ['value'=>45, 'name'=>'Yes 标准B级'],
+            ['value'=>46, 'name'=>'Yes 法规A级'],
+            ['value'=>47, 'name'=>'Yes 法规B级'],
+            ['value'=>48, 'name'=>'Yes 合同协议/法律文件A级'],
+            ['value'=>49, 'name'=>'Yes 合同协议/法律文件B级'],
+            ['value'=>50, 'name'=>'Yes 专利A级'],
+            ['value'=>51, 'name'=>'Yes 专利B级'],
+            ['value'=>52, 'name'=>'Yes 医学文献/论文A级'],
+            ['value'=>53, 'name'=>'Yes 医学文献/论文B级'],
+            ['value'=>54, 'name'=>'Yes 化学品分析A级'],
+            ['value'=>55, 'name'=>'Yes 化学品分析B级'],
+            ['value'=>56, 'name'=>'Yes 发补/补正通知'],
+
+            ['value'=>58, 'name'=>'Yes 小语种A级'],
+            ['value'=>59, 'name'=>'Yes 小语种B级'],
+            ['value'=>60, 'name'=>'Yes 个人A级'],
+            ['value'=>61, 'name'=>'Yes 个人B级'],
+
         ];
 
 		// 文件类型
@@ -403,7 +579,7 @@ class PjProjectDatabase extends Common
 
         return view('form-project_database-view', [
             'info'=>$res,'File_Type'=>$File_Type,'document_type'=>json_encode($document_type), 'yy'=>$yy, 'up'=>$up,
-            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,'newarr'=>$newarr
+            'tr'=>json_encode($tr), 're'=>json_encode($re), 'yp'=>json_encode($yp), 'hp'=>json_encode($hp), 'pa'=>$pa,'newarr'=>$newarr,'typearr'=>$typearr,'ncr'=>json_encode($ncr),
         ]);
     }
 
@@ -432,8 +608,12 @@ class PjProjectDatabase extends Common
         // 获取提交的数据
         $data = $request->put();
 
-        // 更新时间
-        $data['Update_Time'] = date("Ymd");
+        $value = Db::name('pj_project_database')->where('id',$id)->value('Update_Company_TM');
+        if($value != $data['Update_Company_TM']){
+            // 更新时间
+            $data['Update_Time'] = date("Ymd");
+        }
+
 
         // 写入填表人
         $data['Filled_by'] = session('administrator')['name'];

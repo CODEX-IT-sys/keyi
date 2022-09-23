@@ -148,8 +148,32 @@ layui.use(['table','form'], function(){
 		page: {
 			curr:location.hash.replace('#!fenye=', ''),
 			hash:'fenye',
-			limits:[10,20,30,40,50,60,70,80,90,100,10000]
+			limits:[10,20,30,40,50,60,70,80,90,100,1000,2000,3000,5000,10000]
 		},
+		done: function (res, page, count) {
+			var that = this.elem.next();
+			var a = 1;
+			res.data.forEach(function (item, index) {
+				// 所需的条件
+				console.log(item);
+				if(item.Delivered_or_Not == 'Yes' & item.Update_Company_TM == 'No'){
+					// 添加颜色--#1E9FFF ；'threeMonth'根据需要填充背景色的field进行更改
+					that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Delivered_or_Not']").css("background-color", "yellow");
+					that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Update_Company_TM']").css("background-color", "yellow");
+				}
+				if(item.Delivered_or_Not == 'Yes' & item.Update_Company_TM != 'No'){
+					// 添加颜色--#1E9FFF ；'threeMonth'根据需要填充背景色的field进行更改
+					that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Delivered_or_Not']").css("background-color", "#BDFCC9");
+					that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Update_Company_TM']").css("background-color", "#BDFCC9");
+				}
+
+				if(item.Customer_Feedback == '轻微不良（Minor Bad）' | item.Customer_Feedback == '严重不良（Major Bad）' | item.Customer_Feedback == '建议（Recommendation）'){
+					// 添加颜色--#1E9FFF ；'threeMonth'根据需要填充背景色的field进行更改
+					that.find(".layui-table-box tbody tr[data-index='" + index + "'] td[data-field='Customer_Feedback']").css("background-color", "red");
+
+				}
+			});
+		}
     });
     // 回车亦可以搜索
     $(document).keyup(function (event) {

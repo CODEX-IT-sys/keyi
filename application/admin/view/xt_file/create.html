@@ -23,15 +23,27 @@
 						<div class="mainWrap">
 							<form class="layui-form" id="form" method="post">
 
-								<div class="layui-row layui-col-space10">
 
+
+								<div class="layui-row layui-col-space10">
 									<div class="layui-col-xs6">
-										<div class="layui-form-item layui_ic">
-											<label class="layui-form-label" title="{:session('language') == '中文'? '文件夹名称' : 'File Directory'}">
-												{:session('language') == '中文'? '文件夹名称' : 'File Directory'}
-											</label>
+										<div class="layui-form-item">
+											<label class="layui-form-label">{:session('language') == '中文'? '文件类型' : 'File
+												Type'}</label>
 											<div class="layui-input-block">
-												<input id="file_dir" name="file_dir" lay-verify="" autocomplete="off" placeholder="" class="layui-input" type="text">
+												<select name="type" id="type" lay-filter="type" lay-search>
+													<option value="1">{:session('language') == '中文'? '初始资料文件' : 'Source File'}</option>
+													<option value="4">{:session('language') == '中文'? '翻译完成文件' : 'Translated File'}</option>
+													<option value="5">{:session('language') == '中文'? '校对完成文件' : 'Revised File'}</option>
+													<option value="11">{:session('language') == '中文'? 'QA自检报告' : 'QA Report'}</option>
+													<option value="6">{:session('language') == '中文'? '后排完成文件' : 'Postformatted File'}</option>
+													<option value="7">{:session('language') == '中文'? '定稿文件' : 'Final File'}</option>
+													<option value="9">{:session('language') == '中文'? '排版QCR完毕' : 'Format QCR'}</option>
+													<option value="10">{:session('language') == '中文'? '翻译QCR完毕' : 'Translated QCR'}</option>
+													<option value="12">{:session('language') == '中文'? '术语（校定）' : 'Term'}</option>
+													<option value="14">{:session('language') == '中文'? '修订完毕' : 'Revised'}</option>
+													<option value="13">{:session('language') == '中文'? 'N/A' : 'N/A'}</option>
+												</select>
 											</div>
 										</div>
 									</div>
@@ -40,19 +52,14 @@
 								<div class="layui-row layui-col-space10">
 									<div class="layui-col-xs6">
 										<div class="layui-form-item">
-											<label class="layui-form-label">{:session('language') == '中文'? '文件类型' : 'File Type'}</label>
+											<label class="layui-form-label">{:session('language') == '中文'? '文件夹名称' : 'File Directory'}</label>
 											<div class="layui-input-block">
-												<select name="type" lay-filter="type" lay-search>
-													<option value="1">{:session('language') == '中文'? '初始资料文件' : 'Source File'}</option>
-													<option value="2">{:session('language') == '中文'? '预排文件' : 'Preformat File'}</option>
-													<option value="3">{:session('language') == '中文'? '预排完成文件' : 'Preformatted File'}</option>
-													<option value="4">{:session('language') == '中文'? '翻译完成文件' : 'Translated File'}</option>
-													<option value="5">{:session('language') == '中文'? '校对完成文件' : 'Revised File'}</option>
-													<option value="6">{:session('language') == '中文'? '后排完成文件' : 'Postformatted File'}</option>
-													<option value="7">{:session('language') == '中文'? '定稿文件' : 'Final File'}</option>
-													<option value="8">{:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}</option>
-													<option value="9">{:session('language') == '中文'? '排版QCR完毕' : 'Format QCR'}</option>
-													<option value="10">{:session('language') == '中文'? '翻译QCR完毕' : 'Translated QCR'}</option>
+												<select name="file_dir" id="file_dir" lay-filter="type" lay-search>
+													<option value="翻译文件（部分已排版）">{:session('language') == '中文'? '翻译文件（部分已排版）' : 'Translated documents'} </option>
+													<option value="翻译文件（全部已排版）">{:session('language') == '中文'? '翻译文件（全部已排版）' : 'Translated documents'} </option>
+													<option value="参考文件_客户参考">{:session('language') == '中文'? '参考文件_客户参考' : 'References_ Customer reference'} </option>
+													<option value="参考文件_内部参考">{:session('language') == '中文'? '参考文件_内部参考' : 'References_ Internal reference'} </option>
+													<option value="客户要求">{:session('language') == '中文'? '客户要求' : 'Customer requirements'} </option>
 												</select>
 											</div>
 										</div>
@@ -253,6 +260,34 @@
 
 				window.location.href = "javascript:history.go(-1)";
 			})
+		});
+
+		// 第二步 监听父级，每当父级发生变化时，渲染子级的值
+		form.on('select(type)', function(data){
+
+			var fileType = data.value; // fileType 选中的文件类型
+
+			$.ajax({
+				url: "{:url('xt_file/getName')}",
+				dataType: 'json',
+				type: 'post',
+				data: {fileType:fileType},		// 传入文件类型，查找该文件类型的文件名称
+				success: function (resData) {
+
+					// 清空文件名称
+					$('#file_dir').empty();
+
+					$.each(resData.data, function (index, value) {
+						// 这里的 value.bedNo
+						// 前者是页面显示的值，后者是传递给后台的值。
+						// 正常情况下，后者应该是 value.id
+						$('#file_dir').append(new Option(value));// 下拉菜单里添加元素
+					});
+
+					//渲染select
+					form.render('select');
+				}
+			});
 		});
 
 		// 数据提交

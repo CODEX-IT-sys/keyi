@@ -33,7 +33,7 @@ class PjContractReview extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(in_array($job_id, [1,8,9,16,20,22])) {
+        if(in_array($job_id, [1,6,8,9,16,20,22,23])) {
 
             $query = $this;
 
@@ -60,7 +60,7 @@ class PjContractReview extends Model
             });
 
             // codex 校长、副校长、质控主管
-        }else if(in_array($job_id, [4,6,15])) {
+        }else if(in_array($job_id, [4,15])) {
 
             $query = $this->where(function ($query) use($name) {
                 $query->where('Translator', 'like', "%$name%")

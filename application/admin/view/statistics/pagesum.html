@@ -18,12 +18,30 @@
                         <input type="month" name="month" placeholder="" value="{:input('month')}" autocomplete="off" class="layui-input">
                     </div>
                 </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{:session('language') == '中文'? '项目组长' : 'Select Type'}</label>
+                    <div class="layui-input-inline">
+                        <select id="pa" name="pa" lay-filter="pa">
+                            <option value="all" {$pa=='all'?'selected':''}>全部 </option>
+                            <option value="PA01" {$pa=='PA01'?'selected':''}>PA01 </option>
+                            <option value="PA05" {$pa=='PA05'?'selected':''}>PA05 </option>
+                            <option value="PA06" {$pa=='PA06'?'selected':''}>PA06 </option>
+                            <option value="PA12" {$pa=='PA12'?'selected':''}>PA12 </option>
+                        </select>
+                    </div>
+                </div>
             </form>
+
         <div class="global_btn">
             <a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
         </div>
+        <div class="forwardTable farTable">
+            <table class="layui-hide" id="test" lay-filter="test">
+                <span style="color:red;margin-left:35px;font-size: 20px;border:1px solid silver;border-radius: 3px;">未提交页数：{$wtj}</span>
+            </table>
+        </div>
         <div class="layui-form">
-            <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pagesum?month={:input('month')}',id:'test',page:'false',limit:99999,toolbar: true,}">
+            <table class="layui-table" lay-filter="demo" lay-data="{ url:'/admin/statistics/pagesum?month={:input('month')}&pa={:input('pa')}',id:'test',page:'false',limit:99999,toolbar: true,}">
                 <thead >
                 <tr>
                     <th lay-data="{checkbox:true}"></th>
@@ -68,8 +86,8 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>-->
 <script type="text/javascript" src="__STATIC__/js/echarts.min.js"></script>
 <script>
-    layui.use('table', function() {
-        var table = layui.table;
+    layui.use(['table', 'form'], function () {
+        var table = layui.table, form = layui.form;
         // console.log(table);
 //转换静态表格(排序有问题)
 //         table.init('demo', {
@@ -110,7 +128,12 @@
             // console.log(num);
         })
 
+        // 表格类型切换时
+        form.on('select(pa)', function (data) {
 
+            $('#sub').submit();
+
+        });
     });
 </script>
 

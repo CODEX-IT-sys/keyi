@@ -42,14 +42,25 @@
 											<label class="layui-form-label">{:session('language') == '中文'? '文件类型' : 'File Type'}</label>
 											<div class="layui-input-block">
 												<select name="type" lay-search>
-													<option value="1" {$info.type==1?'selected':''}>{:session('language') == '中文'? '初始资料文件' : 'Source File'}</option>
+													<!--<option value="1" {$info.type==1?'selected':''}>{:session('language') == '中文'? '初始资料文件' : 'Source File'}</option>
 													<option value="2" {$info.type==2?'selected':''}>{:session('language') == '中文'? '预排文件' : 'Preformat File'}</option>
 													<option value="3" {$info.type==3?'selected':''}>{:session('language') == '中文'? '预排完成文件' : 'Preformatted File'}</option>
 													<option value="4" {$info.type==4?'selected':''}>{:session('language') == '中文'? '翻译完成文件' : 'Translated File'}</option>
 													<option value="5" {$info.type==5?'selected':''}>{:session('language') == '中文'? '校对完成文件' : 'Revised File'}</option>
 													<option value="6" {$info.type==6?'selected':''}>{:session('language') == '中文'? '后排完成文件' : 'Postformatted File'}</option>
 													<option value="7" {$info.type==7?'selected':''}>{:session('language') == '中文'? '定稿文件' : 'Final File'}</option>
-													<option value="8" {$info.type==8?'selected':''}>{:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}</option>
+													<option value="8" {$info.type==8?'selected':''}>{:session('language') == '中文'? '客户反馈' : 'Customer Feedback'}</option>-->
+													<option value="1" {$info.type==8?'selected':''}>{:session('language') == '中文'? '初始资料文件' : 'Source File'}</option>
+													<option value="4" {$info.type==8?'selected':''}>{:session('language') == '中文'? '翻译完成文件' : 'Translated File'}</option>
+													<option value="5" {$info.type==8?'selected':''}>{:session('language') == '中文'? '校对完成文件' : 'Revised File'}</option>
+													<option value="11" {$info.type==8?'selected':''}>{:session('language') == '中文'? 'QA自检报告' : 'QA Report'}</option>
+													<option value="6" {$info.type==8?'selected':''}>{:session('language') == '中文'? '后排完成文件' : 'Postformatted File'}</option>
+													<option value="7" {$info.type==8?'selected':''}>{:session('language') == '中文'? '定稿文件' : 'Final File'}</option>
+													<option value="9" {$info.type==8?'selected':''}>{:session('language') == '中文'? '排版QCR完毕' : 'Format QCR'}</option>
+													<option value="10" {$info.type==8?'selected':''}>{:session('language') == '中文'? '翻译QCR完毕' : 'Translated QCR'}</option>
+													<option value="12" {$info.type==8?'selected':''}>{:session('language') == '中文'? '术语（校定）' : 'Term'}</option>
+													<option value="14" {$info.type==8?'selected':''}>{:session('language') == '中文'? '修订完毕' : 'Revised'}</option>
+													<option value="13"{$info.type==8?'selected':''}>{:session('language') == '中文'? 'N/A' : 'N/A'}</option>
 												</select>
 											</div>
 										</div>

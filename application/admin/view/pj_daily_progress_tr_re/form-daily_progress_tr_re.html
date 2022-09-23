@@ -673,7 +673,7 @@
 			$('#zzs').val(zzs);
 
 			if(xdzs != 0){
-				var jdbl = (xdzs/zzs)*100;
+				var jdbl = (xdzs/yzs)*100;
 				jdbl = jdbl.toFixed(2);
 				$('#jdbl').val(jdbl);
 			}
@@ -682,11 +682,12 @@
 		$('#xdzs').blur(function(){
 			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
+			var yzs = $.trim($('#yzs').val());
 			var zzs = $.trim($('#zzs').val());
 			var xdzs = $.trim($('#xdzs').val());
 
-			if(!zzs || zzs === '0.00'){
-				layer.msg('先计算中文字数统计');
+			if(!yzs || yzs === '0.00'){
+				layer.msg('先填写原总字数');
 				return false;
 			}
 			if(bfb!=100){
@@ -697,7 +698,7 @@
 					$('#xdzs').val('0');
 					layer.msg('只有工作内容为校对相关才能填写');
 				}else{
-					var jdbl = (xdzs/zzs)*100;
+					var jdbl = (xdzs/yzs)*100;
 					jdbl = jdbl.toFixed(2);
 					$('#jdbl').val(jdbl);
 				}

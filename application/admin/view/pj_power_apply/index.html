@@ -1,0 +1,570 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '权限申请记录' : 'Project Management'}</a>
+                    <a class="on">{:session('language') == '中文'? '申请列表' : 'Contract Review'}</a>
+                </div>
+                <div class="global_btn">
+
+                    <a class="layui-btn com_btn" id="xmjlpl">{:session('language') == '中文'? '批量批准' : 'Approval'}</a>
+                    <a href="{:url('create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
+                </div>
+            </div>
+            <div class="mainCt">
+                <div class="mainWrap">
+                    <div class="forwardTable farTable">
+                        <table class="layui-hide" id="test" lay-filter="test"></table>
+                    </div>
+
+                    <!--文本说明-->
+                    <div class="explain">
+                        <h5 class="explainTitle">
+                            <i class="iconfont icon-tishi"></i>
+                            <span>说明</span>
+                        </h5>
+                        <div class="explainCt">
+                            {$intro|raw}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="js"}
+<!--搜索-->
+<script type="text/html" id="forwardBar">
+
+    <div class="forward">
+        <div class="forward_lead">
+            <div class="layui-form-item label_auto">
+                <label class="layui-form-label">{:session('language') == '中文'? '字段选择' : 'Select Field'}</label>
+                <div class="layui-input-inline">
+                    <select id="field" lay-verify="" lay-search>
+                        <option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
+                        {volist name="$select_field" id="v"}
+                        {if $v.Field != 'delete_time'}{if $v.Field != 'id'}
+                        <option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'?
+                            $v.Comment : str_replace('_' , ' ', $v.Field)}
+                        </option>
+                        {/if}{/if}
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:session('language') == '中文'? '查询内容' : 'Keyword'}</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="keyword" value="{$keyword}"
+                           placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            {if $field==''}
+            <span class="addCondition">
+				<i class="iconfont icon-icon-test"></i>
+			</span>
+            {/if}
+            <div class="searchBtn">
+                <button class="layui-btn search_btn" type="button">
+                    <i class="iconfont icon-sousuo"></i>
+                    <span>{:session('language') == '中文'? '查询' : 'Search'}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!--行工具-->
+<script type="text/html" id="barDemo">
+    <div class="table_btn">
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
+        <a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+        {if in_array($job_id,['1','6','8','9'])}
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="agree">{:session('language') == '中文'? '批准' : 'Agree'}</a>
+        <a class="layui-btn layui-btn-xs delete_btn" lay-event="refuse">{:session('language') == '中文'? '拒绝' : 'Refuse'}</a>
+        {/if}
+    </div>
+</script>
+
+
+
+<!--脚本-->
+<script>
+    var tableIns;  // 数据表格对象，用于重载
+    layui.config({ // 配置并导入excel插件
+        base: '__STATIC__/layui_ext/'
+    }).use(['jquery', 'excel', 'layer', 'form', 'table'], function() {
+        var $ = layui.jquery,
+            excel = layui.excel,
+            layer = layui.layer,
+            form = layui.form, // 表单
+            table = layui.table; //表格
+
+        var field = '{$field}';
+        var keyword = '{$keyword}';
+        var job_id = {$job_id};
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+        // 数据表格字段
+        var data = '{$colsData|raw}';
+        var colsData = JSON.parse(data);
+
+
+        // 通用表头生成器
+        function commonCols(language, colsData) {
+            // 左侧勾选栏
+            var cols = [{type: 'checkbox', fixed: 'left'}];
+            var l = colsData.length;
+
+            // 遍历所有字段
+            for (var i = 0; i < l; i++) {
+                if (colsData[i].Field !== 'delete_time') {
+                    if (colsData[i].Field !== 'id') {
+                        if (language === '中文') {
+                            // cols.push({field: colsData[i].Field ,title: colsData[i].Comment, sort:true, minWidth:180, totalRow:true});
+                            if (colsData[i].Field == 'Approval_Result') {
+                                cols.push({
+                                    field: colsData[i].Field,
+                                    title: colsData[i].Comment,
+                                    totalRow: true,
+                                    width: colsData[i].width,
+                                    fixed: colsData[i].fixed,
+                                    hide: colsData[i].hide,
+                                    sort: colsData[i].sort,
+                                    style: colsData[i].style,
+                                    templet: '#titleTpl'
+                                });
+                            }else{
+                                cols.push({
+                                    field: colsData[i].Field,
+                                    title: colsData[i].Comment,
+                                    totalRow: true,
+                                    width: colsData[i].width,
+                                    fixed: colsData[i].fixed,
+                                    hide: colsData[i].hide,
+                                    sort: colsData[i].sort,
+                                    style: colsData[i].style
+
+                                });
+                            }
+
+
+
+                        } else {
+
+                                cols.push({
+                                    field: colsData[i].Field,
+                                    title: colsData[i].Field,
+                                    sort: true,
+                                    minWidth: 200,
+                                    totalRow: true
+                                });
+
+                        }
+                    }
+                }
+            }
+            // 右侧操作工具
+            if (language === '中文') {
+                if(job_id == 1 || job_id == 6 || job_id == 8 || job_id == 9){
+                    cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 250});
+                }else{
+                    cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150});
+                }
+
+            } else {
+                cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 250});
+            }
+
+            return [cols];
+        }
+
+        var search_type = '{$search_type}';
+        // 生成表格
+        tableIns = table.render({
+            elem: '#test'
+            , url: "{:url('index')}"
+            , where: {field: field, keyword: keyword, search_type: search_type}
+            , headers: {"Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
+            , toolbar: '#forwardBar'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , title: '权限申请表'
+            , cols: commonCols(language, colsData)
+            , limit: 100, height: 'full-200',
+            even: true,
+            page: {
+                curr: location.hash.replace('#!fenye=', ''),
+                hash: 'fenye',
+                limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 300, 500, 10000]
+            },
+
+
+        });
+
+        function copyContent_table(content){
+            var oInput = document.createElement('input');
+            oInput.value = content;
+            document.body.appendChild(oInput);
+            oInput.select(); // 选择对象
+            document.execCommand("Copy"); // 执行浏览器复制命令
+            oInput.className = 'oInput';//设置class名
+            document.getElementsByClassName("oInput")[0].remove();//移除这个input
+            layer.msg('复制成功！', {icon: 1, time: 3000});
+
+        }
+
+        // 批量批准(多选操作)
+        $('#xmjlpl').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var idstr = '';
+            var cd = checkStatus.data.length;
+
+            if (cd !== 0) {
+                for (var i = 0; i < cd; i++) {
+                    idstr += checkStatus.data[i].id + ',';
+                }
+                // 去除多余符号
+                idstr = idstr.substring(0, idstr.length - 1);
+
+                layer.confirm('确认操作？', function (index) {
+                    // 向服务器发送请求
+                    $.ajax({
+                        type: 'get',
+                        url: "{:url('pj_power_apply/batch_pm')}",
+                        data: {id: idstr},
+                        // 成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+            } else {
+                if (language === '中文') {
+                    layer.alert('请先勾选数据再操作');
+                } else {
+                    layer.msg('Please check the box before operating');
+                }
+            }
+        });
+
+        // 回车亦可以搜索
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                $(".search_btn").trigger("click");
+            }
+        });
+
+        // 表头搜索
+        $('.search_btn').click(function () {
+            var searchfield = $('#field').val();
+            var searchkeyword = $.trim($('#keyword').val());
+
+            if (!searchkeyword) {
+                if (language === '中文') {
+                    layer.msg('搜索内容不能为空');
+                } else {
+                    layer.msg('Please input keyword');
+                }
+                return false;
+            }
+            // 页面 带参跳转 可以记住搜索参数
+            window.location.href = "{:url('index')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
+
+            // 表格重载
+            /*table.reload('test', {
+             url: "{:url('index')}",
+             where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
+             page: true, limit:50
+             });*/
+        });
+
+        // 多条件 搜索弹框
+        $(function () {
+            var index;
+            $(".addCondition").live("click", function () {
+                index = parent.layer.open({ //在父窗口打开
+                    type: 2,
+                    title: '条件查询',
+                    maxmin: true,
+                    shadeClose: true, //点击遮罩关闭层
+                    area: ['700px', '560px'],
+                    content: "{:url('pj_power_apply/condition')}",
+                    end: function () {
+                        var search_type = localStorage.getItem('search_type');
+                        var s = localStorage.getItem('field');
+                        var i = localStorage.getItem('keyword');
+                        window.location.href = "{:url('index')}" + '?field=' + s + '&keyword=' + i + '&search_type=' + search_type;
+                        // // 表格重载
+                        // table.reload('test', {
+                        // 	url: "{:url('pj_power_apply/index')}",
+                        // 	where: {search_type : search_type, field: s, keyword: i},  // 设定异步数据接口的额外参数
+                        // 	page: true, limit:50
+                        // });
+                    }
+                });
+            });
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            //获得当前行数据
+            var id = obj.data.id;
+
+            // 删除
+            if (obj.event === 'del') {
+                layer.confirm('确认删除？', function (index) {
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'delete',
+                        contentType: 'application/json',
+                        url: replaceEditUrlId("{:url('pj_power_apply/delete', ['id' => 1])}", id),
+                        dataType: 'json',
+                        // 删除成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+
+            } else if (obj.event === 'edit') {
+
+                window.location.href = replaceEditUrlId("{:url('pj_power_apply/edit', ['id' => 1])}", id);
+
+            } else if (obj.event === 'copyCoverUrl'){
+                $(".font-primary").attr("data-clipboard-text",obj.data.Filing_Code);
+                var clipboard = new ClipboardJS('.font-primary');
+                clipboard.on('success', function(e) {
+                    layer.msg('复制成功');
+                    clipboard.destroy();  //解决多次弹窗
+                    e.clearSelection();
+                });
+            }else if (obj.event === 'agree') {
+                window.location.href = replaceEditUrlId("{:url('pj_power_apply/agree', ['id' => 1])}", id);
+
+            } else if (obj.event === 'refuse') {
+                window.location.href = replaceEditUrlId("{:url('pj_power_apply/refuse', ['id' => 1])}", id);
+
+            } else if (obj.event === 'zjl') {
+                // 总经理确认
+                layer.confirm('确认？', function (index) {
+                    // 向服务器发送请求
+                    $.ajax({
+                        type: 'get',
+                        contentType: 'application/json',
+                        url: replaceEditUrlId("{:url('pj_power_apply/general_manager', ['id' => 1])}", id),
+                        dataType: 'json',
+                        // 成功回调
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        // 项目经理 批量(多选操作)
+
+
+        // 总经理 批量(多选操作)
+
+
+        /*字段筛选 全选 反选*/
+        table.on('toolbar()', function (obj) {
+            var config = obj.config;
+            var btnElem = $(this);
+            var tableId = config.id;
+            var tableView = config.elem.next();
+            switch (obj.event) {
+                case 'LAYTABLE_COLS':
+                    // 给筛选列添加全选还有反选的功能
+                    var panelElem = btnElem.find('.layui-table-tool-panel');
+                    var checkboxElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]');
+                    var checkboxCheckedElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]:checked');
+                    $('<li class="layui-form select_lead" lay-filter="LAY_TABLE_TOOL_COLS_FORM">' +
+                        '<input type="checkbox" lay-skin="primary" lay-filter="LAY_TABLE_TOOL_COLS_ALL" ' + ((checkboxElem.length === checkboxCheckedElem.length) ? 'checked' : '') + ' title="全选">' +
+                        '<span class="invert_select"><i class="iconfont icon-fanxuan"></i>反选</span>' +
+                        '</li>')
+                        .insertBefore(panelElem.find('li').first())
+                        .on('click', '.invert_select', function (event) {
+                            layui.stope(event);
+                            // 反选逻辑
+                            panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]+').click();
+                        });
+
+                    form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+                    break;
+            }
+        });
+
+        // 监听筛选列panel中的全选
+        form.on('checkbox(LAY_TABLE_TOOL_COLS_ALL)', function (obj) {
+            $(obj.elem).closest('ul')
+                .find('[lay-filter="LAY_TABLE_TOOL_COLS"]' + (obj.elem.checked ? ':not(:checked)' : ':checked') + '+').click();
+        });
+
+        // 监听筛选列panel中的单个记录的change
+        $(document).on('change', 'input[lay-filter="LAY_TABLE_TOOL_COLS"]', function (event) {
+            var elemCurr = $(this);
+            // 筛选列单个点击的时候同步全选的状态
+            $('input[lay-filter="LAY_TABLE_TOOL_COLS_ALL"]')
+                .prop('checked',
+                    elemCurr.prop('checked') ? (!$('input[lay-filter="LAY_TABLE_TOOL_COLS"]').not(':checked').length) : false);
+            form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+        });
+
+        $('#tjms').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var idstr = '';
+            var cd = checkStatus.data.length;
+
+            if (cd !== 0) {
+                for (var i = 0; i < cd; i++) {
+                    idstr += checkStatus.data[i].id + ',';
+                }
+                // 去除多余符号
+                idstr = idstr.substring(0, idstr.length - 1);
+
+                layer.confirm('确认操作？', function (index) {
+                    // 向服务器发送请求
+                    $.ajax({
+                        type: 'get',
+                        url: "{:url('pj_power_apply/batch_ms')}",
+                        data: {id: idstr},
+                        // 批量添加成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+            } else {
+                if (language === '中文') {
+                    layer.alert('请先勾选数据再操作');
+                } else {
+                    layer.msg('Please check the box before operating');
+                }
+            }
+        })
+
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var num = 0
+            var num2 = 0
+            for (v in checkStatus.data) {
+                num += checkStatus.data[v]['Pages'];
+                num2 += checkStatus.data[v]['Source_Text_Word_Count'];
+            }
+            var msg = "选中页数:" + num + ';源语数量:' + num2;
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        });
+
+        $("#daoru").click(function () {
+            var html =
+                '<div class="layui-upload" id="upload_file" style="margin-bottom:15px;margin-top:15px;text-align:center">'
+                + '     <button type="button" class="layui-btn layui-btn-radius layui-btn-primary" id="test8">上传xls,xlsx</button>'
+                + '<br />'
+                + '     <button type="button" style="margin-top:5px" class="layui-btn layui-btn-normal" id="test9">上传</button>'
+                + '     <button type="button" style="margin-top:5px" class="layui-btn close">取消</button>'
+                + '</div>'
+            layer.open({
+                title: '导入项目汇总',
+                area: ['300px', '200px'], //宽高
+                type: 1,
+                content: html
+            });
+            layui.use('upload', function () {
+                var upload = layui.upload;
+                upload.render({
+                    elem: '#test8',
+                    url: '/admin/pj_power_apply/import',
+                    auto: false,
+                    accept: 'file',
+                    size: 10240,
+                    //,multiple: true
+                    bindAction: '#test9',
+                    data: {},
+                    done: function (res) {
+                        if (res.code == 1) {
+                            layer.closeAll();
+                            layer.msg(res.msg);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                        return false;
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+<script type="text/html" id="titleTpl">
+    {{#  if(d.Approval_Result == '1'){ }}
+    <span style="color: dodgerblue;">已同意</span>
+    {{# } else if(d.Approval_Result == '2'){ }}
+    <span style="color: red;">已拒绝</span>
+    {{#  } else { }}
+    <span style="color: #FFB800;">待审批</span>
+    {{#  } }}
+</script>
+{/block}

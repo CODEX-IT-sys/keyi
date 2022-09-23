@@ -42,6 +42,202 @@ class Admin extends Controller
         return json(generate_layui_table_data($list));
     }
 
+    //计算更新翻译修订他人的校对比率
+
+    public function gxbl21(){
+        $where1 = [
+            'Percentage_Completed' => 100,
+            'delete_time' => 0,
+        ];
+        $res = Db::name('pj_daily_progress_tr_re')->where('Work_Content','in',['TR Modify Other'])
+            ->where('Work_Date','>',20220831)->where($where1)->select();
+
+        foreach($res as $key=>$val){
+            if($val['Revision_Words'] > 0 && $val['Original_Chinese_Characters'] > 0){
+                $rate = ($val['Revision_Words']/$val['Original_Chinese_Characters'])*100;
+                $rate = number_format($rate,2);
+                $up_data = [
+                    'Revision_Rate' => $rate
+                ];
+                Db::name('pj_daily_progress_tr_re')->where('id',$val['id'])->update($up_data);
+            }
+        }
+        echo '计算更新翻译修订他人的校对比率';
+    }
+
+
+    //计算更新校对比率
+
+    public function gxbl22(){
+        $where1 = [
+            'Percentage_Completed' => 100,
+            'delete_time' => 0,
+        ];
+        $res = Db::name('pj_daily_progress_tr_re')->where('Work_Content','in',['Revise','RE Modify','RE Finalize'])
+            ->where('Work_Date','>',20220831)->where($where1)->select();
+
+        foreach($res as $key=>$val){
+            if($val['Revision_Words'] > 0 && $val['Original_Chinese_Characters'] > 0){
+                $rate = ($val['Revision_Words']/$val['Original_Chinese_Characters'])*100;
+                $rate = number_format($rate,2);
+                $up_data = [
+                    'Revision_Rate' => $rate
+                ];
+                Db::name('pj_daily_progress_tr_re')->where('id',$val['id'])->update($up_data);
+            }
+        }
+        echo '计算更新校对比率';
+    }
+    //同步校对比率 翻译修订他人
+    public function gxbl23(){
+
+        $where1 = [
+            'Percentage_Completed' => 100,
+            'delete_time' => 0,
+        ];
+        $ysh = Db::name('pj_daily_progress_tr_re')->where('Work_Content','in',['TR Modify Other'])->where('Work_Date','>',20220831)->where($where1)->select();
+
+        foreach($ysh as $key=>$val) {
+            if ($val['Revision_Rate'] > 0) {
+                //同步校对比率到翻译同事
+                $where = [
+                    'Filing_Code' => $val['Filing_Code'],
+                    'Job_Name' => $val['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'delete_time' => 0,
+                ];
+                $record = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], 'or')->count();
+                if ($record == 1) {
+                    $upData = [
+                        'Revision_Rate' => $val['Revision_Rate']
+                    ];
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], 'or')
+                        ->update($upData);
+
+
+                }
+            }
+        }
+        echo '同步翻译修订他人的校对比率到翻译同事';
+    }
+
+    public function gxbl24(){
+        //同步校对比率到翻译同事
+        $where1 = [
+            'Percentage_Completed' => 100,
+            'delete_time' => 0,
+        ];
+        $ysh = Db::name('pj_daily_progress_tr_re')->where('Work_Content','in',['Revise','RE Modify','RE Finalize'])->where('Work_Date','>',20220831)->where($where1)->select();
+
+        foreach($ysh as $key=>$val){
+            if ($val['Revision_Rate'] > 0) {
+                //同步校对比率到翻译同事
+                $where = [
+                    'Filing_Code' => $val['Filing_Code'],
+                    'Job_Name' => $val['Job_Name'],
+                    'Percentage_Completed' => 100,
+                    'delete_time' => 0,
+                ];
+
+                //判断是否有翻译修订他人记录
+                $xd_other = Db('pj_daily_progress_tr_re')->where($where)
+                    ->where('Work_Content', 'TR Modify Other')->find();
+                if ($xd_other) {
+                    $upData = [
+                        'Revision_Rate' => $val['Revision_Rate']
+                    ];
+                    $res = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', 'TR Modify Other')
+                        ->update($upData);
+                } else {
+                    $record = Db('pj_daily_progress_tr_re')->where($where)
+                        ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], 'or')->count();
+                    if ($record == 1) {
+                        $upData = [
+                            'Revision_Rate' => $val['Revision_Rate']
+                        ];
+                        $res = Db('pj_daily_progress_tr_re')->where($where)
+                            ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'], 'or')
+                            ->update($upData);
+                    }
+                }
+            }
+        }
+
+        echo '同步校对比率到翻译同事';
+    }
+
+
+    //取消QCR状态
+    public function qx_qcr(){
+        $list = Db::table('ky_pj_project_profile')
+            ->alias('a')
+            ->leftjoin('ky_pj_contract_review b','a.Filing_Code = b.Filing_Code')
+            ->where('b.Date','<',20220616)
+            ->where('b.Delivered_or_Not','=','Yes')
+            ->field(['a.id','a.Spot_Check','b.Delivered_or_Not','b.Date'])
+            ->order('a.Spot_Check desc')
+            ->select();
+        foreach($list as $key=>$val){
+            if($val['Spot_Check'] == 9 || $val['Spot_Check'] == 8 ){
+                $up = [
+                    'Spot_Check' => 1
+                ];
+
+                $res  = Db::table('ky_pj_project_profile')->where('id',$val['id'])->update($up);
+            }
+        }
+        echo '完成';
+    }
+
+    //提取所有的公司名称
+    public function getCompanyName(){
+        //$list = Db::name('mk_feseability')->where('delete_time',0)->field('id,Company_Name')->select();
+        $list = Db::name('mk_customer')->where('delete_time',0)->field('id,Company_Name')->select();
+        $data = array_column($list,'Company_Name');
+        $data = array_unique($data);
+        //var_dump($data);die;
+        $arr = [];
+        foreach($data as $key=>$val){
+            if(is_cn_or_en($val) == 'allcn'){
+                $arr[] = $val;
+            }
+        }
+        var_dump($arr);die;
+        //将公司名称导入到词库
+        foreach($arr as $k=>$v){
+            $res = Db::name('xt_dict')->where('c_id',35)->where('cn_name',$v)->find();
+            if(!$res){
+                $add_data = [
+                    'c_id' => 35,
+                    'cn_name' => $v,
+                ];
+                Db::name('xt_dict')->insert($add_data);
+            }
+        }
+        return 'success';
+    }
+
+    public function ggjd(){
+        $data =Db::name('pj_project_profile')->where('delete_time',0)->field(['id','Stage'])->order('id desc')->limit(1000)->select();
+        foreach($data as $key=>$val){
+            if($val['Stage'] == '校对（全校）'){
+                $update = [
+                    'Stage' => '校对'
+                ];
+            }elseif($val['Stage'] == '未开始'){
+                $update = [
+                    'Stage' => '预排'
+                ];
+            }else{
+                $update = [];
+            }
+            $res = Db::table('ky_pj_project_profile')->where('id',$val['id'])->update($update);
+        }
+        echo '完成';
+    }
 
     //批量更新提前交付天数
     public function jsTime(){
@@ -89,7 +285,7 @@ class Admin extends Controller
         //查询2022年开始的项目汇总记录
         $xmhz = Db::name('pj_contract_review')
             ->where('delete_time',0)
-            ->where('Date','egt','20220101')
+            ->where('Date','egt','20220501')
             ->where('Delivered_or_Not','Yes')
             ->field('Filing_Code,Job_Name,Translator,Reviser,Date,Service,PA')
             ->select();
@@ -145,6 +341,13 @@ class Admin extends Controller
 
                 ];
                 Db::name('pj_project_release')->insert($add_data);
+            }else{
+                $up_data = [
+                    'Reviser' => 'Yes',
+                    'Project_Manager' => 'Yes',
+
+                ];
+                Db::name('pj_project_release')->where('id',$res['id'])->update($up_data);
             }
         }
         echo 'success';

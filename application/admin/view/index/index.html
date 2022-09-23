@@ -32,6 +32,9 @@
                 <a href="http://localhost/phpMyAdmin4.8.5/" target="_blank">
                     {:session('language') == '中文'? '表格管理' : 'Table Management'}
                 </a>
+                {elseif $vo.cn_name=="审批管理"}
+                <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name :
+                    $vo.en_name}{if $approval != 0}<span class="layui-badge">{$approval}</span>{/if}</a>
                 {elseif $vo.cn_name=="电脑软件"}
                 <a href="javascript:;" lay-href="{:url($vo.url)}">{:session('language') == '中文'? $vo.cn_name : $vo.en_name}{if $software != 0}<span class="layui-badge">{$software}</span>{/if}</a>
                 {elseif $vo.cn_name=="翻译问题"}

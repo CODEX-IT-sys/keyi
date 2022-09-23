@@ -95,7 +95,7 @@ class PjDailyProgressTrRe extends Common
     {
         // 查询 可供预选的 文件编码
         $file_code = PjContractReviewModel::field('Filing_Code')
-            ->order('id desc')->limit(30000)->select();
+            ->order('id desc')->limit(50000)->select();
 
         // 职位
         $job_id = session('administrator')['job_id'];
@@ -211,7 +211,8 @@ class PjDailyProgressTrRe extends Common
                         $upData = [
                             'Revision_Rate' => $data['Revision_Rate']
                         ];
-                        $res = Db('pj_daily_progress_tr_re')->where($where)->update($upData);
+                        $res = Db('pj_daily_progress_tr_re')->where($where)
+                            ->where('Work_Content', ['eq', 'Translate'], ['eq', 'TR Modify'], ['eq', 'TR Finalize'],'or')->update($upData);
 
                         //生成翻译评估
                         $tr_data = Db('pj_daily_progress_tr_re')
@@ -360,10 +361,6 @@ class PjDailyProgressTrRe extends Common
         if(empty($data['Revision_Rate'])){
             if($data['Percentage_Completed'] != 100 ){
                 $data['Revision_Rate'] = 'N/A';
-            }else{
-                if($data['Work_Content'] == 'Translate'){
-                    $data['Revision_Rate'] = 0;
-                }
             }
         }
 
@@ -513,9 +510,9 @@ class PjDailyProgressTrRe extends Common
             $data['Productivity'] = 0;
         }
 
-        if($data['Category'] == 'TR'){
+       /* if($data['Category'] == 'TR'){
             $data['Revision_Rate'] = 'N/A';
-        }
+        }*/
         PjDailyProgressTrReModel::update($data);
 
         echo "<script>history.go(-2);</script>";

@@ -1,0 +1,199 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '客户管理' : 'Customer Management'}</a>
+                    <a href="{:url('mk_customer/index')}">{:session('language') == '中文'? '客户要求' : 'Customer'}</a>
+
+                </div>
+                <div class="global_btn">
+
+                    {if(request()->action() !== 'read')}
+                    <button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+                    {/if}
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' :
+                            'Back'}
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="mainCt mainSec formReset">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form">
+
+                        <div class="layui-row layui-col-space10">
+
+                            <!--日期 日历类型 int(11) datetime-->
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item layui_ic">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '中文字段名' : '英文字段名'}">
+                                        {:session('language') == '中文'? '中文字段名' : '英文字段名'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input class="showDate layui-input" name="英文字段名" placeholder="请选择" type="text">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--input 字符类型 varchar(255)-->
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '中文字段名' : '英文字段名'}">
+                                        {:session('language') == '中文'? '中文字段名' : '英文字段名'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="英文字段名" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--备注文本框类型 text-->
+                            <div class="layui-col-xs12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '中文字段名' : '英文字段名'}">
+                                        {:session('language') == '中文'? '中文字段名' : '英文字段名'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="英文字段名" class="layui-textarea">{$info.Remarks|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+
+<!--预定义数据渲染函数-->
+<script>
+    var renderForm = function (layuiForm) {
+        var info = JSON.parse('{$info|raw}');
+
+        // 文本框写入默认值
+        $.each(info, function (name, value) {
+            $('#form [name=' + name + ']').val(value);
+        });
+
+        layuiForm.render();
+
+    }
+</script>
+
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form, layer = layui.layer;
+
+        // 数据渲染
+        renderForm(form);
+
+        // 获取要提交的数据
+        var getSubmitData = function () {
+            var data = {};
+
+            // 获取文本框的数据
+            var serializeArray = $('#form input').serializeArray();
+            $.each(serializeArray, function (index, field) {
+                data[field.name] = field.value;
+            });
+
+            // 获取区域下拉框的数据
+
+            // 获取备注文本框的内容
+            data.Remarks = $('#Remarks').val();
+
+            return data;
+        };
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            // 邮件
+            validator.add('Email1', [{
+                rule: 'email',
+                msg: '邮箱格式错误'
+            }]);
+
+            validator.add('Email2', [{
+                rule: 'email',
+                msg: '邮箱格式错误'
+            }]);
+
+            // 电话
+            validator.add('Mobile1', [{
+                rule: 'phone',
+                msg: '电话格式错误'
+            }]);
+
+            validator.add('Mobile2', [{
+                rule: 'phone',
+                msg: '电话格式错误'
+            }]);
+
+            return validator.start();
+        };
+
+        // 提交
+        $('#save').on('click', function () {
+
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+            console.log(getSubmitData());
+
+            //异步提交
+            $.ajax({
+                url: "{:url('mk_customer/update', ['id' => $info.id])}",
+                type: 'put',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(getSubmitData()),
+                success: function (res) {
+                    layer.alert(res.msg, {title: '提示'}, function (index) {
+
+                        // 关闭alert
+                        layer.close(index);
+
+                        //返回列表页
+                        window.location.href = "{:url('mk_customer/index')}";
+                    });
+                },
+                error: function (jqXHR) {
+                    if (jqXHR.status === 422) {
+                        layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                            layer.close(index);
+                        });
+                    }
+                }
+            });
+        });
+    })
+</script>
+
+{/block}

@@ -17,6 +17,7 @@
 
 						<a href="{:url('pj_project_profile/create')}" class="layui-btn">{:session('language') == '中文'? '新增' : 'Add'}</a>
 						<a class="layui-btn com_btn" id="xzedit">{:session('language') == '中文'? '批量修改' : 'Batch modification'}</a>
+						<a class="layui-btn com_btn" id="pgjd">{:session('language') == '中文'? '批改阶段' : 'Batch modification'}</a>
 						<a class="layui-btn com_btn" id="sjth">{:session('language') == '中文'? '数据计算' : 'Data Calculation'}</a>
 						<a class="layui-btn com_btn" id="daoru">{:session('language') == '中文'? '导入源语' : 'import'}</a>
 						<a class="layui-btn com_btn" id="simple">{:session('language') == '中文'? '简洁' : 'Concise'}</a>
@@ -94,9 +95,12 @@
 	<div class="table_btn">
 		<a class="layui-btn layui-btn-xs com_btn" lay-event="view_file">{:session('language') == '中文'? '查看资料' : 'View File'}</a>
 		<a class="layui-btn layui-btn-xs com_btn" lay-event="view_project">{:session('language') == '中文'? '项目文件' : 'View Project'}</a>
+		<a class="layui-btn layui-btn-xs com_btn" lay-event="change_status">{:session('language') == '中文'? '更改阶段' : 'Change status'}</a>
+		{if !in_array($job_id,['10','11','12','13'])}
 		<a class="layui-btn layui-btn-xs com_btn" lay-event="check">{:session('language') == '中文'? 'QCR' : 'Spot Check'}</a>
 		<a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
 		<a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+		{/if}
 		<!--<a class="layui-btn layui-btn-xs com_btn" lay-event="data_read">{:session('language') == '中文'? '数据读取' : 'Data Read'}</a>-->
 	</div>
 </script>
@@ -109,6 +113,7 @@ layui.use(['table','form'], function(){
     var field = '{$field}'; var keyword = '{$keyword}';
     // 切换语言
 	var language = "{:session('language') == '中文'? '中文' : 'english'}";
+	var job_id = {$job_id};
 	// 数据表格字段
 	var data = '{$colsData|raw}';
 	var colsData = JSON.parse(data);
@@ -142,9 +147,13 @@ layui.use(['table','form'], function(){
         }
 		// 右侧操作工具
 		if(language === '中文') {
-			cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 350});
+			if(job_id == 10 || job_id == 11 || job_id == 12 || job_id == 13){
+				cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 270});
+			}else{
+				cols.push({fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 420});
+			}
 		}else{
-			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 520});
+			cols.push({fixed: 'right', title: 'Action', align: 'center', toolbar: '#barDemo', width: 590});
 		}
 
 		return [cols];
@@ -169,6 +178,9 @@ layui.use(['table','form'], function(){
 			hash:'fenye',
 			limits:[10,20,30,40,50,60,70,80,90,100,10000]
 		},
+		done: function(){
+			toolbar();
+		},
 		//解决实际源语数量排序问题
 		parseData: function (res) {
 			$.each(res.data, function (i, d) {
@@ -179,37 +191,33 @@ layui.use(['table','form'], function(){
 
 
 
-    // 回车亦可以搜索
-    $(document).keyup(function (event) {
-        if (event.keyCode == 13) {
-            $(".search_btn").trigger("click");
-        }
-    });
+   function toolbar(){
+	   // 回车亦可以搜索
+	   $(document).keyup(function (event) {
+		   if (event.keyCode == 13) {
+			   $(".search_btn").trigger("click");
+		   }
+	   });
 
-	// 表头搜索
-	$('.search_btn').click(function () {
+	   // 表头搜索
+	   $('.search_btn').click(function () {
 
-		var searchfield = $('#field').val();
-		var searchkeyword = $.trim($('#keyword').val());
+		   var searchfield = $('#field').val();
+		   var searchkeyword = $.trim($('#keyword').val());
 
-		if (!searchkeyword) {
-			if(language === '中文') {
-				layer.msg('搜索内容不能为空');
-			}else{
-				layer.msg('Please input keyword');
-			}
-			return false;
-		}
-        // 页面 带参跳转 可以记住搜索参数
-        window.location.href = "{:url('index')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
+		   if (!searchkeyword) {
+			   if(language === '中文') {
+				   layer.msg('搜索内容不能为空');
+			   }else{
+				   layer.msg('Please input keyword');
+			   }
+			   return false;
+		   }
+		   // 页面 带参跳转 可以记住搜索参数
+		   window.location.href = "{:url('index')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
 
-        // 表格重载
-		/*table.reload('test', {
-		 url: "{:url('index')}",
-		 where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
-		 page: true, limit:50
-		 });*/
-	});
+	   });
+   }
 
 	// 多条件 搜索弹框
 	$(function(){
@@ -294,7 +302,12 @@ layui.use(['table','form'], function(){
 				title: '选择QCR类别',
 				maxmin: true,
 				area: ['900px', '500px'],
-				content: replaceEditUrlId("{:url('pj_project_profile/split', ['c_id' => 1])}", id)
+				content: replaceEditUrlId("{:url('pj_project_profile/split', ['c_id' => 1])}", id),
+				end: function(){
+
+					tableIns.reload();
+
+				}
 			});
 			/*// 点击修改抽查状态为待抽查
 			layer.confirm('确认？', function (index) {
@@ -315,8 +328,56 @@ layui.use(['table','form'], function(){
 					}
 				});
 			});*/
+		}else if(obj.event === 'change_status'){
+
+			parent.layer.open({  // 在父窗口打开
+				type: 2,
+				title: '更改项目阶段',
+				maxmin: true,
+				area: ['900px', '500px'],
+				content: replaceEditUrlId("{:url('pj_project_profile/stage', ['c_id' => 1])}", id),
+				end: function(){
+
+					tableIns.reload();
+
+				}
+			});
 		}
   	});
+
+	//批量更改阶段
+	$('#pgjd').click(function () {
+		var checkStatus = table.checkStatus('test');
+		var idstr = '';
+		var cd = checkStatus.data.length;
+
+		if (cd !== 0) {
+			for (var i = 0; i < cd; i++) {
+				idstr += checkStatus.data[i].id + ',';
+			}
+			// 去除多余符号
+			idstr = idstr.substring(0, idstr.length - 1);
+
+			parent.layer.open({  // 在父窗口打开
+				type: 2,
+				title: '更改项目阶段',
+				maxmin: true,
+				area: ['900px', '500px'],
+				content: replaceEditUrlId("{:url('pj_project_profile/pg_stage', ['c_id' => 1])}", idstr),
+				end: function(){
+
+					tableIns.reload();
+
+				}
+			});
+		}else {
+			if (language === '中文') {
+				layer.alert('请先勾选数据再操作');
+			} else {
+				layer.msg('Please check the box before operating');
+			}
+		}
+	})
 
 	/*字段筛选 全选 反选*/
     table.on('toolbar()', function (obj) {
@@ -371,13 +432,14 @@ layui.use(['table','form'], function(){
 		var num = 0
 		var num2 = 0
 		var num3 = 0
+		var num4 = 0
 		for (v in checkStatus.data) {
-
 			num += parseInt(checkStatus.data[v]['Pages'])||0;
 			num2 += parseInt(checkStatus.data[v]['Source_Text_Word_Count'])||0;
 			num3 += parseInt(checkStatus.data[v]['Actual_Source_Text_Count'])||0;
+			num4 += 1;
 		}
-		var msg = "页数:" + num + ';源语数量:' + num2+';实际源语数量:'+num3;
+		var msg = "选中项数:" + num4 + ";页数:" + num + ';源语数量:' + num2+';实际源语数量:'+num3;
 
 		$('#jisuan').html(msg)
 		layer.alert(msg);

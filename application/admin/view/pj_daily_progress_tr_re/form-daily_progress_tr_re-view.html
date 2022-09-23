@@ -461,12 +461,12 @@
 			$('#zzs').val(zzs);
 
 			if(xdzs != 0){
-				var jdbl = (xdzs/zzs)*100;
+				var jdbl = (xdzs/yzs)*100;
 				jdbl = jdbl.toFixed(2);
 				$('#jdbl').val(jdbl);
 			}
 		});
-		//校对比率
+	/*	//校对比率
 		$('#jdbl').blur(function(){
 			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
@@ -480,13 +480,13 @@
 					layer.msg('只有工作内容为校对相关才能填写');
 				}
 			}
-		})
+		})*/
 		//计算校对比率
 		$('#xdzs').blur(function(){
 			var work_content = $('#content').val();
 			var bfb = $('#bfb').val();
 			var zzs = $.trim($('#zzs').val());
-
+			var yzs = $.trim($('#yzs').val());
 			var xdzs = $.trim($('#xdzs').val());
 			if(!zzs){
 				layer.msg('先计算中文字数统计');
@@ -500,7 +500,7 @@
 					$('#xdzs').val('0');
 					layer.msg('只有工作内容为校对相关才能填写');
 				}else{
-					var jdbl = (xdzs/zzs)*100;
+					var jdbl = (xdzs/yzs)*100;
 					jdbl = jdbl.toFixed(2);
 					$('#jdbl').val(jdbl);
 				}

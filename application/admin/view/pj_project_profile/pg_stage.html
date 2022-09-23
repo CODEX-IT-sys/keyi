@@ -1,0 +1,134 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="secWrap">
+    <div class="layui-container">
+        <form class="layui-form centerBox" id="form">
+
+
+            <div class="layui-col-xs10">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="{:session('language') == '中文'? '项目阶段' : 'Project Stage'}">
+                        {:session('language') == '中文'? '项目阶段' : 'Project Stage'}
+                    </label>
+                    <div class="layui-input-block">
+                        <select name="cate" id="en_name" lay-filter="" lay-search>
+                            {volist name="stage" id="v"}
+                            <option value="{$v.cn_name}">{:session('language') == '中文'? $v.cn_name : $v.en_name}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <input id="c_id" type="hidden" name="c_id" value="{$c_id}"/>
+        </form>
+    </div>
+
+    <div class="layui-layer-btn layui-layer-btn- bottm_control">
+        <a class="layui-layer-btn0" id="submit">{:session('language') == '中文'? '确认' : 'OK'}</a>
+        <a class="layui-layer-btn1" id="cancel">{:session('language') == '中文'? '取消' : 'Cancel'}</a>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+<!--脚本-->
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            return validator.start();
+        };
+
+        // 字段 重名验证
+        /*$('#english_name').blur(function () {
+
+            var table = $('#table').val();
+
+            var name = $('#english_name').val();
+
+            // 获取数据 提交数据
+            $.ajax({
+                url: "{:url('score/check_name')}",
+                type: 'post',
+                dataType: 'json',
+                data: {table:table, name:name},
+                success: function (res) {
+
+                    if(res.code === 0){
+                        layer.alert(res.msg, {title: '提示'},
+                            function (index) {
+                            // 关闭alert
+                            layer.close(index);});
+
+                        $('#english_name').val('');
+
+                        return false;
+                    }
+                }
+            })
+
+        });*/
+
+
+        // 获取要提交的数据
+        var getSubmitData = function () {
+            // 字段节点公共的字段
+            var data = $('#form').find('[name=cate], [name=c_id]').serialize();
+
+            return data;
+        };
+
+        // 表单提交
+        $('#submit').on('click', function () {
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+            console.log(getSubmitData());
+
+            // 获取数据 提交数据
+            $.ajax({
+                url: "{:url('pj_project_profile/batch_stage')}",
+                type: 'post',
+                dataType: 'json',
+                data: getSubmitData()
+            }).done(function (res) {
+                layer.alert(res.msg, {title: '提示'}, function (index) {
+                    // 关闭alert
+                    layer.close(index);
+
+                    // 关闭表单弹窗
+                    var formIndex = top.layer.getFrameIndex(window.name);
+                    top.layer.close(formIndex);
+
+                });
+            }).fail(function (jqXHR) {
+                if (jqXHR.status === 422) {
+                    layer.alert(jqXHR.responseText, {title: '提示'});
+                }
+            });
+        });
+
+        // 取消
+        function qx() {
+            var index = top.layer.getFrameIndex(window.name);
+            top.layer.close(index);
+        }
+
+        $('#cancel').on('click', function () {
+            qx();
+        });
+    });
+</script>
+{/block}

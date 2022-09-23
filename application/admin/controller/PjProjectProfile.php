@@ -135,6 +135,27 @@ class PjProjectProfile extends Common
                     $colsData[$k]['width'] = 120;
                     $colsData[$k]['sort'] = 'true';
                     break;
+                case 'QCR_Feedback':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Format_QL':
+                    $colsData[$k]['width'] = 130;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Translation_QL':
+                    $colsData[$k]['width'] = 130;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Proposal':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
+                    break;
+                case 'Stage':
+                    $colsData[$k]['width'] = 120;
+                    $colsData[$k]['sort'] = 'true';
+                    $colsData[$k]['style'] = 'color: red';
+                    break;
                 default:
                     $colsData[$k]['width']=80;
 
@@ -163,6 +184,10 @@ class PjProjectProfile extends Common
                 'Comment'=>'文件分类'
             ],
             [
+            'Field'=>'whether_template',
+            'Comment'=>'是否可作为类型库的模板文件'
+            ],
+            [
                 'Field'=>'Format_Difficulty',
                 'Comment'=>'排版难易程度'
             ],
@@ -173,6 +198,14 @@ class PjProjectProfile extends Common
             [
                 'Field'=>'Product_Involved',
                 'Comment'=>'涉及产品'
+            ],
+            [
+                'Field'=>'Brand_and_Model',
+                'Comment'=>'品牌型号'
+            ],
+            [
+                'Field'=>'Industry_Field',
+                'Comment'=>'应用领域'
             ],
             [
                 'Field'=>'Pre_Format_Delivery_Time',
@@ -217,7 +250,11 @@ class PjProjectProfile extends Common
             ],
             [
                 'Field' => 'Spot_Check',
-                'Comment' => '抽查状态'
+                'Comment' => 'QCR状态'
+            ],
+            [
+                'Field' => 'QCR_Feedback',
+                'Comment' => 'QCR反馈'
             ],
             [
                 'Field' => 'Revise_Style',
@@ -376,6 +413,22 @@ class PjProjectProfile extends Common
                     case 'Spot_Check':
                         $colsData[$k]['width'] = 120;
                         $colsData[$k]['sort'] = 'true';
+                    case 'QCR_Feedback':
+                        $colsData[$k]['width'] = 120;
+                        $colsData[$k]['sort'] = 'true';
+                        break;
+                    case 'Format_QL':
+                        $colsData[$k]['width'] = 120;
+                        $colsData[$k]['sort'] = 'true';
+                        break;
+                    case 'Translation_QL':
+                        $colsData[$k]['width'] = 120;
+                        $colsData[$k]['sort'] = 'true';
+                        break;
+                    case 'Proposal':
+                        $colsData[$k]['width'] = 120;
+                        $colsData[$k]['sort'] = 'true';
+                        break;
                     default:
                         $colsData[$k]['width']=80;
 
@@ -383,15 +436,26 @@ class PjProjectProfile extends Common
 
             }
         }
+        $job_id = session('administrator')['job_id'];
         // 非Ajax请求，直接返回视图
         if (!$request->isAjax()) {
             return view('', [
                 'select_field'=>$colsData, 'colsData' => json_encode($colsData),
                 'intro'=>$intro, 'field'=>$field, 'keyword'=>$keyword,'editor'=>$edit,
-                'search_type'=>$search_type
+                'search_type'=>$search_type,'job_id'=>$job_id
             ]);
         }
-
+        if($keyword == '待翻译QCR'){
+            $keyword = 9;
+        }elseif($keyword == '待排版QCR'){
+            $keyword = 8;
+        }elseif($keyword == '翻译QCR'){
+            $keyword = 7;
+        }elseif($keyword == '排版QCR'){
+            $keyword = 6;
+        }elseif($keyword == '翻译QCR,排版QCR'){
+            $keyword = 5;
+        }
         // 调用模型获取列表
         $list = PjProjectProfileModel::getList($search_type, $field, $keyword, $limit);
 
@@ -641,26 +705,26 @@ class PjProjectProfile extends Common
 
         // 翻译
         $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $tr = array_merge($tr, $na);
 
         // 校对
         $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $re = array_merge($re, $na);
 
         // 预排
         $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $yp = array_merge($yp, $na);
 
         // 后排
         $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $hp = array_merge($hp, $na);
 
         // 项目助理
-        $pa = Admin::field('name')->where(['job_id'=> 7, 'status'=> 0])->select();
+        $pa = Admin::field('name')->where(['job_id'=> 7])->select();
 
         // 文件库
         $text_list = Db::name('pj_project_profile_text')->field('id, Project_Name')
@@ -742,7 +806,7 @@ class PjProjectProfile extends Common
 
         // 翻译
         $tr = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6,19])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $tr = array_merge($tr, $na);
         foreach ($tr as $k => $v){
             if(in_array($v['name'],$tr_arr)){
@@ -752,7 +816,7 @@ class PjProjectProfile extends Common
 
         // 校对
         $re = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [10,11,8,4,15,6])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $re = array_merge($re, $na);
         foreach ($re as $k => $v){
             if(in_array($v['name'],$re_arr)){
@@ -762,7 +826,7 @@ class PjProjectProfile extends Common
 
         // 预排
         $yp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $yp = array_merge($yp, $na);
         foreach ($yp as $k => $v){
             if(in_array($v['name'],$yp_arr)){
@@ -772,7 +836,7 @@ class PjProjectProfile extends Common
 
         // 后排
         $hp = Db::name('admin')->field('id as value, name')->where('job_id', 'in', [19,12,13,5])
-            ->where(['status'=> 0, 'delete_time'=>0])->select();
+            ->where(['delete_time'=>0])->select();
         $hp = array_merge($hp, $na);
         foreach ($hp as $k => $v){
             if(in_array($v['name'],$hp_arr)){
@@ -916,11 +980,38 @@ class PjProjectProfile extends Common
             $where = [
                 'Filing_Code' => $data['Filing_Code'],
             ];
+
             Db::name('pj_contract_review')->where($where)->update($up_data);
             Db::name('pj_project_database')->where($where)->update($up_data);
 
         }
+        //项目数据库同步 是否可作为类型库的模板文件 品牌型号 应用领域
+        $up_data2 = [
+            'whether_template' => $data['whether_template'],
+            'Brand_and_Model' => $data['Brand_and_Model'],
+            'Industry_Field' => $data['Industry_Field'],
+        ];
+        Db::name('pj_project_database')->where('Filing_Code',$data['Filing_Code'])->update($up_data2);
 
+        //同步项目名称到术语数据记录表
+        $where3 = [
+            'Project_Name' => $data['Project_Name'],
+            'delete_time' => 0,
+        ];
+        $name = session('administrator')['name'];
+        $updata3 = [
+            'Project_Name' => $data['Project_Name'],
+            'Filled_by' => $name
+        ];
+        //截取项目名称日期
+        $date = substr($data['Project_Name'],0,9);
+
+        if($date >= 20220901){
+            $pj = Db::name('pj_term_record')->where($where3)->find();
+            if(!$pj){
+                Db::name('pj_term_record')->insert($updata3);
+            }
+        }
 
 
 //        $save->schedule()->save(['status' => 'thinkphp']);
@@ -978,7 +1069,13 @@ class PjProjectProfile extends Common
         // 获取提交的数据
         $data = $request->post();
 
-        Db::name('pj_project_database')->where('Filing_Code',$data['Filing_Code'])->update(['Product_Involved'=>$data['Product_Involved']]);
+        $up_database = [
+            'Product_Involved'=>$data['Product_Involved'],
+            'whether_template'=>$data['whether_template'],
+            'Brand_and_Model' => $data['Brand_and_Model'],
+            'Industry_Field' => $data['Industry_Field'],
+        ];
+        Db::name('pj_project_database')->where('Filing_Code',$data['Filing_Code'])->update($up_database);
         Db::name('pj_project_profile')->where('Filing_Code',$data['Filing_Code'])->update(['Product_Involved'=>$data['Product_Involved']]);
         PjProjectProfileModel::update($data);
         //同步校对类型到项目汇总和项目数据库
@@ -1031,6 +1128,81 @@ class PjProjectProfile extends Common
             ];
             Db::name('pj_contract_review')->where($where)->update($up_data);
             Db::name('pj_project_database')->where($where)->update($up_data);
+
+        }
+
+
+        //同步项目名称到术语数据记录表
+        if($data['Project_Name']){
+            $where3 = [
+                'Project_Name' => $data['Project_Name'],
+                'delete_time' => 0,
+            ];
+            $name = session('administrator')['name'];
+            $updata3 = [
+                'Project_Name' => $data['Project_Name'],
+                'Filled_by' => $name
+            ];
+            //截取项目名称日期
+            $date = substr($data['Project_Name'],0,9);
+
+            if($date >= 20220901){
+                $pj = Db::name('pj_term_record')->where($where3)->find();
+                if(!$pj){
+                    Db::name('pj_term_record')->insert($updata3);
+                }
+            }
+
+        }
+
+        //同步产品名称
+        if($data['Product_Involved']){
+            $where3 = [
+                'Project_Name' => $data['Project_Name'],
+                'delete_time' => 0,
+            ];
+
+            Db::name('pj_term_record')->where($where3)->update(['Product_Name'=>$data['Product_Involved']]);
+        }
+        //同步最终交付时间
+        if($data['Final_Delivery_Time']){
+            $where3 = [
+                'Project_Name' => $data['Project_Name'],
+                'delete_time' => 0,
+            ];
+            //找到最晚的时间
+            $ms = Db::name('pj_project_profile')->where($where3)->select();
+            $arr = [];
+            if($ms){
+                foreach($ms as $key=>$val){
+                    $arr[] = strtotime($val['Final_Delivery_Time']);
+                }
+
+                $d_time = max($arr);
+
+                if($d_time){
+                    $d_time = date('Y-m-d H:i',$d_time);
+                    $pj = Db::name('pj_term_record')->where($where3)->update(['Final_Delivery_Time'=>$d_time]);
+                }
+            }
+
+        }
+
+        //同步QCR反馈到质量抽查表
+        if($data['QCR_Feedback']){
+            //判断是否有同一个文件编号的记录存在
+            $where3 = [
+                'Filing_Code'=>$data['Filing_Code'],
+                'Job_Name' => $data['Job_Name'],
+                'delete_time' => 0,
+            ];
+            $check = Db::name('pj_check')->where($where3)->select();
+            foreach($check as $k2=>$v2){
+                $update3 = [
+                    'QCR_Feedback' => $data['QCR_Feedback']
+                ];
+                $re = Db::name('pj_check')->where('id',$v2['id'])->update($update3);
+            }
 
         }
         echo "<script>history.go(-2);</script>";
@@ -1306,6 +1478,103 @@ class PjProjectProfile extends Common
 
                 }
             }
+
+
+            //同步QCR反馈到质量抽查表
+            if(in_array('QCR_Feedback',$field)){
+                foreach($data['arr'] as $k3=>$v3) {
+                    $xm2 = Db::name('pj_project_profile')->where('id', $v3)->field('Filing_Code,Job_Name,QCR_Feedback')->find();
+                    $update_data = [
+                        'QCR_Feedback' => $xm2['QCR_Feedback']
+                    ];
+                    $where3 = [
+                        'Filing_Code' => $xm2['Filing_Code'],
+                        'Job_Name' => $xm2['Job_Name']
+                    ];
+
+                    Db::name('pj_check')->where($where3)->update($update_data);
+                }
+            }
+
+            //如果存在 是否可作为类型库的模板文件，需要同步到项目数据库
+            if(in_array('whether_template',$field)){
+                foreach($data['arr'] as $k4=>$v4) {
+                    $xm2 = Db::name('pj_project_profile')->where('id', $v4)->field('Filing_Code,Job_Name,whether_template')->find();
+                    $update_data = [
+                        'whether_template' => $xm2['whether_template']
+                    ];
+                    $where4 = [
+                        'Filing_Code' => $xm2['Filing_Code'],
+                        'Job_Name' => $xm2['Job_Name']
+                    ];
+
+                    Db::name('pj_project_database')->where($where4)->update($update_data);
+                }
+            }
+
+            //如果存在 品牌型号，需要同步到项目数据库
+            if(in_array('Brand_and_Model',$field)){
+                foreach($data['arr'] as $k4=>$v4) {
+                    $xm2 = Db::name('pj_project_profile')->where('id', $v4)->field('Filing_Code,Job_Name,Brand_and_Model')->find();
+                    $update_data = [
+                        'Brand_and_Model' => $xm2['Brand_and_Model']
+                    ];
+                    $where4 = [
+                        'Filing_Code' => $xm2['Filing_Code'],
+                        'Job_Name' => $xm2['Job_Name']
+                    ];
+
+                    Db::name('pj_project_database')->where($where4)->update($update_data);
+                }
+            }
+
+            //如果存在 应用领域，需要同步到项目数据库
+            if(in_array('Industry_Field',$field)){
+                foreach($data['arr'] as $k4=>$v4) {
+                    $xm2 = Db::name('pj_project_profile')->where('id', $v4)->field('Filing_Code,Job_Name,Industry_Field')->find();
+                    $update_data = [
+                        'Industry_Field' => $xm2['Industry_Field']
+                    ];
+                    $where4 = [
+                        'Filing_Code' => $xm2['Filing_Code'],
+                        'Job_Name' => $xm2['Job_Name']
+                    ];
+
+                    Db::name('pj_project_database')->where($where4)->update($update_data);
+                }
+            }
+
+            //同步最终交付时间
+            if(in_array('Final_Delivery_Time',$field)){
+
+                foreach($data['arr'] as $k4=>$v4) {
+                    $xm2 = Db::name('pj_project_profile')->where('id', $v4)->field('Filing_Code,Job_Name,Project_Name,Final_Delivery_Time')->find();
+
+                    $where5 = [
+                        'Project_Name' => $xm2['Project_Name'],
+                        'delete_time' => 0,
+                    ];
+                    //找到最晚的时间
+                    $ms = Db::name('pj_project_profile')->where($where5)->select();
+                    $arr = [];
+                    if($ms){
+                        foreach($ms as $key=>$val){
+                            $arr[] = strtotime($val['Final_Delivery_Time']);
+                        }
+                        $d_time = max($arr);
+
+                        if($d_time){
+                            $d_time = date('Y-m-d H:i',$d_time);
+                            $pj = Db::name('pj_term_record')->where($where5)->update(['Final_Delivery_Time'=>$d_time]);
+                        }
+                    }
+
+
+                }
+
+
+            }
+
         } catch (ValidateException $e) {
             // 这是进行验证异常捕获
             return json($e->getError());
@@ -1478,6 +1747,144 @@ class PjProjectProfile extends Common
 
     }
 
+    //更改项目阶段
+    public function change_stage(Request $request){
+        // 获取提交的数据
+        $data = $request->post();
+        $cate = $data['cate'];
+        $msg = '您没有权限更改阶段到'.$cate;
+        $job_id = session('administrator')['job_id'];
+        $username = session('administrator')['name'];
+
+        /*$name = Db::name('xt_dict')->where('c_id',32)->field('cn_name')->select();
+        $arr = array_column($name,'cn_name');
+        $x_arr = ['闻心宇','张攀','PA12','王畅'];
+        $arr = array_merge($arr, $x_arr);
+        if(!in_array($username,$arr)){
+            return json(['msg'=>'您的小组暂未开放该功能']);
+        }*/
+
+
+        if(!in_array($job_id,[1,7,8,10,11,12,13,23])){
+            return json(['msg'=>'不是项目组成员，无法操作']);
+        }
+
+        if(in_array($username,['闻心宇','张攀'])){
+            if($cate != 'QCR待修改' && $cate != '提交组长'){
+                return json(['msg' => $msg]);
+            }
+        }else{
+            //job_id 翻译人员：10，校对人员：11，预排人员：12，后排人员：13，项目组长：7
+            if($job_id == 10){
+                if($cate != '校对' && $cate != '后排' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 11){
+                if($cate != '后排' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 12){
+                if($cate != '翻译' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 13){
+                if($cate != '定稿' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+        }
+
+
+
+        $up_data = [
+            'Stage' => $cate,
+        ];
+        $res = Db::name('pj_project_profile')->where('id',$data['c_id'])
+            ->update($up_data);
+        if($res){
+            return json(['msg' => '操作成功']);
+        }else{
+            return json(['msg' => '执行失败']);
+        }
+    }
+    //批量更改项目阶段
+    public function batch_stage(Request $request){
+        // 获取提交的数据
+        $data = $request->post();
+        $cate = $data['cate'];
+        $id = $data['c_id'];
+        $id_arr = explode(',', $id);
+        $id_arr = array_reverse($id_arr);
+
+        //权限验证
+        $msg = '您没有权限更改阶段到'.$cate;
+        $job_id = session('administrator')['job_id'];
+        $username = session('administrator')['name'];
+
+        /*$name = Db::name('xt_dict')->where('c_id',32)->field('cn_name')->select();
+        $arr = array_column($name,'cn_name');
+        $x_arr = ['闻心宇','张攀','PA12','王畅'];
+        $arr = array_merge($arr, $x_arr);
+        if(!in_array($username,$arr)){
+            return json(['msg'=>'您的小组暂未开放该功能']);
+        }*/
+
+
+        if(!in_array($job_id,[1,7,8,10,11,12,13,23])){
+            return json(['msg'=>'不是项目组成员，无法操作']);
+        }
+
+        if(in_array($username,['闻心宇','张攀'])){
+            if($cate != '校对修改' && $cate != '排版修改' && $cate != '提交组长'){
+                return json(['msg' => $msg]);
+            }
+        }else{
+            //job_id 翻译人员：10，校对人员：11，预排人员：12，后排人员：13，项目组长：7
+            if($job_id == 10){
+                if($cate != '校对' && $cate != '后排' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 11){
+                if($cate != '后排' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 12){
+                if($cate != '翻译' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+            if($job_id == 13){
+                if($cate != '定稿' && $cate != 'QCR' && $cate != '提交组长'){
+                    return json(['msg' => $msg]);
+                }
+            }
+
+        }
+
+        foreach ($id_arr as $key => $v) {
+            $up_data = [
+                'Stage' => $cate,
+            ];
+            $res = Db::name('pj_project_profile')->where('id',$v)
+                ->update($up_data);
+        }
+        // 返回数据
+        return json(['msg' => '操作成功']);
+    }
+
+
     public function split($c_id)
     {
         // 文件库
@@ -1486,5 +1893,22 @@ class PjProjectProfile extends Common
             ->where('delete_time', 0)->order('id desc')->select();
         // 返回视图
         return view('', ['c_id' => $c_id, 'text_list' => $text_list]);
+    }
+
+    public function stage($c_id)
+    {
+        //项目阶段
+        $stage  = Db::name('xt_dict')->where('c_id',37)->field('cn_name,en_name')->select();
+
+        // 返回视图
+        return view('', ['c_id' => $c_id, 'stage' => $stage]);
+    }
+
+    public function pg_stage($c_id){
+        //项目阶段
+        $stage  = Db::name('xt_dict')->where('c_id',37)->field('cn_name,en_name')->select();
+
+        // 返回视图
+        return view('', ['c_id' => $c_id, 'stage' => $stage]);
     }
 }

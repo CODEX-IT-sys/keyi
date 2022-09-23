@@ -64,6 +64,15 @@
 									</a>
 								</li>
 								{/if}
+
+								{if $job_id != 0}
+								<li id="7" {$type==7?'class="active"':''} style="margin-top:20px;">
+									<a>
+										<span>{:session('language') == '中文'? 'QCR提醒' : 'QCR Reminder'}</span>
+										<b>{$t['q']}</b>
+									</a>
+								</li>
+								{/if}
 							</ul>
 						</div>
 					</div>
@@ -133,26 +142,80 @@
                 str = "<span class='task_status bg-color2'><i class='iconfont icon-project-soild'></i></span>"; // 绿
             }
 
+			var cols = [[
+				{
+					field: 'id', width: 80, title: '级别'
+					, templet: function (d) {
+						return str;
+					}
+				}
+				, {
+					field: 'Filing_Code', title: '文件编号'
+					, templet: function (d) {
+						return "文件编号：<br>" + d.Filing_Code;
+					}
+				}, {
+					field: 'Job_Name', title: '文件名称'
+					, templet: function (d) {
+						return "文件名称：<br>" + d.Job_Name;
+					}
+				}
+			]];
+
+			if(type == 7){
+				cols = [[
+					{
+						field: 'id', width: 80, title: '级别'
+						, templet: function (d) {
+							return str;
+						}
+					}
+					, {
+						field: 'Filing_Code', title: '文件编号'
+						, templet: function (d) {
+							return "文件编号：<br>" + d.Filing_Code;
+						}
+					}, {
+						field: 'Job_Name', title: '文件名称'
+						, templet: function (d) {
+							return "文件名称：<br>" + d.Job_Name;
+						}
+					}, {
+						field: 'Spot_Check', title: 'QCR状态'
+						, templet: function (d) {
+							if (d.Spot_Check == 9) {
+								return "QCR状态：<br><p style='background-color: red'>" + d.Spot_Check +"</p>";
+							}else{
+								return "QCR状态：<br>" + d.Spot_Check;
+							}
+
+						}
+					}, {
+						field: 'Translation_QL', title: '翻译质量等级'
+						, templet: function (d) {
+							return "翻译质量等级：<br>" + d.Translation_QL;
+						}
+					}, {
+						field: 'Format_QL', title: '排版质量等级'
+						, templet: function (d) {
+							return "排版质量等级：<br>" + d.Format_QL;
+						}
+					}, {
+						field: 'Proposal', title: '建议'
+						, templet: function (d) {
+							return "建议：<br>" + d.Proposal;
+						}
+					}
+				]];
+			}
+
 			tableIns = table.render({
 				elem: '.remind'
 				//,url: "{:url('workbench/index')}"
 				,url: url
 				,where: {type: type}
 				,cellMinWidth: 80
-				,cols: [[
-					{field:'id', width:80, title: '级别'
-						, templet: function (d) {return str;}
-					}
-					,{field:'Filing_Code', title: '文件编号'
-						, templet: function (d) {
-							return "文件编号：<br>" + d.Filing_Code;
-						}
-					},{field:'Job_Name', title: '文件名称'
-						, templet: function (d) {
-							return "文件名称：<br>" + d.Job_Name;
-						}
-					}
-				]]
+				,cols: cols
 				,height: 'full-215'
 				,page: true
 				,limit: 10

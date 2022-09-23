@@ -130,7 +130,27 @@
 							        </div>
 							    </div>
 							</div>
-							
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '品牌型号' : 'Brand and Model'}">
+										{:session('language') == '中文'? '品牌型号' : 'Brand and Model'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Brand_and_Model" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label" title="{:session('language') == '中文'? '应用领域' : 'Industry Field'}">
+										{:session('language') == '中文'? '应用领域' : 'Industry Field'}
+									</label>
+									<div class="layui-input-block">
+										<input name="Industry_Field" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" type="text">
+									</div>
+								</div>
+							</div>
 							<div class="layui-col-xs12">
 							    <div class="layui-form-item">
 							        <label class="layui-form-label" title="{:session('language') == '中文'? '文件用途和语言规范' : 'File Usage and Linguistic Specification'}">
@@ -169,7 +189,21 @@
 									</div>
 								</div>
 							</div>
+							<div class="layui-col-xs4">
+								<div class="layui-form-item">
+									<label class="layui-form-label"
+										   title="{:session('language') == '中文'? '是否可作为类型库的模板文件' : 'whether_template'}">
+										{:session('language') == '中文'? '是否可作为类型库的模板文件' : 'whether_template'}
+									</label>
+									<div class="layui-input-block">
+										<select name="whether_template" lay-filter="whether_template" lay-search>
+											<option value="No">No</option>
+											<option value="Yes">Yes</option>
 
+										</select>
+									</div>
+								</div>
+							</div>
                             <div class="layui-col-xs4">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label" title="{:session('language') == '中文'? '排版难易程度' : 'Format Difficulty'}">

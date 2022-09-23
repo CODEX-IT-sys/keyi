@@ -11,6 +11,7 @@ use think\db\Where;
 use think\Session;
 use word\Word;
 
+//CODEX园地
 class Zanonymous extends Common
 {
 
@@ -30,7 +31,7 @@ class Zanonymous extends Common
         $data = \request()->param('status','2,1');
         $ft=Zanonymou::with('admin,content')->where('auth|sponsor','like','%'.session('administrator')['id'].'%')->where('status','in',$data)->all();
 
-        if(session('administrator')['job_id']==8||session('administrator')['id']==162)
+        if(session('administrator')['job_id']==8||session('administrator')['id']==162 ||session('administrator')['job_id']==6)
         {
 
             $ft=Zanonymou::with('admin,content')->where('status','in',$data)->all();

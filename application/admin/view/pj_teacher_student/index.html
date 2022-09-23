@@ -1,0 +1,464 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '师生管理' : 'Customer Management'}</a>
+                    <a class="on">{:session('language') == '中文'? '老师列表' : 'Inquiry'}</a>
+                </div>
+                <div class="global_btn">
+                    <a href="" class="layui-btn" id="create">{:session('language') == '中文'? '新增' :
+                        'Add'}</a>
+                    <!--<a class="layui-btn com_btn" id="sjth">数据计算</a>-->
+                    <a class="layui-btn delete_btn" id="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+                </div>
+            </div>
+            <div class="mainCt">
+                <div class="mainWrap">
+                    <div class="forwardTable farTable">
+                        <table class="layui-hide" id="test" lay-filter="test"></table>
+                    </div>
+
+                    <!--文本说明-->
+                    <div class="explain">
+                        <h5 class="explainTitle">
+                            <i class="iconfont icon-tishi"></i>
+                            <span>说明</span>
+                            <span id="jisuan" style="background: #0ba4da;float: right;">
+
+                            </span>
+                        </h5>
+                        <div class="explainCt">
+                            {$intro|raw}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<!-- 搜索 -->
+<script type="text/html" id="forwardBar">
+
+    <div class="forward">
+        <div class="forward_lead">
+            <div class="layui-form-item label_auto">
+                <label class="layui-form-label">{:session('language') == '中文'? '字段选择' : 'Select Field'}</label>
+                <div class="layui-input-inline">
+                    <select id="field" lay-verify="" lay-search>
+                        <option value="">{:session('language') == '中文'? '请选择查找字段' : 'Please Select'}</option>
+                        {volist name="$select_field" id="v"}
+                        {if $v.Field != 'delete_time'}{if $v.Field != 'id'}{if $v.Field != 'pid'}{if $v.Field != 'level'}
+                        <option value="{$v.Field}" {$field==$v.Field?'selected':''}>{:session('language') == '中文'?
+                            $v.Comment : str_replace('_' , ' ', $v.Field)}
+                        </option>
+                        {/if}{/if}{/if}{/if}
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:session('language') == '中文'? '查询内容' : 'Keyword'}</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="keyword" value="{$keyword}"
+                           placeholder="{:session('language') == '中文'? '请输入查询内容' : 'Please input keyword'}"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="searchBtn">
+                <button class="layui-btn search_btn" type="button">
+                    <i class="iconfont icon-sousuo"></i>
+                    <span>{:session('language') == '中文'? '查询' : 'Search'}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- 行工具 -->
+<script type="text/html" id="barDemo">
+    <div class="table_btn">
+        <a class="layui-btn layui-btn-xs com_btn" lay-event="student">{:session('language') == '中文'? '学生列表' : 'Student List'}</a>
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="add">{:session('language') == '中文'? '添加学生' : 'Add'}</a>
+       <!-- <a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>-->
+
+    </div>
+</script>
+
+<!-- 脚本 -->
+<script>
+    var tableIns;  //数据表格对象，用于重载
+    layui.use(['table', 'form'], function () {
+        var table = layui.table, form = layui.form;
+        var field = '{$field}';
+        var keyword = '{$keyword}';
+        //切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+        //数据表格字段
+        var data = '{$colsData|raw}';
+        var colsData = JSON.parse(data);
+
+        //通用表头生成器
+        function commonCols(language, colsData) {
+            //左侧勾选栏
+            var cols = [{type: 'checkbox', fixed: 'left', totalRowText: '合计'}];
+            var l = colsData.length;
+
+            //遍历所有字段
+            for (var i = 0; i < l; i++) {
+                if (colsData[i].Field !== 'delete_time') {
+                    if (colsData[i].Field !== 'id') {
+                        if (colsData[i].Field !== 'pid') {
+                            if (colsData[i].Field !== 'level') {
+                                if (colsData[i].Field !== 'update_time') {
+                                    if (language === '中文') {
+                                        cols.push({
+                                            field: colsData[i].Field,
+                                            title: colsData[i].Comment,
+                                            sort: true,
+                                            minWidth: 120,
+                                            totalRow: true,
+                                            edit: true
+                                        });
+                                    } else {
+                                        cols.push({
+                                            field: colsData[i].Field,
+                                            title: colsData[i].Field,
+                                            sort: true,
+                                            minWidth: 180,
+                                            totalRow: true
+                                        });
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            //右侧操作工具
+            if (language === '中文') {
+                cols.push({title: '操作', toolbar: '#barDemo', fixed: 'right', align: 'center', width: 240});
+            } else {
+                cols.push({title: 'Action', toolbar: '#barDemo', fixed: 'right', align: 'center', width: 240});
+            }
+
+            return [cols];
+        }
+
+        //生成表格
+        tableIns = table.render({
+            elem: '#test'
+            , url: "{:url('pj_teacher_student/index')}"
+            , where: {field: field, keyword: keyword}
+            , toolbar: '#forwardBar'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , title: '师生列表'
+            //,totalRow: true
+            , cols: commonCols(language, colsData),
+            limit: 50, height: 700,
+            page: {
+                curr: location.hash.replace('#!fenye=', ''),
+                hash: 'fenye'
+            },
+        });
+
+        // 回车亦可以搜索
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                $(".search_btn").trigger("click");
+            }
+        });
+
+        //表头搜索
+        $('.search_btn').click(function () {
+            var searchfield = $('#field').val();
+            var searchkeyword = $.trim($('#keyword').val());
+
+            if (!searchkeyword) {
+                if (language === '中文') {
+                    layer.msg('搜索内容不能为空');
+                } else {
+                    layer.msg('Please input keyword');
+                }
+                return false
+            }
+
+            // 页面 带参跳转 可以记住搜索参数
+            window.location.href = "{:url('index')}" + '?field=' + searchfield + '&keyword=' + searchkeyword;
+
+            //表格重载
+            /*table.reload('test', {
+                url: "{:url('mk_inquiry/index')}",
+                where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
+                page: true, limit:50
+            });*/
+        });
+
+        // 多条件 搜索弹框
+        $(function () {
+            var index;
+            $(".addCondition").live("click", function () {
+                index = parent.layer.open({ //在父窗口打开
+                    type: 2,
+                    title: '条件查询',
+                    maxmin: true,
+                    shadeClose: true, //点击遮罩关闭层
+                    area: ['700px', '560px'],
+                    content: "{:url('mk_inquiry/condition')}",
+                    end: function () {
+
+                        var search_type = localStorage.getItem('search_type');
+                        var s = localStorage.getItem('field');
+                        var i = localStorage.getItem('keyword');
+
+                        // 表格重载
+                        table.reload('test', {
+                            url: "{:url('mk_inquiry/index')}",
+                            totalRow: true,
+                            where: {search_type: search_type, field: s, keyword: i},  // 设定异步数据接口的额外参数
+                            page: true
+                            , limit: 50
+                        });
+                    }
+                });
+            });
+        });
+
+        //批量删除(多选操作)
+        $('#del').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var idstr = '';
+            var cd = checkStatus.data.length;
+
+            if (cd !== 0) {
+                for (var i = 0; i < cd; i++) {
+                    idstr += checkStatus.data[i].id + ',';
+                }
+                // 去除多余符号
+                idstr = idstr.substring(0, idstr.length - 1);
+
+                layer.confirm('确认删除？', function (index) {
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'get',
+                        url: "{:url('pj_teacher_student/batch_delete')}",
+                        data: {id: idstr},
+                        // 删除成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+            } else {
+                if (language === '中文') {
+                    layer.alert('请先勾选要删除的数据再操作');
+                } else {
+                    layer.msg('Please check the box before operating');
+                }
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            //获得当前行数据
+            var id = obj.data.id;
+
+            // 删除
+            if (obj.event === 'del') {
+                layer.confirm('确认删除？', function (index) {
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'delete',
+                        contentType: 'application/json',
+                        url: replaceEditUrlId("{:url('mk_inquiry/delete', ['id' => 1])}", id),
+                        dataType: 'json',
+                        // 删除成功
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 表格重载
+                                tableIns.reload();
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                });
+
+            } else if (obj.event === 'student') {
+
+                window.location.href = replaceEditUrlId("{:url('pj_teacher_student/student', ['pid' => 1])}", id);
+
+            } else if (obj.event === 'quota') {
+
+                // 报价单
+                window.location.href = replaceEditUrlId("{:url('mk_inquiry/quotation', ['id' => 1])}", id);
+
+            } else if (obj.event === 'add') {
+                //新增学生
+                parent.layer.open({  // 在父窗口打开
+                    type: 2,
+                    title: '新增',
+                    maxmin: true,
+                    area: ['900px', '500px'],
+                    content: replaceEditUrlId("{:url('pj_teacher_student/add', ['pid' => 1])}", id)
+                });
+                //window.location.href = replaceEditUrlId("{:url('mk_inquiry/file_index', ['id' => 1])}", id);
+            }
+        });
+
+
+        $('#create').click(function () {
+            parent.layer.open({  // 在父窗口打开
+                type: 2,
+                title: '新增',
+                maxmin: true,
+                area: ['900px', '500px'],
+                content: replaceEditUrlId("{:url('pj_teacher_student/create', ['c_id' => 1])}", 1),
+                end: function(){
+
+                    window.location.href= "{:url('pj_teacher_student/index')}";
+                }
+            });
+        });
+
+        /*字段筛选 全选 反选*/
+        table.on('toolbar()', function (obj) {
+            var config = obj.config;
+            var btnElem = $(this);
+            var tableId = config.id;
+            var tableView = config.elem.next();
+            switch (obj.event) {
+                case 'LAYTABLE_COLS':
+                    // 给筛选列添加全选还有反选的功能
+                    var panelElem = btnElem.find('.layui-table-tool-panel');
+                    var checkboxElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]');
+                    var checkboxCheckedElem = panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]:checked');
+                    $('<li class="layui-form select_lead" lay-filter="LAY_TABLE_TOOL_COLS_FORM">' +
+                        '<input type="checkbox" lay-skin="primary" lay-filter="LAY_TABLE_TOOL_COLS_ALL" ' + ((checkboxElem.length === checkboxCheckedElem.length) ? 'checked' : '') + ' title="全选">' +
+                        '<span class="invert_select"><i class="iconfont icon-fanxuan"></i>反选</span>' +
+                        '</li>')
+                        .insertBefore(panelElem.find('li').first())
+                        .on('click', '.invert_select', function (event) {
+                            layui.stope(event);
+                            // 反选逻辑
+                            panelElem.find('[lay-filter="LAY_TABLE_TOOL_COLS"]+').click();
+                        });
+
+                    form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+                    break;
+            }
+        });
+
+        // 监听筛选列panel中的全选
+        form.on('checkbox(LAY_TABLE_TOOL_COLS_ALL)', function (obj) {
+            $(obj.elem).closest('ul')
+                .find('[lay-filter="LAY_TABLE_TOOL_COLS"]' + (obj.elem.checked ? ':not(:checked)' : ':checked') + '+').click();
+        });
+
+        // 监听筛选列panel中的单个记录的change
+        $(document).on('change', 'input[lay-filter="LAY_TABLE_TOOL_COLS"]', function (event) {
+            var elemCurr = $(this);
+            // 筛选列单个点击的时候同步全选的状态
+            $('input[lay-filter="LAY_TABLE_TOOL_COLS_ALL"]')
+                .prop('checked',
+                    elemCurr.prop('checked') ? (!$('input[lay-filter="LAY_TABLE_TOOL_COLS"]').not(':checked').length) : false);
+            form.render('checkbox', 'LAY_TABLE_TOOL_COLS_FORM');
+        });
+
+
+        $('#sjth').click(function () {
+            var checkStatus = table.checkStatus('test');
+            var num = 0
+            var num2 = 0
+            for (v in checkStatus.data) {
+                num += checkStatus.data[v]['Pages'];
+                num2 += checkStatus.data[v]['Source_Text_Word_Count'];
+            }
+            var msg = "选中页数:" + num;
+
+            $('#jisuan').html(msg)
+            layer.alert(msg);
+            // console.log(num);
+        });
+        table.on('edit(test)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            console.log(obj.tr) //得到当前行元素对象
+            console.log(obj.data) //得到当前行数据
+            obj.update(value) //修改当前行数据
+
+            layer.confirm('确认修改?', {
+                btn: ['确认', '取消'], //按钮
+                success: function () {
+                    this.enterEsc = function (event) {
+                        if (event.keyCode === 13) {
+                            return false; //阻止系统默认回车事件
+                        } else if (event.keyCode == 27) {
+                            return false;
+                        }
+                    };
+                    $(document).on('keydown', this.enterEsc); //监听键盘事件，关闭层
+                },
+                end: function () {
+                    $(document).off('keydown', this.enterEsc); //解除键盘关闭事件
+                }
+            }, function () {
+                $.ajax({
+                    url: "{:url('editing')}",
+                    type: "post",
+                    data: {id: data.id, field: field, value},
+                    success: function (result) {
+                        if (result.code == 1) {
+                            // 表格重载
+                            tableIns.reload();
+                            window.location.reload();
+                        } else {
+                            layer.msg('编辑失败')
+                        }
+
+                    }
+                });
+            }, function () {
+
+            });
+
+
+        });
+
+
+    });
+</script>
+{/block}

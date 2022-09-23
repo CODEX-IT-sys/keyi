@@ -1,0 +1,181 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="{:url('xt_file/index')}">{:session('language') == '中文'? '师生管理' : 'File Management'}</a>
+                    <a>{:session('language') == '中文'? '学生列表' : 'File List'}</a>
+
+                </div>
+
+                <div class="global_btn">
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' :
+                            'Back'}
+                        </button>
+                    </a>
+                </div>
+
+            </div>
+            <div class="mainCt">
+                <div class="mainWrap">
+                    <div class="forwardTable">
+                        <table class="layui-hide" id="admin" lay-data="{id:'admin'}" lay-filter="admin"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+
+
+<!--行工具-->
+<script type="text/html" id="barDemo">
+    <div class="table_btn">
+        <a class="layui-btn layui-btn-xs modify_btn" lay-event="edit">{:session('language') == '中文'? '修改' : 'Edit'}</a>
+        <a class="layui-btn layui-btn-xs delete_btn" lay-event="del">{:session('language') == '中文'? '删除' : 'Delete'}</a>
+
+    </div>
+</script>
+
+<!--文件类型-->
+
+
+<!--脚本-->
+<script type="text/javascript">
+    var tableIns;  // 数据表格对象，用于重载
+
+    var pid = "{$pid}";
+
+    layui.use(['layer', 'table', 'element'], function () {
+        var layer = top.layer;
+        var table = layui.table;
+        var cols;
+
+        // 切换语言
+        var language = "{:session('language') == '中文'? '中文' : 'english'}";
+
+        if (language === '中文') {
+            cols = [[
+
+                {field: 'name', title: '学生姓名', sort: true, minWidth: 200},
+                {field: 'create_time', title: '创建时间', sort: true, minWidth: 130},
+                {width: 240, title: '操作', align: 'center', toolbar: '#barDemo'}
+            ]]
+        } else {
+            cols = [[
+
+                {field: 'name', title: 'Student Name', sort: true, minWidth: 200},
+                {field: 'create_time', title: 'Create_time', sort: true, minWidth: 130},
+                {width: 240, title: 'Action', align: 'center', toolbar: '#barDemo'}
+            ]]
+        }
+
+        // 渲染表格数据
+        tableIns = table.render({
+            elem: '#admin',
+
+            url: replaceEditUrlId("{:url('pj_teacher_student/student', ['pid' => 1])}", pid),
+            method: 'get',
+            cols: cols,
+            limit: 50,
+            page: true
+        });
+
+        // 搜索
+        $('.search_btn').click(function () {
+            var searchfield = $('#field').val();
+            var searchkeyword = $.trim($('#keyword').val());
+
+            if (!searchkeyword) {
+                layer.msg('搜索内容不能为空');
+                return false;
+            }
+
+            // 表格重载
+            table.reload('admin', {
+                url: replaceEditUrlId("{:url('pj_teacher_student/student', ['pid' => 1])}", pid),
+                where: {field: searchfield, keyword: searchkeyword},  // 设定异步数据接口的额外参数
+                page: 1
+            });
+        });
+
+        //刷新
+        $("#refresh").bind("click", function () {
+
+            location.reload();
+
+        });
+
+        //监听工具条
+        table.on('tool(admin)', function (obj) {
+
+            var data = obj.data; //获得当前行数据
+            console.log(data);
+            var id = obj.data.id; //获得当前行id
+            var layEvent = obj.event;//获得 lay-event 对应的值
+
+            if (layEvent === 'del') { //删除
+
+
+                layer.confirm('确认删除么？', function (index) {
+
+                    layer.close(index);
+
+                    // 向服务器发送删除请求
+                    $.ajax({
+                        type: 'get',
+                        contentType: 'application/json',
+                        url: replaceEditUrlId("{:url('pj_teacher_student/delete', ['id' => 1])}", id),
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.alert(res.msg, {title: '提示'}, function (index) {
+                                // 删除成功
+                                // 表格重载
+                                tableIns.reload();
+
+                                // 关闭alert
+                                layer.close(index);
+                            });
+                        },
+                        error: function (jqXHR) {
+                            // 删除失败
+                            if (jqXHR.status === 422) {
+                                layer.alert(jqXHR.responseText, {title: '提示'}, function (index) {
+                                    layer.close(index);
+                                });
+                            }
+                        }
+                    });
+
+                });
+
+            } else if (layEvent === 'edit') { //编辑
+                parent.layer.open({  // 在父窗口打开
+                    type: 2,
+                    title: '修改',
+                    maxmin: true,
+                    area: ['900px', '500px'],
+                    content: replaceEditUrlId("{:url('pj_teacher_student/edit', ['id' => 1])}", id),
+                    end: function(){
+                        tableIns.reload();
+                    }
+                });
+
+
+            }
+        });
+
+
+    });
+</script>
+{/block}

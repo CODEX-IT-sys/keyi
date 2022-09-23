@@ -110,6 +110,9 @@ class Index extends Controller
             $faq_all = Db::name('faq')->where('delete_time',0)->count('id');
             $faq = $faq_all - $faq_exist-$project_all;
         }
+
+        //待审批数量
+        $approval = Db::name('pj_approval')->where('delete_time',0)->where('status',0)->count('id');
         // iframe url
         /*if($if_url == ''){
 
@@ -128,7 +131,8 @@ class Index extends Controller
         }*/
 
         // 返回视图
-        return view('', ['menu'=>$top, 'msg_s'=>$msg_s, 'faq'=>$faq,'software'=>$software,'translate'=>$translate,'revise'=>$revise,'project'=>$project,'work'=>$work,'tq_status'=>$tq_status,'job_id'=>$job_id]);
+        return view('', ['menu'=>$top, 'msg_s'=>$msg_s, 'faq'=>$faq,'software'=>$software,'translate'=>$translate,
+            'revise'=>$revise,'project'=>$project,'work'=>$work,'tq_status'=>$tq_status,'job_id'=>$job_id,'approval'=>$approval]);
     }
 
     // 欢迎页

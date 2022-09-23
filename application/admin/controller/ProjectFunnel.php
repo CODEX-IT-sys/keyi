@@ -271,7 +271,7 @@ class ProjectFunnel extends Controller
 
         // 待提交 总页数
 //        $arr['Total_Pages_submitted'] = $arr['a_Total_Pages_Process'] + $arr['b_Total_Pages_Process'] + $arr['c_Total_Pages_Translated'];
-        $arr['Total_Pages_submitted'] = Db::name('pj_contract_review')->where('Delivered_or_Not', 'No')->where('delete_time','')->sum('pages');
+        $arr['Total_Pages_submitted'] = Db::name('pj_contract_review')->where('Delivered_or_Not', 'No')->where('delete_time',0)->sum('pages');
 
 
 

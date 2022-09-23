@@ -76,7 +76,7 @@ class PjDailyProgressDtp extends Common
     {
         // 查询 可供预选的 文件编码
         $file_code = PjContractReviewModel::field('id, Filing_Code')
-            ->order('id desc')->limit(30000)->select();
+            ->order('id desc')->limit(50000)->select();
 			
 		// 文件类型
 		$File_Type = Db::name('xt_dict')->where('c_id',4)->select();

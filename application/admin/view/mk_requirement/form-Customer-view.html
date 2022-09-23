@@ -1,0 +1,264 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '客户管理' : 'Customer Management'}</a>
+                    <a href="{:url('mk_requirement/index')}">{:session('language') == '中文'? '客户要求' : 'Customer'}</a>
+
+                </div>
+                <div class="global_btn">
+
+                    <button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' :
+                            'Back'}
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="mainCt mainSec formReset signLimit">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form" method="post" action="{:url('mk_requirement/update')}">
+
+                        <div class="layui-row layui-col-space10">
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item layui_ic">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '日期' : 'Date'}">
+                                        {:session('language') == '中文'? '日期' : 'Date'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input class="showDate layui-input" value="{$info.Date|default=''}" autocomplete="off" name="Date" type="text">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '客户公司' : 'Customer Company'}">
+                                        {:session('language') == '中文'? '客户公司' : 'Customer Company'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Customer_Company" value="{$info.Customer_Company|default=''}" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '来稿人' : 'Attention'}">
+                                        {:session('language') == '中文'? '来稿人' : 'Attention'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Attention" value="{$info.Attention|default=''}" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '所属部门' : 'Department'}">
+                                        {:session('language') == '中文'? '所属部门' : 'Department'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Department" value="{$info.Department|default=''}" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? 'SA' : 'SA'}">
+                                        {:session('language') == '中文'? 'SA' : 'SA'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="SA" value="{$info.SA|default=''}" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '项目组长' : 'PTL'}">
+                                        {:session('language') == '中文'? '项目组长' : 'PTL'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="PTL" value="{$info.PTL|default=''}" lay-verify="required" autocomplete="off"
+                                               placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '排版要求' : 'Formatting'}">
+                                        {:session('language') == '中文'? '排版要求' : 'Formatting'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Formatting"
+                                                  name="Formatting"
+                                                  class="layui-textarea">{$info.Formatting|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '术语表' : 'Glossary'}">
+                                        {:session('language') == '中文'? '术语表' : 'Glossary'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Glossary" value="{$info.Glossary|default=''}" lay-verify="required" autocomplete="off"
+                                               placeholder="" class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '翻译范围' : 'Translation Scope'}">
+                                        {:session('language') == '中文'? '翻译范围' : 'Translation Scope'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Translation_Scope"
+                                                  name="Translation_Scope"
+                                                  class="layui-textarea">{$info.Translation_Scope|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '文风要求' : 'Language Style'}">
+                                        {:session('language') == '中文'? '文风要求' : 'Language Style'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Language_Style"
+                                                  name="Language_Style"
+                                                  class="layui-textarea">{$info.Language_Style|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '术语要求' : 'Terminology'}">
+                                        {:session('language') == '中文'? '术语要求' : 'Terminology'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Terminology"
+                                                  name="Terminology"
+                                                  class="layui-textarea">{$info.Terminology|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '交付要求' : 'Deliverables'}">
+                                        {:session('language') == '中文'? '交付要求' : 'Deliverables'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Deliverables" name="Deliverables"
+                                                  class="layui-textarea">{$info.Deliverables|default=''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+<script>
+
+    layui.use(['form', 'laydate'], function () {
+        var form = layui.form, laydate = layui.laydate, layer = layui.layer;
+        var language = "{:session('language')}";
+
+        //同时绑定多个,单个日期选择，显示在input里面
+        $('.showDate').click(function () {
+            laydate.render({
+                elem: this
+                , trigger: 'click'
+                , theme: '#1B3382'
+                , position: 'fixed'
+                //,isInitValue: true
+                //,value: new Date()
+                //,type:'datetime'
+                , format: 'yyyyMMdd'
+            });
+        });
+
+
+
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            validator.add('Customer_Company', [{
+                rule: 'require',
+                msg: '客户公司不能为空'
+            }]);
+
+            return validator.start();
+        };
+
+        // 数据提交
+        $('#save').on('click', function () {
+
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+            var tip = layer.msg('Data Uploading', {icon: 16, shade: 0.3, time: 3000});
+
+            // 表单提交
+            $('#form').submit();
+        });
+    })
+</script>
+{/block}

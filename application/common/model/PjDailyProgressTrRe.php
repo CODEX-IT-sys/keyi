@@ -36,7 +36,7 @@ class PjDailyProgressTrRe extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(!in_array($job_id, [1,8,9,16,17,20,22])) {
+        if(!in_array($job_id, [1,6,8,9,16,17,20,22,23])) {
 
             if($job_id == 7){
                 $cid = Db::name('xt_dict_cate')->where('en_name',$name)->field(['id'])->find();
@@ -68,25 +68,13 @@ class PjDailyProgressTrRe extends Model
                     });
                 }
 
-            }elseif( $name=='李晓艺'){
-                //兼职新人组
-                $xid = Db::name('xt_dict_cate')->where('en_name','PA777')->field(['id'])->find();
-                $x_id = $xid['id'];
-                $x_arr = Db::name('xt_dict')->where('c_id',$x_id)->select();
-                $name_arr  = array_column($x_arr,'cn_name');
-                array_push($name_arr,$name);
-                $query = $this->where(function ($query) use($name,$name_arr) {
-                    $query->where('Filled_by','in',$name_arr)
-                        ->whereOr('Name_of_Translator_or_Reviser', 'in', $name_arr);
-                });
-
-            }elseif($name=='周美玲'){
+            }elseif($name=='周美玲' || $name=='李晓艺'){
 
             }else{
                 // 否则 就只显示自己录入的 或 项目助理数据
                 $query = $this->where(function ($query) use($name) {
                     $query->where('Filled_by', $name)
-                        ->whereOr('Name_of_Translator_or_Reviser', 'like', "$name%");
+                        ->whereOr('Name_of_Translator_or_Reviser', '=', "$name%");
                 });
             }
 

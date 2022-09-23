@@ -35,7 +35,7 @@ class PjTranslationEvaluation extends Model
         $query = $this;
 
         // 查询器对象 判断管理层
-        if(!in_array($job_id, [1,8,9,20])) {
+        if(!in_array($job_id, [1,6,8,9,20,23])) {
 
             if ($job_id == 7) {
                 $cid = Db::name('xt_dict_cate')->where('en_name', $name)->field(['id'])->find();

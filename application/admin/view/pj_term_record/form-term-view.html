@@ -1,0 +1,343 @@
+{extend name="./layout/list.html" /}
+
+{block name="body"}
+
+<div class="hn_body">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="top">
+                <div class="position_lead">
+                    <i class="iconfont icon-navigation"></i>
+                    <a href="#">{:session('language') == '中文'? '术语数据记录表' : 'Termbase Record'}</a>
+                    <a class="on">{:session('language') == '中文'? '修改' : 'Add'}</a>
+                </div>
+                <div class="global_btn">
+                    <button class="layui-btn" id="save">{:session('language') == '中文'? '保存' : 'Save'}</button>
+
+                    <a href="javascript:history.back(-1);">
+                        <button class="layui-btn layui-btn-primary" type="button">{:session('language') == '中文'? '返回' :
+                            'Back'}
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="mainCt mainSec formReset signLimit">
+                <div class="mainWrap">
+
+                    <form class="layui-form" id="form" method="post" action="{:url('pj_term_record/update')}">
+
+                        <div class="layui-row layui-col-space10">
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '项目名称' : 'Project Name'}">
+                                        {:session('language') == '中文'? '项目名称' : 'Project Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Project_Name" lay-filter="" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}</option>
+                                            {volist name="$text_list" id="v"}
+                                            <option value="{$v.Project_Name}" {$info.Project_Name==$v.Project_Name?'selected':''}>{$v.Project_Name}</option>
+                                            {/volist}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '产品名称和/或文件类型' : 'Product Name'}">
+                                        {:session('language') == '中文'? '产品名称和/或文件类型' : 'Product Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Product_Name" value="{$info.Product_Name}" lay-verify="required" autocomplete="off" placeholder=""
+                                               class="layui-input" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '是否已提交项目术语库/表（否，请备注注明原因）' : 'Whether Submited'}">
+                                        {:session('language') == '中文'? '是否已提交项目术语库/表（否，请备注注明原因）' : 'Whether Submited'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Whether_Submited"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="Yes" {$info.Whether_Submited=='Yes'?'selected':''}>Yes</option>
+                                            <option value="否，请在备注注明原因" {$info.Whether_Submited=='否，请在备注注明原因'?'selected':''}>否，请在备注注明原因</option>
+                                            <option value="No 该项目提供非翻译服务" {$info.Whether_Submited=='No 该项目提供非翻译服务'?'selected':''}>No 该项目提供非翻译服务</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '是否已确认项目临时术语库/表符合填写规范' : 'Whether Confirmed'}">
+                                        {:session('language') == '中文'? '是否已确认项目临时术语库/表符合填写规范' : 'Whether Confirmed'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Whether_Confirmed"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="Yes" {$info.Whether_Confirmed=='Yes'?'selected':''}>Yes</option>
+                                            <option value="No" {$info.Whether_Confirmed=='No'?'selected':''}>No</option>
+                                            <option value="N/A" {$info.Whether_Confirmed=='N/A'?'selected':''}>N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item layui_ic">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '确认日期' : 'Confirm Date'}">
+                                        {:session('language') == '中文'? '确认日期' : 'Confirm Date'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input class="Date layui-input"  value="{$info.confirm_date}" name="confirm_date" type="text">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '项目初期提供的核定术语库（加密和设置失效日期）' : 'Approved Termbase'}">
+                                        {:session('language') == '中文'? '项目初期提供的核定术语库（加密和设置失效日期）' : 'Approved Termbase'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input name="Approved_Termbase" value="{$info.Approved_Termbase}" type="text" value="" autocomplete="off"
+                                               placeholder="" class="layui-input">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '术语填写规范检查结果' : 'Sampling_Results'}">
+                                        {:session('language') == '中文'? '术语填写规范检查结果' : 'Sampling_Results'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Sampling_Results"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="A 组长提交的术语符合填写规范" {$info.Sampling_Results=='A 组长提交的术语符合填写规范'?'selected':''}>A 组长提交的术语符合填写规范</option>
+                                            <option value="B 组长提交的术语不符合填写规范" {$info.Sampling_Results=='B 组长提交的术语不符合填写规范'?'selected':''}>B 组长提交的术语不符合填写规范</option>
+                                               <option value="N/A">N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '术语质量检查结果' : 'QA_Sampling_Results'}">
+                                        {:session('language') == '中文'? '术语质量检查结果' : 'QA_Sampling_Results'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="QA_Sampling_Results"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="A 项目负责人/定稿人员术语准确性较好" {$info.Sampling_Results=='A 项目负责人/定稿人员术语准确性较好'?'selected':''}>A 项目负责人/定稿人员术语准确性较好</option>
+                                            <option value="B 项目负责人/定稿人员术语严重质量问题" {$info.Sampling_Results=='B 项目负责人/定稿人员术语严重质量问题'?'selected':''}>B 项目负责人/定稿人员术语严重质量问题</option>
+                                            <option value="N/A">N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '是否核定项目临时术语库/表所有术语' : 'Whether_Terms_Approved'}">
+                                        {:session('language') == '中文'? '是否核定项目临时术语库/表所有术语' : 'Whether_Terms_Approved'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Whether_Terms_Approved"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="Yes" {$info.Whether_Terms_Approved=='Yes'?'selected':''}>Yes</option>
+                                            <option value="No" {$info.Whether_Terms_Approved=='No'?'selected':''}>No</option>
+                                            <option value="N/A" {$info.Whether_Terms_Approved=='N/A'?'selected':''}>N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '是否已查重' : 'Whether Checked'}">
+                                        {:session('language') == '中文'? '是否已查重' : 'Whether Checked'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Whether_Checked"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="Yes" {$info.Whether_Checked=='Yes'?'selected':''}>Yes</option>
+                                            <option value="No" {$info.Whether_Checked=='No'?'selected':''}>No</option>
+                                            <option value="N/A" {$info.Whether_Checked=='N/A'?'selected':''}>N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '更新的术语库名称（以日期为版本）' : 'Updated Termbase Name'}">
+                                        {:session('language') == '中文'? '更新的术语库名称（以日期为版本）' : 'Updated Termbase Name'}
+                                    </label>
+                                    <div class="layui-input-block">
+
+                                        <input name="Updated_Termbase_Name" value="{$info.Updated_Termbase_Name}" id="Reviser" type="text" value="" autocomplete="off"
+                                               placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '责任人' : 'Responsible'}">
+                                        {:session('language') == '中文'? '责任人' : 'Responsible'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <select name="Responsible"  lay-filter="File_Type" lay-search>
+                                            <option value="">{:session('language') == '中文'? '请选择' : 'Please Select'}
+                                            </option>
+                                            <option value="周美玲" {$info.Responsible=='周美玲'?'selected':''}>周美玲</option>
+                                        <!--    <option value="李晓艺" {$info.Responsible=='李晓艺'?'selected':''}>李晓艺</option>-->
+                                            <option value="N/A" {$info.Responsible=='N/A'?'selected':''}>N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-col-xs4">
+                                <div class="layui-form-item layui_ic">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '更新日期' : 'Update Date'}">
+                                        {:session('language') == '中文'? '更新日期' : 'Update Date'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input class="Date layui-input" name="update_date" type="text" value="{$info.update_date}">
+                                        <i class="layui-icon layui-icon-date"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-col-xs12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label"
+                                           title="{:session('language') == '中文'? '备注' : 'Remark'}">
+                                        {:session('language') == '中文'? '备注' : 'Remark'}
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="" id="Remark" name="Remark"
+                                                  class="layui-textarea">{$info.Remark}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="id" value="{$info.id}">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{/block}
+
+{block name="js"}
+
+{js href="__JS__/xm-select.js"}
+
+<script>
+
+    layui.use(['form', 'laydate'], function () {
+        var form = layui.form, laydate = layui.laydate, layer = layui.layer;
+
+        //同时绑定多个,单个日期选择，显示在input里面
+        $('.Date').click(function () {
+            laydate.render({
+                elem: this
+                , trigger: 'click'
+                , theme: '#1B3382'
+                , position: 'fixed'
+                //,isInitValue: true
+                //,value: new Date()
+                //,type:'datetime'
+                , format: 'yyyyMMdd'
+            });
+        });
+
+        $('.showDate').click(function () {
+            laydate.render({
+                elem: this
+                , trigger: 'click'
+                , theme: '#1B3382'
+                , position: 'fixed'
+                //,isInitValue: true
+                //,value: new Date()
+                , type: 'datetime'
+                , format: 'yyyy-MM-dd HH:mm'
+                , ready: function (date) {
+                    this.dateTime.hours = 23;
+                    this.dateTime.minutes = 0;
+                    //this.dateTime.seconds=59;
+                }
+            });
+        });
+
+
+        // 表单验证
+        var validatorFunc = function () {
+            var validator = new Validator();
+
+            validator.add('Project_Name', [{
+                rule: 'require',
+                msg: '项目名称不能为空'
+            }]);
+
+            return validator.start();
+        };
+
+        // 数据提交
+        $('#save').on('click', function () {
+
+            // 表单验证
+            var errorMsg = validatorFunc();
+            if (errorMsg) {
+                layer.alert(errorMsg, {title: '提示'});
+                return false;
+            }
+
+            var tip = layer.msg('Data Uploading', {icon: 16, shade: 0.3, time: 3000});
+
+
+
+            // 表单提交
+            $('#form').submit();
+        });
+    })
+</script>
+{/block}
